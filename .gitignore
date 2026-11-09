@@ -1,0 +1,13 @@
+# Dependencies & build
+node_modules/
+.DS_Store
+Thumbs.db
+
+# Temp & Artifacts
+.archify/
+generate_icons.py
+*.log
+
+# Git & IDE
+.vscode/
+.idea/

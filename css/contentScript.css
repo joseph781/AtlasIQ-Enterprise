@@ -1,0 +1,221 @@
+/* === AtlasIQ Enterprise Floating Dock (Silicon Valley Design) === */
+.atlasiq-dock-container {
+    position: fixed;
+    top: 72px;
+    left: 420px; /* Positioned right beside the Google Maps left search pane */
+    z-index: 999999;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: #1e293b;
+    pointer-events: auto;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.atlasiq-dock-card {
+    width: 290px;
+    background: rgba(255, 255, 255, 0.96);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-radius: 14px;
+    border: 1px solid rgba(226, 232, 240, 0.9);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.12), 0 8px 10px -6px rgba(0, 0, 0, 0.08);
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    box-sizing: border-box;
+}
+
+/* Header */
+.atlasiq-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.atlasiq-brand {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 15px;
+    font-weight: 800;
+    color: #0f172a;
+    letter-spacing: -0.3px;
+}
+
+.atlasiq-brand span {
+    color: #2563eb;
+}
+
+.atlasiq-badge-pro {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    background: #eff6ff;
+    color: #2563eb;
+    border: 1px solid #bfdbfe;
+    padding: 2px 6px;
+    border-radius: 6px;
+    letter-spacing: 0.4px;
+}
+
+/* Metric Counter Pill */
+.atlasiq-stats-bar {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    background: #f8fafc;
+    border-radius: 10px;
+    padding: 8px 10px;
+    border: 1px solid #f1f5f9;
+}
+
+.atlasiq-stat-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.atlasiq-stat-label {
+    font-size: 10px;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.atlasiq-stat-value {
+    font-size: 17px;
+    font-weight: 800;
+    color: #0f172a;
+    line-height: 1.2;
+}
+
+.atlasiq-stat-value.emails {
+    color: #10b981;
+}
+
+/* Form Controls */
+.atlasiq-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.atlasiq-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: #475569;
+    flex: 1;
+}
+
+.atlasiq-select, .atlasiq-input {
+    height: 30px;
+    border-radius: 6px;
+    border: 1px solid #cbd5e1;
+    background: #ffffff;
+    font-size: 12px;
+    font-weight: 500;
+    color: #1e293b;
+    padding: 2px 8px;
+    outline: none;
+    transition: border-color 0.15s;
+    box-sizing: border-box;
+}
+
+.atlasiq-select:focus, .atlasiq-input:focus {
+    border-color: #2563eb;
+}
+
+.atlasiq-input {
+    width: 90px;
+    text-align: center;
+}
+
+/* Primary Action Buttons */
+.atlasiq-btn {
+    width: 100%;
+    height: 34px;
+    border-radius: 8px;
+    border: none;
+    font-size: 12px;
+    font-weight: 700;
+    color: #ffffff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: all 0.15s ease;
+    box-sizing: border-box;
+}
+
+.atlasiq-btn:hover {
+    filter: brightness(1.08);
+    transform: translateY(-1px);
+}
+
+.atlasiq-btn:active {
+    transform: translateY(0);
+}
+
+.atlasiq-btn-start {
+    background: #2563eb;
+    box-shadow: 0 2px 6px rgba(37, 99, 235, 0.3);
+}
+
+.atlasiq-btn-stop {
+    background: #ef4444;
+}
+
+.atlasiq-btn-export {
+    background: #10b981;
+    box-shadow: 0 2px 6px rgba(16, 185, 129, 0.25);
+}
+
+.atlasiq-btn-secondary {
+    background: #f1f5f9;
+    color: #475569;
+    border: 1px solid #e2e8f0;
+}
+
+.atlasiq-btn-secondary:hover {
+    background: #e2e8f0;
+    color: #0f172a;
+}
+
+/* Status Indicator */
+.atlasiq-status-pill {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #64748b;
+    padding: 2px 0;
+}
+
+.atlasiq-pulse-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #94a3b8;
+}
+
+.atlasiq-pulse-dot.active {
+    background: #10b981;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+    animation: pulseAnimation 1.6s infinite;
+}
+
+@keyframes pulseAnimation {
+    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.5); }
+    70% { transform: scale(1.1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
+.atlasiq-divider {
+    height: 1px;
+    background: #e2e8f0;
+    margin: 2px 0;
+    border: none;
+}
