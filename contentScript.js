@@ -351,16 +351,30 @@ async function startExtraction() {
         extractLeadsFromDOM();
         updateUiCounters();
 
-        // Check for end of list
+        // Check for end of list or stuck scroll
         const isEnd = checkEndOfResults(scrollContainer);
-        if (isEnd) {
-            setDockStatus("Fin de resultados");
-            break;
+        if (isEnd || unchangedCount >= 6) {
+            if (tryClickSearchThisArea()) {
+                setDockStatus("Ampliando zona...", true);
+                unchangedCount = 0;
+                await new Promise(r => setTimeout(r, 2600));
+                continue;
+            }
+            if (isEnd) {
+                setDockStatus("Fin de resultados");
+                break;
+            }
         }
 
         if (scrollContainer.scrollTop === previousScroll) {
             unchangedCount++;
             if (unchangedCount >= 10) {
+                if (tryClickSearchThisArea()) {
+                    setDockStatus("Ampliando zona...", true);
+                    unchangedCount = 0;
+                    await new Promise(r => setTimeout(r, 2600));
+                    continue;
+                }
                 setDockStatus("Fin de lista");
                 break;
             }
@@ -434,6 +448,23 @@ function checkEndOfResults(container) {
     if (text.includes("Has llegado al final") || 
         text.includes("You've reached the end") ||
         text.includes("No hay más resultados")) {
+        return true;
+    }
+    return false;
+}
+
+function tryClickSearchThisArea() {
+    const buttons = Array.from(document.querySelectorAll('button, [role="button"]'));
+    const target = buttons.find(b => {
+        const t = (b.innerText || b.getAttribute('aria-label') || '').toLowerCase();
+        return (t.includes('buscar en esta zona') || 
+                t.includes('search this area') || 
+                t.includes('buscar aquí') || 
+                t.includes('search here') ||
+                t.includes('buscar en este área')) && b.offsetParent !== null;
+    });
+    if (target) {
+        target.click();
         return true;
     }
     return false;

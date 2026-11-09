@@ -677,3 +677,56 @@ body {
     display: inline-flex;
     align-items: center;
 }
+
+/* === Cloud Search & Scraper Section === */
+.tl-cloud-search-section {
+    background: #ffffff;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 24px;
+    overflow: hidden;
+}
+
+.tl-cloud-search-container {
+    padding: 18px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.tl-cloud-search-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.tl-cloud-search-form {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.tl-cloud-input {
+    width: 100%;
+    height: 42px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 0 14px 0 36px;
+    font-size: 13px;
+    font-family: inherit;
+    color: var(--text-primary);
+    background: #f8fafc;
+    transition: all 0.2s ease;
+}
+
+.tl-cloud-input:focus {
+    outline: none;
+    border-color: var(--primary);
+    background: #ffffff;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+select.tl-cloud-input {
+    padding-left: 12px;
+}
