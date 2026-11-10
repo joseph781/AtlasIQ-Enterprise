@@ -242,6 +242,31 @@
                         <!-- Injected via JS -->
                     </div>
                 </div>
+
+                <!-- DETAILED NICHE BREAKDOWN TABLE IN CRM -->
+                <div style="margin-top: 6px; border-top: 1px solid var(--border-color); padding-top: 14px;">
+                    <div style="font-size: 13px; font-weight: 800; color: #0f172a; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between;">
+                        <span>📊 Detalle de Nichos en el Cuadrante Escrapeado:</span>
+                        <span style="font-size: 11px; color: #64748b; font-weight: normal;">Haz clic en cualquier nicho para filtrarlo al instante</span>
+                    </div>
+                    <div id="sat-niche-breakdown-container" style="overflow-x: auto;">
+                        <table style="width: 100%; border-collapse: collapse; font-size: 12px; background: #fff; border-radius: 8px; overflow: hidden; border: 1px solid var(--border-color);">
+                            <thead>
+                                <tr style="background: #f1f5f9; text-align: left; color: #475569; font-weight: 700; border-bottom: 1px solid var(--border-color);">
+                                    <th style="padding: 8px 12px;">Nicho / Rubro</th>
+                                    <th style="padding: 8px 12px; text-align: center;">Total Negocios</th>
+                                    <th style="padding: 8px 12px; text-align: center;">Proximidad Promedio</th>
+                                    <th style="padding: 8px 12px; text-align: center;">Saturación</th>
+                                    <th style="padding: 8px 12px; text-align: center;">Sin Web (Oportunidad)</th>
+                                    <th style="padding: 8px 12px; text-align: center;">Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody id="sat-niche-tbody">
+                                <tr><td colspan="6" style="padding: 12px; text-align: center; color: #94a3b8;">Cargando análisis de nichos...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </section>
 
@@ -298,8 +323,20 @@
                         <span>📞 Canales de Contacto Directo</span>
                     </div>
                     <div class="tl-detail-row">
+                        <span class="tl-detail-label">Rubro / Nicho:</span>
+                        <span class="tl-detail-val" id="drawer-category">-</span>
+                    </div>
+                    <div class="tl-detail-row">
+                        <span class="tl-detail-label">📍 Distancia:</span>
+                        <span class="tl-detail-val" id="drawer-distance">-</span>
+                    </div>
+                    <div class="tl-detail-row">
+                        <span class="tl-detail-label">👥 Competidor más cercano:</span>
+                        <span class="tl-detail-val" id="drawer-nearest-peer">-</span>
+                    </div>
+                    <div class="tl-detail-row">
                         <span class="tl-detail-label">Teléfono:</span>
-                        <span class="tl-detail-val" id="drawer-lead-phone">-</span>
+                        <span class="tl-detail-val" id="drawer-phone">-</span>
                     </div>
                     <div class="tl-detail-row">
                         <span class="tl-detail-label">WhatsApp Directo:</span>
@@ -307,15 +344,15 @@
                     </div>
                     <div class="tl-detail-row">
                         <span class="tl-detail-label">Email Verificado:</span>
-                        <span class="tl-detail-val" id="drawer-lead-email">-</span>
+                        <span class="tl-detail-val" id="drawer-email">-</span>
                     </div>
                     <div class="tl-detail-row">
                         <span class="tl-detail-label">Sitio Web:</span>
-                        <span class="tl-detail-val" id="drawer-lead-web">-</span>
+                        <span class="tl-detail-val"><a href="#" id="drawer-website" target="_blank">-</a></span>
                     </div>
                     <div class="tl-detail-row">
                         <span class="tl-detail-label">Dirección:</span>
-                        <span class="tl-detail-val" id="drawer-lead-address" style="max-width: 60%;">-</span>
+                        <span class="tl-detail-val" id="drawer-address" style="max-width: 60%;">-</span>
                     </div>
                 </div>
 
@@ -326,11 +363,11 @@
                     </div>
                     <div class="tl-detail-row">
                         <span class="tl-detail-label">Tech Stack Detectado:</span>
-                        <span class="tl-detail-val" id="drawer-lead-tech">No detectado</span>
+                        <span class="tl-detail-val" id="drawer-tech">No detectado</span>
                     </div>
                     <div class="tl-detail-row">
                         <span class="tl-detail-label">Redes Sociales:</span>
-                        <div id="drawer-social-icons" style="display: flex; gap: 8px;"></div>
+                        <div id="drawer-socials" style="display: flex; gap: 8px;"></div>
                     </div>
                 </div>
 
@@ -340,13 +377,13 @@
                         <span>⚡ Propuestas de Venta & Auditoría IA</span>
                     </div>
                     <div class="tl-pitch-tabs">
-                        <button class="tl-pitch-tab active" id="tab-pitch-wa">WhatsApp</button>
-                        <button class="tl-pitch-tab" id="tab-pitch-email">Email Frío</button>
-                        <button class="tl-pitch-tab" id="tab-pitch-gemini" style="background: linear-gradient(135deg, #eff6ff, #dbeafe); color: #1e40af; border: 1px solid #bfdbfe;">✨ Gemini IA en Vivo</button>
+                        <button class="tl-pitch-tab active" id="tab-pitch-wa" data-channel="whatsapp">WhatsApp</button>
+                        <button class="tl-pitch-tab" id="tab-pitch-email" data-channel="email">Email Frío</button>
+                        <button class="tl-pitch-tab" id="tab-pitch-gemini" data-channel="gemini" style="background: linear-gradient(135deg, #eff6ff, #dbeafe); color: #1e40af; border: 1px solid #bfdbfe;">✨ Gemini IA en Vivo</button>
                     </div>
                     <div class="tl-pitch-box" id="drawer-pitch-text">Cargando propuesta...</div>
                     <div id="gemini-controls" style="display: none; margin-top: 8px;">
-                        <button class="tl-btn tl-btn-primary" id="btn-run-gemini" style="width: 100%;">
+                        <button class="tl-btn tl-btn-primary" id="btn-ai-generate-pitch" style="width: 100%;">
                             ✨ Generar Auditoría y Guión con Gemini
                         </button>
                     </div>

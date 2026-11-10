@@ -468,6 +468,76 @@ function checkEndOfResults(container) {
 }
 
 /**
+ * Resilient Category & Address Extractor
+ * Multi-layer heuristics that work across Google Maps variants.
+ */
+function extractCategoryAndAddress(card) {
+    let category = "";
+    let address = "";
+
+    // Strategy 1: Check W4Efsd containers (Standard Maps result rows)
+    const w4Containers = card.querySelectorAll("div.W4Efsd, div.A80fqc");
+    for (const container of w4Containers) {
+        const fullText = (container.textContent || "").trim();
+        if (/^[1-5][.,]\d\s*\(/i.test(fullText)) continue; // skip rating row
+
+        if (fullText.includes("·")) {
+            const rawParts = fullText.split("·").map(p => p.trim()).filter(Boolean);
+            for (const part of rawParts) {
+                if (part.includes("$") || /cierra|abierto|open|closed/i.test(part)) continue;
+                if (!category && part.length < 40 && !/\d{3,}/.test(part) && !/calle|carrera|av\.|avenida|sector|urbaniz/i.test(part)) {
+                    category = part;
+                } else if (!address && (part.length >= 4 || /\d+/.test(part) || /calle|carrera|av\.|avenida|sector|urbaniz/i.test(part))) {
+                    address = part;
+                }
+            }
+        } else {
+            const items = Array.from(container.children).map(c => c.textContent.trim()).filter(Boolean);
+            for (const it of items) {
+                if (it === "·" || it.includes("$") || /cierra|abierto|open|closed/i.test(it)) continue;
+                if (!category && it.length < 40 && !/\d{3,}/.test(it) && !/calle|carrera|av\.|avenida/i.test(it)) {
+                    category = it;
+                } else if (!address && it.length > 5 && (/calle|carrera|av\.|avenida|sector|\d+/.test(it))) {
+                    address = it;
+                }
+            }
+        }
+        if (category && address) break;
+    }
+
+    // Strategy 2: Category button, pill, or chip under title
+    if (!category) {
+        const potentialCatEls = Array.from(card.querySelectorAll('button.DkEaL, span.Y4hgCf, div.W4Efsd span')).filter(el => {
+            const t = el.textContent.trim();
+            return t.length >= 3 && t.length <= 40 && 
+                   !t.includes("·") && 
+                   !t.includes("★") && 
+                   !/^[1-5][.,]\d/.test(t) && 
+                   !/^\(\d+\)$/.test(t) && 
+                   !/cierra|abierto|open|closed|sitio web|cómo llegar|guardar|compartir/i.test(t) &&
+                   !/calle|carrera|av\.|avenida|sector/i.test(t);
+        });
+        if (potentialCatEls.length > 0) {
+            category = potentialCatEls[0].textContent.trim();
+        }
+    }
+
+    // Strategy 3: Contextual fallback from Google Maps active search input
+    if (!category) {
+        const searchInput = document.querySelector("#searchboxinput, input[name='q']");
+        const query = searchInput ? searchInput.value.trim() : "";
+        if (query) {
+            const cleanQuery = query.split(/\s+(?:en|de|cerca|near|in)\s+/i)[0].trim();
+            if (cleanQuery && cleanQuery.length >= 3 && cleanQuery.length <= 35) {
+                category = cleanQuery.charAt(0).toUpperCase() + cleanQuery.slice(1);
+            }
+        }
+    }
+
+    return { category, address };
+}
+
+/**
  * Resilient DOM Card Extractor
  * Multi-layer fallback that survives Google Maps UI redesigns.
  */
@@ -524,23 +594,10 @@ function extractLeadsFromDOM() {
                 if (revMatch) reviewCount = revMatch;
             }
 
-            // Category & Address
-            let category = "";
-            let address = "";
-            const spans = card.querySelectorAll("span, div");
-            for (const span of spans) {
-                if (span.children.length === 0 && span.textContent.includes("·")) {
-                    const parts = span.textContent.split("·").map(s => s.trim()).filter(Boolean);
-                    for (const p of parts) {
-                        if (p.includes("$") || p.includes("Cierra") || p.includes("Abierto") || p.includes("Open") || p.includes("Closed")) continue;
-                        if (/\d+/.test(p) || p.toLowerCase().includes("calle") || p.toLowerCase().includes("av") || p.length > 8) {
-                            if (!address) address = p;
-                        } else if (!category) {
-                            category = p;
-                        }
-                    }
-                }
-            }
+            // Category & Address (Multi-strategy Resilient Extractor)
+            const catAndAddr = extractCategoryAndAddress(card);
+            const category = catAndAddr.category;
+            const address = catAndAddr.address;
 
             // Website
             let website = "";
@@ -683,7 +740,24 @@ window.addEventListener("message", function(event) {
             let phone = ""; try { phone = e[178][0][0] || ""; } catch(b) {}
             let reviewCount = ""; try { reviewCount = e[4][8] ? String(e[4][8]) : ""; } catch(b) {}
             let averageRating = ""; try { averageRating = e[4][7] ? String(e[4][7]) : ""; } catch(b) {}
-            let category = ""; try { category = (e[13] || []).join("; "); } catch(b) {}
+            let category = "";
+            try {
+                if (Array.isArray(e[13]) && e[13].length > 0) category = e[13].join("; ");
+                else if (typeof e[13] === "string" && e[13].length > 0) category = e[13];
+                else if (Array.isArray(e[76]) && e[76].length > 0) category = e[76].join("; ");
+                else if (Array.isArray(e[24]) && e[24].length > 0) category = e[24].join("; ");
+                else if (typeof e[30] === "string" && e[30].length > 0) category = e[30];
+            } catch(b) {}
+            if (!category) {
+                const searchInput = document.querySelector("#searchboxinput, input[name='q']");
+                const query = searchInput ? searchInput.value.trim() : "";
+                if (query) {
+                    const cleanQuery = query.split(/\s+(?:en|de|cerca|near|in)\s+/i)[0].trim();
+                    if (cleanQuery && cleanQuery.length >= 3 && cleanQuery.length <= 35) {
+                        category = cleanQuery.charAt(0).toUpperCase() + cleanQuery.slice(1);
+                    }
+                }
+            }
             let placeID = ""; try { placeID = e[78] || ""; } catch(b) {}
             let cID = ""; try { cID = e[37][0][0][29][1] || ""; } catch(b) {}
             let address = ""; try { address = (e[2] || []).join(", "); } catch(b) {}

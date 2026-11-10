@@ -7,7 +7,9 @@ Thumbs.db
 .archify/
 generate_icons.py
 *.log
+*.zip
 
 # Git & IDE
 .vscode/
 .idea/
+

@@ -474,7 +474,96 @@ function updateMarketSaturationView(targetNiche = "all") {
         chip.innerHTML = `<span>+ ${niche.name}</span> <small style="opacity: 0.8; font-weight: normal;">(Viabilidad ${niche.viability}) ↗</small>`;
         chipsContainer.appendChild(chip);
     });
+
+    // Populate Detailed Niche Breakdown Table
+    renderNicheBreakdownTable();
 }
+
+// Render Detailed Niche Breakdown Table
+function renderNicheBreakdownTable() {
+    const tbody = document.getElementById("sat-niche-tbody");
+    if (!tbody) return;
+
+    if (!allLeads || allLeads.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="padding: 12px; text-align: center; color: #94a3b8;">No hay prospectos en la base de datos.</td></tr>';
+        return;
+    }
+
+    const nicheMap = new Map();
+    allLeads.forEach(lead => {
+        const cat = (lead.category || "General").trim();
+        if (!nicheMap.has(cat)) nicheMap.set(cat, []);
+        nicheMap.get(cat).push(lead);
+    });
+
+    const sortedNiches = Array.from(nicheMap.entries()).sort((a, b) => b[1].length - a[1].length);
+
+    let html = "";
+    sortedNiches.forEach(([catName, leadList]) => {
+        const total = leadList.length;
+        let distSum = 0;
+        let distCount = 0;
+        let noWebCount = 0;
+
+        leadList.forEach(l => {
+            if (!l.website || l.website.trim() === "") noWebCount++;
+            if (l.nearestPeerDistanceKm !== null && l.nearestPeerDistanceKm !== undefined && !isNaN(l.nearestPeerDistanceKm)) {
+                distSum += l.nearestPeerDistanceKm;
+                distCount++;
+            }
+        });
+
+        const avgDist = distCount > 0 ? (distSum / distCount) : null;
+        const avgDistText = avgDist !== null ? 
+            (avgDist < 1 ? `${Math.round(avgDist * 1000)} m` : `${avgDist.toFixed(1)} km`) : "-";
+
+        let satBadge = '<span class="tl-sat-badge" style="background: #ecfdf5; color: #047857;">Océano Azul</span>';
+        if (total >= 25 || (avgDist !== null && avgDist < 0.3)) {
+            satBadge = '<span class="tl-sat-badge" style="background: #fef2f2; color: #b91c1c;">Saturado</span>';
+        } else if (total >= 10 || (avgDist !== null && avgDist < 0.7)) {
+            satBadge = '<span class="tl-sat-badge" style="background: #fffbeb; color: #b45309;">Equilibrado</span>';
+        }
+
+        const noWebPct = total > 0 ? Math.round((noWebCount / total) * 100) : 0;
+
+        html += `
+            <tr style="border-bottom: 1px solid #f1f5f9; transition: background 0.15s;">
+                <td style="padding: 8px 12px; font-weight: 700; color: #1e293b;">
+                    ${catName}
+                </td>
+                <td style="padding: 8px 12px; text-align: center; font-weight: 800; color: #0f172a;">
+                    ${total}
+                </td>
+                <td style="padding: 8px 12px; text-align: center; color: #475569;">
+                    📍 ${avgDistText}
+                </td>
+                <td style="padding: 8px 12px; text-align: center;">
+                    ${satBadge}
+                </td>
+                <td style="padding: 8px 12px; text-align: center; color: ${noWebPct > 50 ? '#ef4444' : '#475569'}; font-weight: 600;">
+                    ${noWebPct}% (${noWebCount}/${total})
+                </td>
+                <td style="padding: 8px 12px; text-align: center;">
+                    <button class="tl-btn tl-btn-outline" onclick="selectAndFilterNiche('${catName.replace(/'/g, "\\'")}')" style="height: 24px; font-size: 11px; padding: 0 8px; border-color: #3b82f6; color: #1d4ed8;">
+                        Filtrar ↗
+                    </button>
+                </td>
+            </tr>
+        `;
+    });
+
+    tbody.innerHTML = html;
+}
+
+window.selectAndFilterNiche = function(nicheName) {
+    const nicheSelect = document.getElementById("filter-niche");
+    if (nicheSelect) {
+        nicheSelect.value = nicheName;
+    }
+    applyFilters();
+    const tableCard = document.querySelector(".tl-table-card");
+    if (tableCard) tableCard.scrollIntoView({ behavior: "smooth" });
+};
 
 // Lead Detail Drawer Controller
 function openLeadDrawer(lead) {
@@ -553,6 +642,14 @@ function openLeadDrawer(lead) {
         (lead.distanceKm < 1 ? `${Math.round(lead.distanceKm * 1000)} m` : `${lead.distanceKm} km`) : "No calculada";
     const peerDistText = lead.nearestPeerDistanceKm !== null && lead.nearestPeerDistanceKm !== undefined ? 
         (lead.nearestPeerDistanceKm < 1 ? `${Math.round(lead.nearestPeerDistanceKm * 1000)} m` : `${lead.nearestPeerDistanceKm.toFixed(1)} km`) : "N/A";
+
+    const distEl = document.getElementById("drawer-distance");
+    if (distEl) distEl.textContent = distText;
+    const peerEl = document.getElementById("drawer-nearest-peer");
+    if (peerEl) {
+        peerEl.textContent = lead.nearestPeerName ? 
+            `${peerDistText} (${lead.nearestPeerName})` : peerDistText;
+    }
     
     // Refresh Outreach Pitch
     updatePitchPreview();
@@ -649,11 +746,10 @@ document.addEventListener("DOMContentLoaded", () => {
     // SATURATION PANEL TOGGLE
     const satPanel = document.getElementById("market-saturation-panel");
     document.getElementById("btn-toggle-saturation").addEventListener("click", () => {
-        if (satPanel.style.display === "none") {
-            satPanel.style.display = "block";
+        const isHidden = window.getComputedStyle(satPanel).display === "none";
+        satPanel.style.display = isHidden ? "block" : "none";
+        if (isHidden) {
             updateMarketSaturationView(document.getElementById("filter-niche")?.value || "all");
-        } else {
-            satPanel.style.display = "none";
         }
     });
     document.getElementById("btn-close-saturation").addEventListener("click", () => {
@@ -683,8 +779,19 @@ document.addEventListener("DOMContentLoaded", () => {
         tab.addEventListener("click", () => {
             document.querySelectorAll(".tl-pitch-tab").forEach(t => t.classList.remove("active"));
             tab.classList.add("active");
-            currentPitchChannel = tab.getAttribute("data-channel");
-            updatePitchPreview();
+            currentPitchChannel = tab.getAttribute("data-channel") || "whatsapp";
+
+            const geminiControls = document.getElementById("gemini-controls");
+            const standardActions = document.getElementById("standard-pitch-actions");
+            if (currentPitchChannel === "gemini") {
+                if (geminiControls) geminiControls.style.display = "block";
+                if (standardActions) standardActions.style.display = "none";
+                document.getElementById("drawer-pitch-text").textContent = "Haz clic en el botón de abajo para generar una auditoría y guión de ventas personalizado con Google Gemini.";
+            } else {
+                if (geminiControls) geminiControls.style.display = "none";
+                if (standardActions) standardActions.style.display = "flex";
+                updatePitchPreview();
+            }
         });
     });
 
