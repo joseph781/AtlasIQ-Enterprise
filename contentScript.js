@@ -74,13 +74,20 @@ function updateUiCounters() {
     });
 }
 
-// Synchronize leads to storage (throttled)
+// Synchronize leads to storage (throttled or immediate)
 let syncTimeout = null;
-function persistLeadsToStorage() {
-    if (syncTimeout) clearTimeout(syncTimeout);
-    syncTimeout = setTimeout(() => {
-        chrome.storage.local.set({ leads: leads });
-    }, 500);
+function persistLeadsToStorage(immediate = false) {
+    if (syncTimeout) {
+        clearTimeout(syncTimeout);
+        syncTimeout = null;
+    }
+    if (immediate) {
+        chrome.storage.local.set({ leads: leads, lastSync: Date.now() });
+    } else {
+        syncTimeout = setTimeout(() => {
+            chrome.storage.local.set({ leads: leads, lastSync: Date.now() });
+        }, 500);
+    }
 }
 
 // Background website enrichment
@@ -279,13 +286,20 @@ function createFloatingDock() {
     btnStart.addEventListener("click", () => startExtraction());
     btnStop.addEventListener("click", () => stopExtraction());
     btnExport.addEventListener("click", () => {
-        chrome.runtime.sendMessage({ action: "openPage", data: leads });
+        persistLeadsToStorage(true);
+        chrome.storage.local.set({ leads: leads, lastSync: Date.now() }, () => {
+            chrome.runtime.sendMessage({ action: "openPage" }, (res) => {
+                if (chrome.runtime.lastError) {
+                    window.open(chrome.runtime.getURL("dashboard.html"), "_blank");
+                }
+            });
+        });
     });
     btnClear.addEventListener("click", () => {
         if (confirm("¿Deseas reiniciar la lista de prospectos?")) {
             leads = [];
             leads_keys.clear();
-            persistLeadsToStorage();
+            persistLeadsToStorage(true);
             updateUiCounters();
         }
     });
@@ -355,6 +369,9 @@ async function startExtraction() {
 
         if (scrollContainer.scrollTop === previousScroll) {
             unchangedCount++;
+            if (unchangedCount >= 3) {
+                tryClickSearchThisArea();
+            }
             if (unchangedCount >= 10) {
                 setDockStatus("Fin de lista");
                 break;
@@ -365,6 +382,22 @@ async function startExtraction() {
     }
 
     stopExtraction();
+}
+
+function tryClickSearchThisArea() {
+    try {
+        const btns = Array.from(document.querySelectorAll('button'));
+        const areaBtn = btns.find(b => {
+            const txt = (b.textContent || "").toLowerCase();
+            return txt.includes("buscar en esta zona") || txt.includes("search this area") || txt.includes("rechercher dans cette zone");
+        });
+        if (areaBtn && window.getComputedStyle(areaBtn).display !== "none") {
+            console.log("[AtlasIQ] Clic automático en 'Buscar en esta zona' para expandir cuadrante.");
+            areaBtn.click();
+            return true;
+        }
+    } catch (e) {}
+    return false;
 }
 
 function playChime(freq1 = 587.33, freq2 = 880) {
@@ -391,7 +424,7 @@ function stopExtraction() {
     if (uiStopBtnEl) uiStopBtnEl.style.display = "none";
     setDockStatus("Listo");
     updateUiCounters();
-    persistLeadsToStorage();
+    persistLeadsToStorage(true);
     playChime(523.25, 659.25);
 }
 

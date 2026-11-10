@@ -424,8 +424,7 @@
     ],
     "action": {
         "default_icon": "icons/icon48.png",
-        "default_title": "AtlasIQ Enterprise – Lead Generation & CRM",
-        "default_popup": "popup.html"
+        "default_title": "AtlasIQ Enterprise – Lead Generation & CRM"
     },
     "background": {
         "service_worker": "bg.js"
@@ -444,6 +443,8 @@
     }],
     "permissions": [
         "storage",
+        "unlimitedStorage",
+        "geolocation",
         "scripting",
         "activeTab"
     ],

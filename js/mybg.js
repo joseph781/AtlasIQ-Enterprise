@@ -299,12 +299,74 @@ async function enrichWebsite(websiteUrl, businessName = "", deepCrawl = true) {
     return result;
 }
 
+// Focus or create Dashboard Tab in 1 click
+function openOrFocusDashboard() {
+    const dashboardPath = chrome.runtime.getURL("dashboard.html");
+    chrome.tabs.query({}, (tabs) => {
+        const existingTab = tabs.find(t => t.url && (t.url.includes("dashboard.html") || t.url === dashboardPath));
+        if (existingTab && existingTab.id) {
+            chrome.tabs.update(existingTab.id, { active: true });
+            if (existingTab.windowId) {
+                chrome.windows.update(existingTab.windowId, { focused: true });
+            }
+        } else {
+            chrome.tabs.create({ url: "dashboard.html" });
+        }
+    });
+}
+
+// 1-Click Launch from Extension Icon in Browser Toolbar
+if (chrome.action && chrome.action.onClicked) {
+    chrome.action.onClicked.addListener((tab) => {
+        openOrFocusDashboard();
+    });
+}
+
+// Background Location Detection on Startup / Install
+function primeUserLocation() {
+    chrome.storage.local.get(["user_location"], (data) => {
+        if (!data.user_location) {
+            fetch("https://ipwho.is/")
+                .then(r => r.json())
+                .then(locData => {
+                    if (locData && locData.success !== false && locData.latitude && locData.longitude) {
+                        chrome.storage.local.set({
+                            user_location: {
+                                lat: locData.latitude,
+                                lon: locData.longitude,
+                                city: locData.city || "",
+                                region: locData.region || "",
+                                country: locData.country || "",
+                                source: "ip",
+                                label: `${locData.city || locData.region || "Ubicación"}, ${locData.country || ""}`.trim().replace(/^,|,$/g, ""),
+                                detectedAt: Date.now()
+                            }
+                        });
+                    }
+                })
+                .catch(() => {});
+        }
+    });
+}
+
+if (chrome.runtime.onInstalled) {
+    chrome.runtime.onInstalled.addListener(() => primeUserLocation());
+}
+if (chrome.runtime.onStartup) {
+    chrome.runtime.onStartup.addListener(() => primeUserLocation());
+}
+
 // Runtime Message Router
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.action === "openPage") {
-        chrome.storage.local.set({ leads: request.data }, () => {
-            chrome.tabs.create({ url: "dashboard.html" });
-        });
+        if (request.data && Array.isArray(request.data)) {
+            chrome.storage.local.set({ leads: request.data, lastSync: Date.now() }, () => {
+                openOrFocusDashboard();
+            });
+        } else {
+            openOrFocusDashboard();
+        }
+        sendResponse({ ok: true });
         return false;
     }
 

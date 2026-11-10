@@ -20,8 +20,15 @@
             <div class="tl-brand-icon">🌐</div>
             <div class="tl-brand-title">Atlas<span>IQ</span> CRM</div>
             <span class="tl-nav-badge">Silicon Valley Enterprise v2.5</span>
+            <div class="tl-user-location-badge" id="header-user-location" title="Ubicación geográfica detectada">
+                <span class="tl-loc-dot"></span>
+                <span id="user-location-text">Detectando ubicación...</span>
+            </div>
         </div>
         <div class="tl-nav-actions">
+            <button id="btn-open-maps-search" class="tl-btn tl-btn-outline" style="border-color: #3b82f6; color: #1d4ed8;" title="Abrir Google Maps para prospectar en esta zona">
+                🗺️ Explorar en Maps
+            </button>
             <a href="index.html" target="_blank" class="tl-btn tl-btn-outline" style="text-decoration: none;" title="Abrir Guía y Manual Oficial">
                 📖 Manual Oficial
             </a>
@@ -33,6 +40,9 @@
             </button>
             <button id="btn-export-csv" class="tl-btn tl-btn-outline">
                 📥 Exportar CSV
+            </button>
+            <button id="btn-export-vcard" class="tl-btn tl-btn-outline" title="Exportar contactos a la agenda del móvil (.vcf)">
+                📱 vCard Móvil
             </button>
             <button id="btn-settings" class="tl-btn tl-btn-ghost" title="Configurar Webhook y Ajustes">
                 ⚙️ Ajustes
@@ -115,6 +125,135 @@
                 </button>
             </div>
         </section>
+
+        <!-- GRANULAR INTELLIGENCE FILTER ROW -->
+        <section class="tl-filter-row-secondary">
+            <div class="tl-filter-group-left">
+                <div style="display: flex; align-items: center; gap: 6px;">
+                    <label for="filter-niche" style="font-size: 12px; font-weight: 700; color: #475569;">🏷️ Nicho:</label>
+                    <select id="filter-niche" class="tl-select-filter" style="min-width: 170px;">
+                        <option value="all" selected>Todos los Nichos (Todos)</option>
+                    </select>
+                </div>
+
+                <label class="tl-checkbox-label" title="Coincidencia estricta y exacta por rubro/categoría principal">
+                    <input type="checkbox" id="check-strict-niche" />
+                    <span>Nicho Estricto</span>
+                </label>
+
+                <div style="display: flex; align-items: center; gap: 6px;">
+                    <label for="filter-distance" style="font-size: 12px; font-weight: 700; color: #475569;">📍 Distancia Máx:</label>
+                    <select id="filter-distance" class="tl-select-filter">
+                        <option value="all" selected>Cualquier distancia (Todas)</option>
+                        <option value="1">&lt; 1 km (Hiper-local)</option>
+                        <option value="3">&lt; 3 km (Sector)</option>
+                        <option value="5">&lt; 5 km (Comuna/Zona)</option>
+                        <option value="10">&lt; 10 km (Ciudad)</option>
+                        <option value="25">&lt; 25 km (Metropolitano)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="tl-filter-group-right">
+                <button id="btn-toggle-saturation" class="tl-btn tl-btn-primary" style="height: 32px; font-size: 12px; padding: 0 12px; background: #1e293b; border-color: #334155;">
+                    🧭 Radar de Saturación & Nichos
+                </button>
+                <button id="btn-reset-filters" class="tl-btn tl-btn-ghost" style="height: 32px; font-size: 11px; color: #64748b;" title="Restablecer todos los filtros">
+                    ↺ Restablecer
+                </button>
+            </div>
+        </section>
+
+        <!-- MARKET SATURATION & NICHE INTELLIGENCE RADAR (COLLAPSIBLE / TOGGLEABLE) -->
+        <section class="tl-saturation-section" id="market-saturation-panel">
+            <div class="tl-saturation-header">
+                <div class="tl-sat-title-box">
+                    <span style="font-size: 18px;">🧭</span>
+                    <div class="tl-sat-title">Radar de Saturación & Expansión de Nichos <span class="tl-badge-score tl-score-high" id="sat-target-badge" style="font-size: 10px; margin-left: 6px;">Todos los rubros</span></div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span style="font-size: 11px; color: #64748b;" id="sat-updated-label">Inteligencia geoespacial en tiempo real</span>
+                    <button id="btn-close-saturation" class="tl-btn tl-btn-ghost" style="height: 26px; font-size: 14px; padding: 0 6px;">✕</button>
+                </div>
+            </div>
+
+            <div class="tl-sat-body">
+                <!-- METRIC CARDS -->
+                <div class="tl-sat-grid">
+                    <!-- Gauge Card -->
+                    <div class="tl-sat-card">
+                        <div class="tl-sat-card-header">
+                            <span class="tl-sat-card-label">Índice de Saturación</span>
+                            <span class="tl-sat-badge" id="sat-level-badge" style="background: #e0f2fe; color: #0369a1;">Analizando...</span>
+                        </div>
+                        <div class="tl-sat-val-lg" id="sat-score-val">--%</div>
+                        <div class="tl-sat-meter-bar">
+                            <div class="tl-sat-meter-fill" id="sat-meter-fill" style="width: 0%; background: #2563eb;"></div>
+                        </div>
+                        <div class="tl-sat-subtext" id="sat-density-sub">Calculando densidad y proximidad entre competidores...</div>
+                    </div>
+
+                    <!-- Proximity Card ("Distancia del uno al otro") -->
+                    <div class="tl-sat-card">
+                        <div class="tl-sat-card-header">
+                            <span class="tl-sat-card-label">Distancia Entre Negocios</span>
+                            <span class="tl-sat-badge" style="background: #f1f5f9; color: #334155;">Proximidad Peer-to-Peer</span>
+                        </div>
+                        <div class="tl-sat-val-lg" id="sat-peer-dist-val">-- m</div>
+                        <div class="tl-sat-subtext" id="sat-peer-dist-sub">Distancia promedio al competidor idéntico más cercano en la zona.</div>
+                    </div>
+
+                    <!-- Digital Vulnerability Card -->
+                    <div class="tl-sat-card">
+                        <div class="tl-sat-card-header">
+                            <span class="tl-sat-card-label">Vulnerabilidad Digital</span>
+                            <span class="tl-sat-badge" style="background: #fef2f2; color: #b91c1c;">Oportunidad B2B</span>
+                        </div>
+                        <div class="tl-sat-val-lg" id="sat-vuln-val">--%</div>
+                        <div class="tl-sat-subtext" id="sat-vuln-sub">Porcentaje de negocios sin presencia web o sin pixel publicitario.</div>
+                    </div>
+
+                    <!-- Spatial Expansion Card -->
+                    <div class="tl-sat-card">
+                        <div class="tl-sat-card-header">
+                            <span class="tl-sat-card-label">Cuadrante Menos Saturado</span>
+                            <span class="tl-sat-badge" style="background: #f0fdf4; color: #15803d;">Expansión</span>
+                        </div>
+                        <div class="tl-sat-val-lg" id="sat-quadrant-val" style="font-size: 20px;">--</div>
+                        <div class="tl-sat-subtext" id="sat-quadrant-sub">Zona geográfica con menor presión de competencia directa.</div>
+                    </div>
+                </div>
+
+                <!-- Strategic Advisory Box -->
+                <div class="tl-sat-advice-box">
+                    <span class="tl-sat-advice-icon">💡</span>
+                    <div class="tl-sat-advice-text" id="sat-advice-text">
+                        Inicia una prospección o selecciona un nicho específico para evaluar la viabilidad de apertura y saturación.
+                    </div>
+                </div>
+
+                <!-- Opportunity Niches Radar -->
+                <div>
+                    <div style="font-size: 12px; font-weight: 700; color: #475569; margin-bottom: 6px; display: flex; align-items: center; justify-content: space-between;">
+                        <span>🎯 Nichos Desatendidos & Sitios de Interés para Desarrollar en la Zona:</span>
+                        <span style="font-size: 11px; color: #94a3b8; font-weight: normal;">Haz clic para buscar en Google Maps</span>
+                    </div>
+                    <div class="tl-opportunity-chips" id="sat-opportunity-chips">
+                        <!-- Injected via JS -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FILTER SAFETY BANNER -->
+        <div class="tl-filter-alert-banner" id="filter-reset-banner">
+            <div>
+                ⚠️ <strong>Filtros activos:</strong> Mostrando <span id="banner-filtered-count">0</span> de <span id="banner-total-count">0</span> prospectos. Si no ves los prospectos deseados, restablece los filtros.
+            </div>
+            <button id="banner-btn-reset" class="tl-btn tl-btn-outline" style="height: 26px; font-size: 11px; padding: 0 10px; border-color: #f59e0b; color: #b45309;">
+                Restablecer Filtros
+            </button>
+        </div>
 
         <!-- DATA TABLE -->
         <section class="tl-table-card">
