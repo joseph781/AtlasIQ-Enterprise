@@ -801,3 +801,267 @@ async function fetchIpGeolocation(callback) {
     if (callback) callback(null);
 }
 
+/**
+ * Live DNS MX Deliverability Verification ($0 DoH via Cloudflare)
+ * Validates whether an email domain has active Mail Exchange (MX) records.
+ */
+const _mxVerificationCache = new Map();
+
+async function verifyDomainMx(input) {
+    if (!input || typeof input !== "string") {
+        return { valid: false, provider: "Inválido", records: [] };
+    }
+
+    let domain = input.trim();
+    if (domain.includes("@")) {
+        domain = domain.split("@")[1].trim();
+    } else {
+        domain = domain.replace(/^https?:\/\//i, "").split("/")[0].split(":")[0].trim();
+    }
+
+    if (!domain || !domain.includes(".")) {
+        return { valid: false, provider: "Dominio inválido", records: [] };
+    }
+
+    const key = domain.toLowerCase();
+    if (_mxVerificationCache.has(key)) {
+        return _mxVerificationCache.get(key);
+    }
+
+    try {
+        const res = await fetch(`https://cloudflare-dns.com/dns-query?name=${encodeURIComponent(domain)}&type=MX`, {
+            headers: { "Accept": "application/dns-json" },
+            signal: AbortSignal.timeout(5000)
+        });
+
+        if (!res.ok) throw new Error("DoH status " + res.status);
+        const data = await res.json();
+
+        if (data && data.Status === 0 && Array.isArray(data.Answer) && data.Answer.length > 0) {
+            const records = data.Answer.map(a => a.data || "");
+            const rawStr = records.join(" ").toLowerCase();
+            let provider = "Servidor MX Activo";
+            if (rawStr.includes("google") || rawStr.includes("l.google.com") || rawStr.includes("googlemail")) {
+                provider = "Google Workspace / Gmail";
+            } else if (rawStr.includes("outlook") || rawStr.includes("microsoft") || rawStr.includes("protection")) {
+                provider = "Microsoft 365 / Outlook";
+            } else if (rawStr.includes("zoho")) {
+                provider = "Zoho Mail";
+            } else if (rawStr.includes("ovh") || rawStr.includes("hostinger") || rawStr.includes("cpanel") || rawStr.includes("secureserver")) {
+                provider = "Hosting Corporativo";
+            }
+
+            const result = { valid: true, provider, records };
+            _mxVerificationCache.set(key, result);
+            return result;
+        } else {
+            const result = { valid: false, provider: "Sin servidor MX (Riesgo de rebote)", records: [] };
+            _mxVerificationCache.set(key, result);
+            return result;
+        }
+    } catch (e) {
+        return { valid: false, provider: "Error verificación (" + e.message + ")", records: [] };
+    }
+}
+
+/**
+ * White-Label Agency PDF Audit Generator ($0 Cost via jsPDF)
+ * Author: Joseph Castillo (CEO) / WINDOWSTELECOM
+ */
+function generateLeadPdfAudit(lead) {
+    if (!lead) return;
+
+    const jspdfModule = (typeof window !== "undefined" && window.jspdf) ? window.jspdf : (typeof jspdf !== "undefined" ? jspdf : null);
+    if (!jspdfModule || !jspdfModule.jsPDF) {
+        alert("La biblioteca jsPDF no está disponible en este momento.");
+        return;
+    }
+
+    const doc = new jspdfModule.jsPDF({
+        orientation: "portrait",
+        unit: "mm",
+        format: "a4"
+    });
+
+    const pageWidth = 210;
+    const pageHeight = 297;
+    const margin = 16;
+    const contentWidth = pageWidth - (margin * 2);
+
+    // 1. TOP HEADER BANNER (Navy Slate)
+    doc.setFillColor(15, 23, 42); // #0f172a
+    doc.rect(0, 0, pageWidth, 40, "F");
+
+    // Accent line (Emerald / Blue)
+    doc.setFillColor(37, 99, 235); // #2563eb
+    doc.rect(0, 40, pageWidth, 2.5, "F");
+
+    // Header Branding
+    doc.setTextColor(255, 255, 255);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(14);
+    doc.text("WINDOWSTELECOM  |  AtlasIQ Enterprise", margin, 16);
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(9);
+    doc.setTextColor(148, 163, 184); // #94a3b8
+    doc.text("DIAGNÓSTICO ESTRATÉGICO & AUDITORÍA DE PRESENCIA DIGITAL B2B", margin, 23);
+
+    const todayStr = new Date().toLocaleDateString("es-ES", { year: 'numeric', month: 'long', day: 'numeric' });
+    doc.text(`Fecha: ${todayStr}  |  Ref: ATQ-${Math.floor(100000 + Math.random() * 900000)}`, margin, 30);
+
+    // 2. TARGET BUSINESS TITLE
+    let y = 52;
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(16);
+    doc.setTextColor(15, 23, 42);
+    doc.text(lead.name || "Empresa Prospectada", margin, y);
+
+    y += 6;
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    doc.setTextColor(100, 116, 139);
+    doc.text(`Rubro: ${lead.category || "Comercial"}  •  Ubicación: ${lead.address || "Zona Comercial"}`, margin, y);
+
+    // 3. SCORE & OPPORTUNITY HIGHLIGHT CARD
+    y += 10;
+    doc.setFillColor(248, 250, 252);
+    doc.setDrawColor(226, 232, 240);
+    doc.roundedRect(margin, y, contentWidth, 34, 3, 3, "FD");
+
+    const score = parseInt(lead.lead_score) || 65;
+    let scoreColor = [239, 68, 68];
+    let scoreLabel = "Prioridad Alta de Venta (Vulnerable digitalmente)";
+    if (score >= 75) {
+        scoreColor = [16, 185, 129];
+        scoreLabel = "Oportunidad de Alto Cierre";
+    } else if (score >= 50) {
+        scoreColor = [245, 158, 11];
+        scoreLabel = "Oportunidad Moderada";
+    }
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(11);
+    doc.setTextColor(15, 23, 42);
+    doc.text("Índice de Oportunidad Comercial (Score IA):", margin + 6, y + 10);
+
+    doc.setFontSize(18);
+    doc.setTextColor(scoreColor[0], scoreColor[1], scoreColor[2]);
+    doc.text(`${score} / 100`, margin + 6, y + 21);
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(9);
+    doc.setTextColor(71, 85, 105);
+    doc.text(scoreLabel, margin + 40, y + 19);
+
+    // Score meter bar
+    doc.setFillColor(226, 232, 240);
+    doc.roundedRect(margin + 6, y + 26, contentWidth - 12, 3, 1.5, 1.5, "F");
+    doc.setFillColor(scoreColor[0], scoreColor[1], scoreColor[2]);
+    doc.roundedRect(margin + 6, y + 26, (contentWidth - 12) * (score / 100), 3, 1.5, 1.5, "F");
+
+    // 4. DETAILED TECHNICAL DIAGNOSIS
+    y += 44;
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(12);
+    doc.setTextColor(15, 23, 42);
+    doc.text("1. Diagnóstico de Canales y Activos Digitales", margin, y);
+
+    y += 6;
+    const checks = [
+        { label: "Sitio Web Oficial:", val: lead.website || "CRÍTICO: No cuenta con presencia web (Pérdida de clientes)", ok: !!lead.website },
+        { label: "Email Corporativo / Servidor MX:", val: lead.email ? `${lead.email} (${lead.mx_provider || 'Verificado DoH'})` : "Sin email comercial indexado públicamente", ok: !!lead.email },
+        { label: "Línea WhatsApp Directa:", val: lead.phone || "No especificado", ok: !!lead.phone },
+        { label: "Stack Tecnológico Detectado:", val: lead.tech_stack || "Sin tecnologías de conversión o analítica detectadas", ok: !!lead.tech_stack },
+        { label: "Reputación Google Maps:", val: `${lead.averageRating || 'N/A'} ★ (${lead.reviewCount || 0} valoraciones de clientes)`, ok: (parseFloat(lead.averageRating) >= 4.0) }
+    ];
+
+    checks.forEach(item => {
+        doc.setFillColor(item.ok ? 240 : 254, item.ok ? 253 : 242, item.ok ? 244 : 242);
+        doc.roundedRect(margin, y, contentWidth, 9, 1.5, 1.5, "F");
+        
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(9);
+        doc.setTextColor(15, 23, 42);
+        doc.text(item.label, margin + 4, y + 6);
+
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(8.5);
+        doc.setTextColor(item.ok ? 21 : 185, item.ok ? 128 : 28, item.ok ? 61 : 28);
+        doc.text(String(item.val).substring(0, 68), margin + 60, y + 6);
+        y += 11;
+    });
+
+    // 5. COMPETITIVE PROXIMITY & ZONE PRESSURE
+    y += 4;
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(12);
+    doc.setTextColor(15, 23, 42);
+    doc.text("2. Presión Competitiva en el Cuadrante Geográfico", margin, y);
+
+    y += 6;
+    doc.setFillColor(248, 250, 252);
+    doc.roundedRect(margin, y, contentWidth, 24, 2, 2, "F");
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(9);
+    doc.setTextColor(51, 65, 85);
+    const peerText = lead.nearestPeerDist ? 
+        `Competidor más cercano del mismo nicho detectado a ${lead.nearestPeerDist} (${lead.nearestPeerName || 'Competidor en zona'}).` :
+        "Zona con presencia comercial activa de competidores locales.";
+    doc.text(peerText, margin + 5, y + 7);
+    doc.text("Impacto de mercado: En el mercado actual, los negocios que integran web optimizada y canal directo", margin + 5, y + 13);
+    doc.text("de WhatsApp captan un 74% más de contactos comerciales frente a comercios tradicionales.", margin + 5, y + 19);
+
+    // 6. RECOMMENDED ROADMAP
+    y += 32;
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(12);
+    doc.setTextColor(15, 23, 42);
+    doc.text("3. Plan de Acción y Modernización Propuesto", margin, y);
+
+    y += 6;
+    const planSteps = [
+        "Fase 1: Implementación de Web Corporativa de Alta Velocidad adaptada a móviles.",
+        "Fase 2: Embudo de Captación y Botón Automatizado de Prospección por WhatsApp.",
+        "Fase 3: Campañas de Tráfico Hiperlocal y Posicionamiento en Google Maps (SEO Local).",
+        "Fase 4: Configuración de Dominio Corporativo, Correos MX Seguros y Analítica Web."
+    ];
+
+    planSteps.forEach((step, idx) => {
+        doc.setFillColor(238, 242, 255);
+        doc.circle(margin + 4, y + 4, 3, "F");
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(8);
+        doc.setTextColor(79, 70, 229);
+        doc.text(String(idx + 1), margin + 3, y + 6);
+
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(9);
+        doc.setTextColor(30, 41, 59);
+        doc.text(step, margin + 12, y + 6);
+        y += 9;
+    });
+
+    // 7. FOOTER
+    doc.setDrawColor(203, 213, 225);
+    doc.line(margin, pageHeight - 22, pageWidth - margin, pageHeight - 22);
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(8.5);
+    doc.setTextColor(15, 23, 42);
+    doc.text("Joseph Castillo – CEO & Senior Technology Consultant  |  WINDOWSTELECOM", margin, pageHeight - 15);
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(7.5);
+    doc.setTextColor(148, 163, 184);
+    doc.text("AtlasIQ Enterprise Lead Intelligence Suite  •  windowstelecom.com  •  Documento Confidencial", margin, pageHeight - 10);
+
+    const safeName = (lead.name || "Empresa").replace(/[^a-zA-Z0-9_\u00C0-\u017F]/g, "_").substring(0, 35);
+    doc.save(`${safeName}_Auditoria_Digital_WINDOWSTELECOM.pdf`);
+
+    if (typeof playAudioNotification === "function") {
+        playAudioNotification("success");
+    }
+}
+

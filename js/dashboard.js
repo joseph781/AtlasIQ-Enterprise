@@ -11,8 +11,12 @@ let currentPitchChannel = "whatsapp";
 let userLocation = null;
 let clusterCentroid = null;
 
-// Tabulator Instance
+// Tabulator & Leaflet Map Instances
 let table = null;
+let leafletMap = null;
+let mapMarkerLayer = null;
+let mapHeatLayer = null;
+let currentFilteredLeads = [];
 
 // Universal Storage Adapter (Extension & Cloudflare Pages Web App)
 const storageAdapter = (typeof chrome !== "undefined" && chrome.storage && chrome.storage.local) ? {
@@ -112,8 +116,37 @@ function initTable() {
                 widthGrow: 1.8,
                 formatter: (cell) => {
                     const val = cell.getValue();
+                    const row = cell.getRow().getData();
                     if (!val) return '<span style="color: #94a3b8;">-</span>';
-                    return `<a href="mailto:${val}" style="color: #2563eb; text-decoration: none; font-weight: 500;">${val}</a>`;
+                    let mxBadge = "";
+                    if (row.mx_status === "valid") {
+                        mxBadge = `<span class="tl-mx-badge valid" title="${row.mx_provider || 'Servidor MX Activo'}">✓ MX</span>`;
+                    } else if (row.mx_status === "invalid") {
+                        mxBadge = `<span class="tl-mx-badge invalid" title="${row.mx_provider || 'Sin servidor MX'}">✕ Sin MX</span>`;
+                    } else {
+                        mxBadge = `<button class="tl-btn-verify-mx" data-email="${val}" style="font-size: 10px; padding: 1px 5px; border-radius: 4px; border: 1px solid #cbd5e1; background: #fff; cursor: pointer; margin-left: 4px;" title="Verificar DNS MX con DoH Cloudflare">🔍 Validar</button>`;
+                    }
+                    return `<a href="mailto:${val}" style="color: #2563eb; text-decoration: none; font-weight: 500;">${val}</a>${mxBadge}`;
+                },
+                cellClick: async (e, cell) => {
+                    if (e.target && e.target.classList.contains("tl-btn-verify-mx")) {
+                        e.stopPropagation();
+                        const row = cell.getRow();
+                        const rowData = row.getData();
+                        const email = e.target.getAttribute("data-email");
+                        e.target.textContent = "⏳...";
+                        const res = await verifyDomainMx(email);
+                        rowData.mx_status = res.valid ? "valid" : "invalid";
+                        rowData.mx_provider = res.provider;
+                        row.update({ mx_status: rowData.mx_status, mx_provider: rowData.mx_provider });
+                        const leadInAll = allLeads.find(l => l.name === rowData.name && l.phone === rowData.phone);
+                        if (leadInAll) {
+                            leadInAll.mx_status = rowData.mx_status;
+                            leadInAll.mx_provider = rowData.mx_provider;
+                            storageAdapter.set({ leads: allLeads });
+                        }
+                        if (res.valid) playAudioNotification("success");
+                    }
                 }
             },
             {
@@ -382,11 +415,15 @@ function applyFilters() {
         return true;
     });
 
+    currentFilteredLeads = filtered;
+
     if (table) {
         table.setData(filtered);
     }
 
     updateKpiMetrics(allLeads, filtered);
+    updateMapData(currentFilteredLeads);
+    renderKanbanBoard(currentFilteredLeads);
 
     // Safety Alert Banner for Active Filters
     const banner = document.getElementById("filter-reset-banner");
@@ -565,6 +602,257 @@ window.selectAndFilterNiche = function(nicheName) {
     if (tableCard) tableCard.scrollIntoView({ behavior: "smooth" });
 };
 
+/**
+ * Interactive Leaflet Map & Heatmap Controller ($0 Cost)
+ */
+function initLeafletMap() {
+    const mapEl = document.getElementById("atlasiq-map");
+    if (!mapEl || leafletMap || typeof L === "undefined") return;
+
+    // Centroid or User Location or fallback
+    const initialLat = clusterCentroid?.lat || userLocation?.lat || 8.9248;
+    const initialLon = clusterCentroid?.lon || userLocation?.lon || -67.4285;
+
+    leafletMap = L.map("atlasiq-map", {
+        center: [initialLat, initialLon],
+        zoom: 13,
+        zoomControl: true
+    });
+
+    // Free OpenStreetMap Tile Layer
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        maxZoom: 19,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(leafletMap);
+
+    mapMarkerLayer = L.layerGroup().addTo(leafletMap);
+}
+
+function updateMapData(leadsToRender) {
+    if (!leafletMap || typeof L === "undefined") return;
+
+    const leads = leadsToRender || currentFilteredLeads || allLeads;
+    const showMarkers = document.getElementById("check-map-markers")?.checked !== false;
+    const showHeatmap = document.getElementById("check-map-heatmap")?.checked !== false;
+
+    // 1. Clear previous layers
+    if (mapMarkerLayer) mapMarkerLayer.clearLayers();
+    if (mapHeatLayer) {
+        leafletMap.removeLayer(mapHeatLayer);
+        mapHeatLayer = null;
+    }
+
+    const validLeads = leads.filter(l => {
+        const lat = parseFloat(l.latitude);
+        const lon = parseFloat(l.longitude);
+        return !isNaN(lat) && !isNaN(lon) && (lat !== 0 || lon !== 0);
+    });
+
+    const badge = document.getElementById("map-counter-badge");
+    if (badge) badge.textContent = `${validLeads.length} Pines en mapa`;
+
+    if (validLeads.length === 0) return;
+
+    const latLngBounds = [];
+    const heatPoints = [];
+
+    validLeads.forEach(lead => {
+        const lat = parseFloat(lead.latitude);
+        const lon = parseFloat(lead.longitude);
+        const score = parseInt(lead.lead_score) || 50;
+
+        latLngBounds.push([lat, lon]);
+
+        // Weight heat by lead score & density
+        const intensity = score >= 75 ? 0.9 : (score >= 45 ? 0.6 : 0.3);
+        heatPoints.push([lat, lon, intensity]);
+
+        if (showMarkers) {
+            let pinColor = "#3b82f6"; // Blue
+            if (score >= 75) pinColor = "#10b981"; // Emerald
+            else if (score >= 45) pinColor = "#f59e0b"; // Amber
+
+            const customIcon = L.divIcon({
+                className: "tl-map-pin-div",
+                html: `<div style="background: ${pinColor}; width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 10px; font-weight: 800; border: 2px solid white; box-shadow: 0 2px 6px rgba(0,0,0,0.3);">${score}</div>`,
+                iconSize: [26, 26],
+                iconAnchor: [13, 13],
+                popupAnchor: [0, -13]
+            });
+
+            const distStr = lead.distanceKm !== null && lead.distanceKm !== undefined ? 
+                (lead.distanceKm < 1 ? `${Math.round(lead.distanceKm * 1000)} m` : `${lead.distanceKm} km`) : "-";
+
+            const webStr = lead.website ? 
+                `<a href="${lead.website}" target="_blank" style="color: #2563eb; text-decoration: underline;">${extractDomain(lead.website)}</a>` : 
+                '<span style="color: #ef4444; font-weight: 600;">Sin Web (Oportunidad)</span>';
+
+            const popupContent = `
+                <div style="font-family: inherit; font-size: 12px; line-height: 1.4; min-width: 220px; padding: 2px;">
+                    <div style="font-size: 14px; font-weight: 800; color: #0f172a; margin-bottom: 2px;">${lead.name}</div>
+                    <div style="color: #64748b; font-size: 11px; margin-bottom: 6px;">
+                        ★ ${lead.averageRating || 'N/A'} · ${lead.category || 'General'}
+                    </div>
+                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 6px 8px; margin-bottom: 8px;">
+                        <div>📍 Distancia: <strong>${distStr}</strong></div>
+                        <div>📞 Teléfono: <strong>${lead.phone || 'No detectado'}</strong></div>
+                        <div>🌐 Sitio Web: <strong>${webStr}</strong></div>
+                    </div>
+                    <button onclick="window.openLeadDrawerById('${encodeURIComponent(lead.placeID || lead.name)}')" class="tl-btn tl-btn-primary" style="width: 100%; height: 26px; font-size: 11px;">
+                        Ver Ficha y Contactar ↗
+                    </button>
+                </div>
+            `;
+
+            const marker = L.marker([lat, lon], { icon: customIcon }).bindPopup(popupContent);
+            mapMarkerLayer.addLayer(marker);
+        }
+    });
+
+    // 2. Add Heatmap Layer
+    if (showHeatmap && heatPoints.length > 0 && typeof L.heatLayer === "function") {
+        mapHeatLayer = L.heatLayer(heatPoints, {
+            radius: 30,
+            blur: 20,
+            maxZoom: 16,
+            gradient: { 0.3: "#3b82f6", 0.55: "#10b981", 0.75: "#f59e0b", 1.0: "#ef4444" }
+        }).addTo(leafletMap);
+    }
+
+    // 3. Fit bounds
+    if (latLngBounds.length > 0) {
+        leafletMap.fitBounds(latLngBounds, { padding: [40, 40], maxZoom: 15 });
+    }
+}
+
+window.openLeadDrawerById = function(encodedId) {
+    const targetId = decodeURIComponent(encodedId);
+    const found = allLeads.find(l => (l.placeID && l.placeID === targetId) || l.name === targetId);
+    if (found) {
+        openLeadDrawer(found);
+    }
+};
+
+/**
+ * Sales Pipeline Kanban Controller ($0 Cost)
+ */
+function renderKanbanBoard(leadsToRender) {
+    const leads = leadsToRender || currentFilteredLeads || allLeads;
+    const stages = ["nuevo", "contactado", "negociacion", "ganado", "descartado"];
+
+    const counts = { nuevo: 0, contactado: 0, negociacion: 0, ganado: 0, descartado: 0 };
+
+    stages.forEach(st => {
+        const container = document.getElementById(`kanban-cards-${st}`);
+        if (container) container.innerHTML = "";
+    });
+
+    leads.forEach(lead => {
+        const stage = lead.pipeline_stage && stages.includes(lead.pipeline_stage) ? lead.pipeline_stage : "nuevo";
+        counts[stage]++;
+
+        const container = document.getElementById(`kanban-cards-${stage}`);
+        if (!container) return;
+
+        const score = parseInt(lead.lead_score) || 50;
+        let scoreClass = "tl-score-med";
+        if (score >= 75) scoreClass = "tl-score-high";
+        else if (score < 45) scoreClass = "tl-score-low";
+
+        const pInfo = formatPhone(lead.phone);
+        const distStr = lead.distanceKm !== null && lead.distanceKm !== undefined ? 
+            (lead.distanceKm < 1 ? `${Math.round(lead.distanceKm * 1000)} m` : `${lead.distanceKm} km`) : "-";
+
+        const leadKey = lead.placeID || lead.name;
+
+        const card = document.createElement("div");
+        card.className = "tl-kanban-card-item";
+        card.draggable = true;
+        card.setAttribute("data-lead-key", leadKey);
+
+        card.innerHTML = `
+            <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 6px;">
+                <strong style="font-size: 13px; color: #0f172a; line-height: 1.3; cursor: pointer;" onclick="window.openLeadDrawerById('${encodeURIComponent(leadKey)}')">${lead.name}</strong>
+                <span class="tl-badge-score ${scoreClass}" style="font-size: 10px; padding: 1px 5px;">${score}</span>
+            </div>
+            <div style="font-size: 11px; color: #64748b; display: flex; justify-content: space-between;">
+                <span>★ ${lead.averageRating || '-'} · ${lead.category || 'General'}</span>
+                <span>📍 ${distStr}</span>
+            </div>
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 4px; padding-top: 6px; border-top: 1px solid #f1f5f9;">
+                <div style="font-size: 11px; color: #334155;">
+                    ${lead.phone ? `📞 ${lead.phone}` : '<span style="color: #94a3b8;">Sin teléfono</span>'}
+                </div>
+                <div style="display: flex; gap: 4px;">
+                    ${pInfo.whatsappUrl ? `<a href="${pInfo.whatsappUrl}" target="_blank" class="tl-btn tl-btn-outline" style="height: 22px; font-size: 10px; padding: 0 5px;" title="WhatsApp">💬</a>` : ''}
+                    <button class="tl-btn tl-btn-primary" style="height: 22px; font-size: 10px; padding: 0 6px;" onclick="window.openLeadDrawerById('${encodeURIComponent(leadKey)}')">Detalle ↗</button>
+                </div>
+            </div>
+        `;
+
+        card.addEventListener("dragstart", (e) => {
+            card.classList.add("dragging");
+            e.dataTransfer.setData("text/plain", leadKey);
+            e.dataTransfer.effectAllowed = "move";
+        });
+
+        card.addEventListener("dragend", () => {
+            card.classList.remove("dragging");
+        });
+
+        container.appendChild(card);
+    });
+
+    stages.forEach(st => {
+        const countEl = document.getElementById(`kanban-count-${st}`);
+        if (countEl) countEl.textContent = counts[st];
+    });
+}
+
+function initKanbanDropzones() {
+    const stages = ["nuevo", "contactado", "negociacion", "ganado", "descartado"];
+    stages.forEach(st => {
+        const container = document.getElementById(`kanban-cards-${st}`);
+        if (!container) return;
+
+        container.addEventListener("dragover", (e) => {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = "move";
+            container.classList.add("drag-over");
+        });
+
+        container.addEventListener("dragleave", () => {
+            container.classList.remove("drag-over");
+        });
+
+        container.addEventListener("drop", (e) => {
+            e.preventDefault();
+            container.classList.remove("drag-over");
+            const leadKey = e.dataTransfer.getData("text/plain");
+            if (!leadKey) return;
+
+            const targetLead = allLeads.find(l => (l.placeID && l.placeID === leadKey) || l.name === leadKey);
+            if (targetLead && targetLead.pipeline_stage !== st) {
+                targetLead.pipeline_stage = st;
+                storageAdapter.set({ leads: allLeads });
+                renderKanbanBoard(currentFilteredLeads);
+                playAudioNotification("success");
+            }
+        });
+    });
+
+    const btnReset = document.getElementById("btn-kanban-reset-all");
+    if (btnReset) {
+        btnReset.addEventListener("click", () => {
+            if (confirm("¿Deseas reiniciar todos los prospectos al estado 'Nuevo Prospecto'?")) {
+                allLeads.forEach(l => { l.pipeline_stage = "nuevo"; });
+                storageAdapter.set({ leads: allLeads });
+                renderKanbanBoard(currentFilteredLeads);
+            }
+        });
+    }
+}
+
 // Lead Detail Drawer Controller
 function openLeadDrawer(lead) {
     activeLeadForDrawer = lead;
@@ -603,6 +891,32 @@ function openLeadDrawer(lead) {
     document.getElementById("drawer-email").textContent = lead.email || "No verificado";
     document.getElementById("drawer-address").textContent = lead.address || "No especificada";
     document.getElementById("drawer-category").textContent = lead.category || "General";
+
+    // MX Deliverability Pill in Drawer
+    const mxSpan = document.getElementById("drawer-email-mx");
+    if (mxSpan) {
+        if (!lead.email) {
+            mxSpan.innerHTML = "";
+        } else if (lead.mx_status === "valid") {
+            mxSpan.innerHTML = `<span class="tl-mx-badge valid" title="${lead.mx_provider || 'Servidor MX Activo'}">✓ MX Activo</span>`;
+        } else if (lead.mx_status === "invalid") {
+            mxSpan.innerHTML = `<span class="tl-mx-badge invalid" title="${lead.mx_provider || 'Sin servidor MX'}">✕ Sin MX</span>`;
+        } else {
+            mxSpan.innerHTML = `<button id="btn-drawer-check-mx" style="font-size: 10px; padding: 2px 6px; border-radius: 4px; border: 1px solid #cbd5e1; background: #fff; cursor: pointer;">🔍 Validar MX</button>`;
+            const btn = document.getElementById("btn-drawer-check-mx");
+            if (btn) {
+                btn.onclick = async () => {
+                    btn.textContent = "⏳...";
+                    const res = await verifyDomainMx(lead.email);
+                    lead.mx_status = res.valid ? "valid" : "invalid";
+                    lead.mx_provider = res.provider;
+                    storageAdapter.set({ leads: allLeads });
+                    if (table) table.replaceData(currentFilteredLeads);
+                    openLeadDrawer(lead);
+                };
+            }
+        }
+    }
 
     // Web & Tech Stack
     const webLink = document.getElementById("drawer-website");
@@ -654,6 +968,16 @@ function openLeadDrawer(lead) {
     // Refresh Outreach Pitch
     updatePitchPreview();
 
+    // Wire White-Label PDF Audit Generator
+    const btnPdf = document.getElementById("btn-download-pdf-audit");
+    if (btnPdf) {
+        btnPdf.onclick = () => {
+            if (activeLeadForDrawer) {
+                generateLeadPdfAudit(activeLeadForDrawer);
+            }
+        };
+    }
+
     overlay.classList.add("open");
 }
 
@@ -697,6 +1021,155 @@ function resetAllFilters() {
     applyFilters();
 }
 
+// ==========================================
+// FEATURE 3: SPEED OUTREACH QUEUE CONTROLLER
+// ==========================================
+let speedQueue = [];
+let speedIndex = 0;
+
+function startSpeedOutreach() {
+    const candidates = (currentFilteredLeads && currentFilteredLeads.length > 0) ? currentFilteredLeads : allLeads;
+    speedQueue = candidates.filter(l => {
+        if (!l || !l.phone) return false;
+        const p = formatPhone(l.phone);
+        return !!p.whatsappUrl;
+    });
+
+    if (speedQueue.length === 0) {
+        alert("No se encontraron prospectos con número de teléfono o WhatsApp en la lista actual.");
+        return;
+    }
+
+    speedIndex = 0;
+    const modal = document.getElementById("speed-outreach-modal");
+    const backdrop = document.getElementById("tl-modal-backdrop");
+    if (modal) modal.classList.add("open");
+    if (backdrop) backdrop.classList.add("open");
+    renderSpeedLead();
+}
+
+function renderSpeedLead() {
+    if (speedIndex >= speedQueue.length) {
+        alert("🎉 ¡Has completado todos los prospectos de la cola de prospección rápida!");
+        closeSpeedOutreach();
+        applyFilters();
+        return;
+    }
+
+    const lead = speedQueue[speedIndex];
+    const total = speedQueue.length;
+
+    // Counter & Progress Bar
+    const counterEl = document.getElementById("speed-queue-counter");
+    if (counterEl) counterEl.textContent = `${speedIndex + 1} / ${total}`;
+
+    const progressFill = document.getElementById("speed-progress-fill");
+    if (progressFill) {
+        const pct = Math.round(((speedIndex) / total) * 100);
+        progressFill.style.width = pct + "%";
+    }
+
+    // Lead Details
+    const nameEl = document.getElementById("speed-lead-name");
+    if (nameEl) nameEl.textContent = lead.name || "Empresa Sin Nombre";
+
+    const metaEl = document.getElementById("speed-lead-meta");
+    if (metaEl) {
+        const distStr = lead.distanceKm ? ` · 📍 ${lead.distanceKm < 1 ? Math.round(lead.distanceKm * 1000) + 'm' : lead.distanceKm + 'km'}` : "";
+        metaEl.textContent = `${lead.category || "General"}${distStr} · ${lead.city || lead.address || "Ubicación detectada"}`;
+    }
+
+    const scoreEl = document.getElementById("speed-lead-score");
+    if (scoreEl) {
+        const score = parseInt(lead.lead_score) || 50;
+        scoreEl.textContent = score;
+        scoreEl.className = `tl-badge-score ${score >= 75 ? 'tl-score-high' : score < 45 ? 'tl-score-low' : 'tl-score-med'}`;
+    }
+
+    const phoneEl = document.getElementById("speed-lead-phone");
+    if (phoneEl) phoneEl.textContent = lead.phone || "-";
+
+    // Dynamic Personalized Pitch
+    const pitch = generateOutreachPitch(lead, "whatsapp");
+    const pitchBox = document.getElementById("speed-pitch-box");
+    if (pitchBox) pitchBox.textContent = pitch;
+}
+
+function sendSpeedAndAdvance() {
+    if (speedIndex >= speedQueue.length) return;
+    const lead = speedQueue[speedIndex];
+    const pitchBox = document.getElementById("speed-pitch-box");
+    const pitch = pitchBox ? pitchBox.textContent : generateOutreachPitch(lead, "whatsapp");
+
+    const pInfo = formatPhone(lead.phone);
+    if (pInfo.whatsappUrl) {
+        window.open(`${pInfo.whatsappUrl}?text=${encodeURIComponent(pitch)}`, "_blank");
+    }
+
+    // Advance Stage to Contacted in CRM Pipeline
+    lead.pipeline_stage = "contactado";
+    storageAdapter.set({ leads: allLeads }, () => {
+        renderKanbanBoard(currentFilteredLeads);
+    });
+
+    playAudioNotification("success");
+    speedIndex++;
+    renderSpeedLead();
+}
+
+function skipSpeedLead() {
+    speedIndex++;
+    renderSpeedLead();
+}
+
+function closeSpeedOutreach() {
+    const modal = document.getElementById("speed-outreach-modal");
+    const backdrop = document.getElementById("tl-modal-backdrop");
+    if (modal) modal.classList.remove("open");
+    if (backdrop) backdrop.classList.remove("open");
+}
+
+// ==========================================
+// FEATURE 4: LIVE DNS MX BULK VERIFICATION
+// ==========================================
+async function verifyAllLeadsMx() {
+    const targets = (currentFilteredLeads && currentFilteredLeads.length > 0) ? currentFilteredLeads : allLeads;
+    const emailLeads = targets.filter(l => l.email && l.email.includes("@"));
+
+    if (emailLeads.length === 0) {
+        alert("No se encontraron prospectos con correo electrónico en la vista actual.");
+        return;
+    }
+
+    const btn = document.getElementById("btn-verify-all-emails");
+    const originalText = btn ? btn.textContent : "";
+    if (btn) {
+        btn.disabled = true;
+        btn.textContent = `⏳ Validando 0/${emailLeads.length}...`;
+    }
+
+    let checked = 0;
+    for (const lead of emailLeads) {
+        const res = await verifyDomainMx(lead.email);
+        lead.mx_status = res.valid ? "valid" : "invalid";
+        lead.mx_provider = res.provider;
+        checked++;
+        if (btn) btn.textContent = `⏳ Validando ${checked}/${emailLeads.length}...`;
+    }
+
+    storageAdapter.set({ leads: allLeads }, () => {
+        if (table) table.replaceData(currentFilteredLeads);
+        if (btn) {
+            btn.textContent = "✅ ¡Emails Validados!";
+            setTimeout(() => {
+                btn.textContent = originalText;
+                btn.disabled = false;
+            }, 2500);
+        }
+        playAudioNotification("success");
+    });
+}
+
 // DOM Ready Initializer
 document.addEventListener("DOMContentLoaded", () => {
     initTable();
@@ -720,6 +1193,63 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // SEARCH INPUT LISTENER
     document.getElementById("filter-search").addEventListener("input", () => applyFilters());
+
+    // VIEW SWITCHER TABS
+    const tabTable = document.getElementById("tab-view-table");
+    const tabMap = document.getElementById("tab-view-map");
+    const tabKanban = document.getElementById("tab-view-kanban");
+    const viewTable = document.getElementById("view-section-table");
+    const viewMap = document.getElementById("view-section-map");
+    const viewKanban = document.getElementById("view-section-kanban");
+
+    function setActiveView(activeTab, activeView) {
+        [tabTable, tabMap, tabKanban].forEach(t => t && t.classList.remove("active"));
+        [viewTable, viewMap, viewKanban].forEach(v => v && (v.style.display = "none"));
+        if (activeTab) activeTab.classList.add("active");
+        if (activeView) activeView.style.display = "block";
+    }
+
+    if (tabTable) {
+        tabTable.addEventListener("click", () => {
+            setActiveView(tabTable, viewTable);
+        });
+    }
+
+    if (tabMap) {
+        tabMap.addEventListener("click", () => {
+            setActiveView(tabMap, viewMap);
+            if (!leafletMap) initLeafletMap();
+            setTimeout(() => {
+                if (leafletMap) {
+                    leafletMap.invalidateSize();
+                    updateMapData(currentFilteredLeads);
+                }
+            }, 100);
+        });
+    }
+
+    if (tabKanban) {
+        tabKanban.addEventListener("click", () => {
+            setActiveView(tabKanban, viewKanban);
+            renderKanbanBoard(currentFilteredLeads);
+        });
+    }
+
+    initKanbanDropzones();
+
+    // Map checkboxes & Recenter
+    const checkHeatmap = document.getElementById("check-map-heatmap");
+    if (checkHeatmap) checkHeatmap.addEventListener("change", () => updateMapData(currentFilteredLeads));
+
+    const checkMarkers = document.getElementById("check-map-markers");
+    if (checkMarkers) checkMarkers.addEventListener("change", () => updateMapData(currentFilteredLeads));
+
+    const btnRecenter = document.getElementById("btn-map-recenter");
+    if (btnRecenter) {
+        btnRecenter.addEventListener("click", () => {
+            if (leafletMap) updateMapData(currentFilteredLeads);
+        });
+    }
 
     // NICHE FILTER & STRICT CHECKBOX LISTENERS
     document.getElementById("filter-niche").addEventListener("change", () => applyFilters());
@@ -918,9 +1448,13 @@ Entrega un mensaje directo, profesional y persuasivo adaptado para ${currentPitc
     // SETTINGS MODAL
     document.getElementById("btn-settings").addEventListener("click", () => {
         document.getElementById("settings-modal").classList.add("open");
+        const backdrop = document.getElementById("tl-modal-backdrop");
+        if (backdrop) backdrop.classList.add("open");
     });
     document.getElementById("btn-modal-cancel").addEventListener("click", () => {
         document.getElementById("settings-modal").classList.remove("open");
+        const backdrop = document.getElementById("tl-modal-backdrop");
+        if (backdrop) backdrop.classList.remove("open");
     });
     document.getElementById("btn-modal-save").addEventListener("click", () => {
         const url = document.getElementById("setting-webhook-url").value.trim();
@@ -928,8 +1462,38 @@ Entrega un mensaje directo, profesional y persuasivo adaptado para ${currentPitc
         storageAdapter.set({ tl_webhook_url: url, tl_gemini_key: geminiKey }, () => {
             alert("Ajustes guardados correctamente.");
             document.getElementById("settings-modal").classList.remove("open");
+            const backdrop = document.getElementById("tl-modal-backdrop");
+            if (backdrop) backdrop.classList.remove("open");
         });
     });
+
+    // SPEED OUTREACH LISTENERS
+    const btnStartSpeed = document.getElementById("btn-start-speed-outreach");
+    if (btnStartSpeed) btnStartSpeed.addEventListener("click", startSpeedOutreach);
+
+    const btnSpeedClose = document.getElementById("btn-speed-close");
+    if (btnSpeedClose) btnSpeedClose.addEventListener("click", closeSpeedOutreach);
+
+    const btnSpeedSkip = document.getElementById("btn-speed-skip");
+    if (btnSpeedSkip) btnSpeedSkip.addEventListener("click", skipSpeedLead);
+
+    const btnSpeedNext = document.getElementById("btn-speed-send-next");
+    if (btnSpeedNext) btnSpeedNext.addEventListener("click", sendSpeedAndAdvance);
+
+    // LIVE DNS MX BULK VERIFICATION LISTENER
+    const btnVerifyAllMx = document.getElementById("btn-verify-all-emails");
+    if (btnVerifyAllMx) btnVerifyAllMx.addEventListener("click", verifyAllLeadsMx);
+
+    // UNIVERSAL MODAL BACKDROP LISTENER
+    const modalBackdrop = document.getElementById("tl-modal-backdrop");
+    if (modalBackdrop) {
+        modalBackdrop.addEventListener("click", () => {
+            closeSpeedOutreach();
+            const setModal = document.getElementById("settings-modal");
+            if (setModal) setModal.classList.remove("open");
+            modalBackdrop.classList.remove("open");
+        });
+    }
 
     // CLEAR DATA
     document.getElementById("btn-clear-data").addEventListener("click", () => {

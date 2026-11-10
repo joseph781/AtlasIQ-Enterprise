@@ -576,6 +576,208 @@ body {
     display: flex;
 }
 
+/* Modal Dim Backdrop */
+.tl-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.45);
+    backdrop-filter: blur(2px);
+    z-index: 190;
+    display: none;
+}
+
+.tl-modal-backdrop.open {
+    display: block;
+}
+
+/* Live MX DNS Verification Badges */
+.tl-mx-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    padding: 1px 6px;
+    border-radius: 9999px;
+    font-size: 10px;
+    font-weight: 700;
+    vertical-align: middle;
+    margin-left: 5px;
+    white-space: nowrap;
+}
+
+.tl-mx-badge.valid {
+    background: #ecfdf5;
+    color: #059669;
+    border: 1px solid #a7f3d0;
+}
+
+.tl-mx-badge.invalid {
+    background: #fef2f2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+}
+
+.tl-mx-badge.checking {
+    background: #eff6ff;
+    color: #2563eb;
+    border: 1px solid #bfdbfe;
+    animation: tlPulse 1.5s infinite;
+}
+
+/* === VIEW SWITCHER TABS === */
+.tl-view-tabs {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.tl-view-tab {
+    padding: 8px 16px;
+    border-radius: var(--radius-md);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    background: #ffffff;
+    border: 1px solid var(--border-color);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    box-shadow: var(--shadow-sm);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.tl-view-tab:hover {
+    background: #f1f5f9;
+    color: var(--text-primary);
+}
+
+.tl-view-tab.active {
+    background: var(--primary);
+    color: #ffffff;
+    border-color: var(--primary);
+    box-shadow: 0 2px 4px rgba(37, 99, 235, 0.25);
+}
+
+/* Leaflet Custom DivIcon Pin */
+.tl-map-pin-div {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    color: #fff;
+    font-weight: 900;
+    font-size: 11px;
+    border: 2px solid #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+    transition: transform 0.15s ease;
+    cursor: pointer;
+}
+
+.tl-map-pin-div:hover {
+    transform: scale(1.25);
+    z-index: 9999 !important;
+}
+
+/* Custom Leaflet Popup */
+.leaflet-popup-content-wrapper {
+    border-radius: var(--radius-md) !important;
+    box-shadow: var(--shadow-xl) !important;
+    padding: 2px !important;
+}
+
+.leaflet-popup-content {
+    margin: 12px 14px !important;
+    line-height: 1.4 !important;
+}
+
+/* === KANBAN BOARD STYLES === */
+.tl-kanban-board {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 14px;
+    min-height: 580px;
+    align-items: flex-start;
+}
+
+@media (max-width: 1200px) {
+    .tl-kanban-board {
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    }
+}
+
+.tl-kanban-col {
+    background: #f8fafc;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    display: flex;
+    flex-direction: column;
+    min-height: 520px;
+    max-height: 780px;
+    overflow: hidden;
+}
+
+.tl-kanban-col-header {
+    padding: 12px 14px;
+    background: #ffffff;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-weight: 700;
+    font-size: 13px;
+    color: var(--text-primary);
+}
+
+.tl-kanban-count {
+    background: #e2e8f0;
+    color: #334155;
+    font-size: 11px;
+    font-weight: 800;
+    padding: 2px 7px;
+    border-radius: 10px;
+}
+
+.tl-kanban-cards-container {
+    padding: 10px;
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    transition: background 0.15s ease;
+}
+
+.tl-kanban-cards-container.drag-over {
+    background: #eff6ff;
+    outline: 2px dashed var(--primary);
+    outline-offset: -4px;
+}
+
+.tl-kanban-card-item {
+    background: #ffffff;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    padding: 10px 12px;
+    box-shadow: var(--shadow-sm);
+    cursor: grab;
+    transition: all 0.15s ease;
+    user-select: none;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.tl-kanban-card-item:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+    border-color: #cbd5e1;
+}
+
+.tl-kanban-card-item.dragging {
+    opacity: 0.4;
+    cursor: grabbing;
+}
+
 /* === AtlasIQ GeoIntelligence & Granular Filter Bar === */
 .tl-user-location-badge {
     display: inline-flex;

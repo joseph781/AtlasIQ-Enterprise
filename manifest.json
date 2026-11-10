@@ -437,7 +437,8 @@
             "injected.js",
             "css/*",
             "js/*",
-            "icons/*"
+            "icons/*",
+            "lib/*"
         ],
         "matches": ["<all_urls>"]
     }],

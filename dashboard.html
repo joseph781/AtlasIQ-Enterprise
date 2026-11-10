@@ -6,10 +6,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AtlasIQ Enterprise CRM – Silicon Valley Grade B2B Intelligence</title>
     <link href="lib/tabulator/css/semantic-ui/tabulator_semantic-ui.min.css" rel="stylesheet" />
+    <link href="lib/leaflet/leaflet.css" rel="stylesheet" />
     <link href="css/dashboard.css" rel="stylesheet" />
     <script src="lib/jquery-3.1.1.min.js"></script>
     <script src="lib/tabulator/js/tabulator.min.js"></script>
     <script src="lib/xlsx.full.min.js"></script>
+    <script src="lib/leaflet/leaflet.js"></script>
+    <script src="lib/leaflet/leaflet-heat.js"></script>
+    <script src="lib/jspdf/jspdf.umd.min.js"></script>
     <script src="js/util.js"></script>
 </head>
 
@@ -120,6 +124,12 @@
             </div>
 
             <div class="tl-toolbar-actions">
+                <button id="btn-start-speed-outreach" class="tl-btn tl-btn-success" style="height: 32px; font-size: 12px; font-weight: 700;" title="Iniciar sesión de prospección guiada por WhatsApp">
+                    ⚡ Prospección Rápida
+                </button>
+                <button id="btn-verify-all-emails" class="tl-btn tl-btn-outline" style="height: 32px; font-size: 12px;" title="Verificar servidores de correo MX de los emails en vivo ($0 DoH Cloudflare)">
+                    📧 Validar MX Emails
+                </button>
                 <button id="btn-export-json" class="tl-btn tl-btn-outline" style="height: 32px; font-size: 12px;">
                     { } JSON
                 </button>
@@ -280,9 +290,135 @@
             </button>
         </div>
 
-        <!-- DATA TABLE -->
-        <section class="tl-table-card">
+        <!-- VIEW NAVIGATION TABS -->
+        <section class="tl-view-tabs" style="display: flex; gap: 8px; margin-bottom: -6px;">
+            <button class="tl-view-tab active" id="tab-view-table">
+                📋 Tabla de Prospectos
+            </button>
+            <button class="tl-view-tab" id="tab-view-map">
+                🗺️ Mapa Geoespacial & Calor
+            </button>
+            <button class="tl-view-tab" id="tab-view-kanban">
+                📊 Pipeline Kanban
+            </button>
+        </section>
+
+        <!-- DATA TABLE VIEW -->
+        <section class="tl-table-card" id="view-section-table">
             <div id="example-table"></div>
+        </section>
+
+        <!-- INTERACTIVE GEOMAP VIEW -->
+        <section class="tl-map-card" id="view-section-map" style="display: none; background: #fff; border-radius: var(--radius-lg); border: 1.5px solid var(--border-color); padding: 16px; box-shadow: var(--shadow-md); position: relative;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span style="font-size: 18px;">🗺️</span>
+                    <strong style="font-size: 15px; color: #0f172a;">Radar Geoespacial y Concentración de Clientes</strong>
+                    <span class="tl-badge-score tl-score-high" id="map-counter-badge" style="font-size: 11px;">0 Pines en mapa</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <label class="tl-checkbox-label" style="background: #fff;">
+                        <input type="checkbox" id="check-map-heatmap" checked />
+                        <span>🔥 Capa de Calor (Densidad)</span>
+                    </label>
+                    <label class="tl-checkbox-label" style="background: #fff;">
+                        <input type="checkbox" id="check-map-markers" checked />
+                        <span>📍 Pines de Prospectos</span>
+                    </label>
+                    <button id="btn-map-recenter" class="tl-btn tl-btn-outline" style="height: 30px; font-size: 12px; padding: 0 10px;">
+                        🎯 Centrar en Zona
+                    </button>
+                </div>
+            </div>
+            <div id="atlasiq-map" style="height: 600px; width: 100%; border-radius: var(--radius-md); border: 1px solid var(--border-color); z-index: 10;"></div>
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 10px; font-size: 11px; color: #64748b;">
+                <div>
+                    <strong>Leyenda de Oportunidad:</strong> 
+                    <span style="color: #10b981; font-weight: 700; margin-left: 6px;">🟢 Score Alto (75+)</span> · 
+                    <span style="color: #f59e0b; font-weight: 700; margin-left: 6px;">🟡 Score Medio (45-74)</span> · 
+                    <span style="color: #64748b; font-weight: 700; margin-left: 6px;">⚪ Score Bajo (&lt;45)</span>
+                </div>
+                <div>Haz clic en cualquier pin para ver el diagnóstico y abrir WhatsApp</div>
+            </div>
+        </section>
+
+        <!-- PIPELINE KANBAN VIEW -->
+        <section class="tl-kanban-card" id="view-section-kanban" style="display: none; background: #fff; border-radius: var(--radius-lg); border: 1.5px solid var(--border-color); padding: 18px; box-shadow: var(--shadow-md);">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span style="font-size: 18px;">📊</span>
+                    <strong style="font-size: 15px; color: #0f172a;">Pipeline de Ventas y Seguimiento de Leads (Kanban)</strong>
+                    <span style="font-size: 12px; color: #64748b;">Arrastra los prospectos entre columnas para actualizar su estado de venta</span>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <button id="btn-kanban-reset-all" class="tl-btn tl-btn-outline" style="height: 28px; font-size: 11px; color: #64748b;" title="Mover todos los prospectos de nuevo a 'Nuevo Prospecto'">
+                        ↺ Reiniciar Estados
+                    </button>
+                </div>
+            </div>
+
+            <!-- KANBAN BOARD COLUMNS -->
+            <div class="tl-kanban-board" id="atlasiq-kanban-board">
+                <!-- Column 1: Nuevo -->
+                <div class="tl-kanban-col" data-stage="nuevo">
+                    <div class="tl-kanban-col-header" style="border-top: 3px solid #3b82f6;">
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <span>📥</span>
+                            <span class="tl-kanban-col-title">Nuevo Prospecto</span>
+                        </div>
+                        <span class="tl-kanban-count" id="kanban-count-nuevo">0</span>
+                    </div>
+                    <div class="tl-kanban-cards-container" id="kanban-cards-nuevo" data-stage="nuevo"></div>
+                </div>
+
+                <!-- Column 2: Contactado -->
+                <div class="tl-kanban-col" data-stage="contactado">
+                    <div class="tl-kanban-col-header" style="border-top: 3px solid #f59e0b;">
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <span>💬</span>
+                            <span class="tl-kanban-col-title">Contactado</span>
+                        </div>
+                        <span class="tl-kanban-count" id="kanban-count-contactado">0</span>
+                    </div>
+                    <div class="tl-kanban-cards-container" id="kanban-cards-contactado" data-stage="contactado"></div>
+                </div>
+
+                <!-- Column 3: En Negociación -->
+                <div class="tl-kanban-col" data-stage="negociacion">
+                    <div class="tl-kanban-col-header" style="border-top: 3px solid #8b5cf6;">
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <span>🤝</span>
+                            <span class="tl-kanban-col-title">En Negociación</span>
+                        </div>
+                        <span class="tl-kanban-count" id="kanban-count-negociacion">0</span>
+                    </div>
+                    <div class="tl-kanban-cards-container" id="kanban-cards-negociacion" data-stage="negociacion"></div>
+                </div>
+
+                <!-- Column 4: Cerrado / Ganado -->
+                <div class="tl-kanban-col" data-stage="ganado">
+                    <div class="tl-kanban-col-header" style="border-top: 3px solid #10b981;">
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <span>🎉</span>
+                            <span class="tl-kanban-col-title">Cliente Ganado</span>
+                        </div>
+                        <span class="tl-kanban-count" id="kanban-count-ganado">0</span>
+                    </div>
+                    <div class="tl-kanban-cards-container" id="kanban-cards-ganado" data-stage="ganado"></div>
+                </div>
+
+                <!-- Column 5: Descartado -->
+                <div class="tl-kanban-col" data-stage="descartado">
+                    <div class="tl-kanban-col-header" style="border-top: 3px solid #ef4444;">
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <span>❌</span>
+                            <span class="tl-kanban-col-title">Descartado</span>
+                        </div>
+                        <span class="tl-kanban-count" id="kanban-count-descartado">0</span>
+                    </div>
+                    <div class="tl-kanban-cards-container" id="kanban-cards-descartado" data-stage="descartado"></div>
+                </div>
+            </div>
         </section>
     </main>
 
@@ -344,7 +480,10 @@
                     </div>
                     <div class="tl-detail-row">
                         <span class="tl-detail-label">Email Verificado:</span>
-                        <span class="tl-detail-val" id="drawer-email">-</span>
+                        <div style="display: flex; align-items: center;">
+                            <span class="tl-detail-val" id="drawer-email">-</span>
+                            <span id="drawer-email-mx" style="margin-left: 6px;"></span>
+                        </div>
                     </div>
                     <div class="tl-detail-row">
                         <span class="tl-detail-label">Sitio Web:</span>
@@ -395,6 +534,9 @@
                             💬 Abrir WhatsApp
                         </a>
                     </div>
+                    <button id="btn-download-pdf-audit" class="tl-btn tl-btn-outline" style="width: 100%; margin-top: 10px; border-color: #0f172a; color: #0f172a; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px;" title="Generar informe ejecutivo de auditoría en PDF de marca blanca">
+                        📄 Descargar Auditoría PDF (Marca Blanca)
+                    </button>
                 </div>
             </div>
         </aside>
@@ -429,6 +571,64 @@
             <button class="tl-btn tl-btn-primary" id="btn-modal-save">Guardar Ajustes</button>
         </div>
     </div>
+
+    <!-- SPEED OUTREACH MODAL (WHATSAPP FAST QUEUE) -->
+    <div class="tl-modal" id="speed-outreach-modal" style="width: 560px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 20px;">⚡</span>
+                <h3 style="font-size: 16px; font-weight: 800; color: #0f172a;">Cola de Prospección Rápida de WhatsApp</h3>
+            </div>
+            <span class="tl-badge-score tl-score-high" id="speed-queue-counter">0 / 0</span>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 6px;">
+            <!-- Current Target Lead Info -->
+            <div style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 12px;">
+                <div style="display: flex; align-items: flex-start; justify-content: space-between;">
+                    <div>
+                        <h4 id="speed-lead-name" style="font-size: 15px; font-weight: 800; color: #0f172a;">Empresa</h4>
+                        <div id="speed-lead-meta" style="font-size: 11px; color: #64748b; margin-top: 2px;">Categoría · Distancia</div>
+                    </div>
+                    <span id="speed-lead-score" class="tl-badge-score tl-score-high">85</span>
+                </div>
+                <div style="margin-top: 8px; font-size: 12px; color: #334155;">
+                    📞 Teléfono: <strong id="speed-lead-phone">-</strong>
+                </div>
+            </div>
+
+            <!-- Pitch Preview Box -->
+            <div>
+                <label style="font-size: 12px; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">
+                    Mensaje Personalizado de Apertura:
+                </label>
+                <div class="tl-pitch-box" id="speed-pitch-box" style="max-height: 140px; font-size: 12px;"></div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="tl-sat-meter-bar" style="height: 6px;">
+                <div class="tl-sat-meter-fill" id="speed-progress-fill" style="width: 0%; background: var(--success);"></div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px;">
+                <button id="btn-speed-close" class="tl-btn tl-btn-ghost" style="font-size: 12px;">
+                    Cerrar
+                </button>
+                <div style="display: flex; gap: 8px;">
+                    <button id="btn-speed-skip" class="tl-btn tl-btn-outline" style="font-size: 12px;">
+                        ⏩ Saltar
+                    </button>
+                    <button id="btn-speed-send-next" class="tl-btn tl-btn-success" style="font-size: 12px; padding: 0 16px;">
+                        🚀 Enviar WhatsApp y Avanzar ➔
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL BACKDROP -->
+    <div class="tl-modal-backdrop" id="tl-modal-backdrop"></div>
 
     <script src="js/dashboard.js"></script>
 </body>
