@@ -260,7 +260,20 @@ async function enrichWebsite(websiteUrl, businessName = "", deepCrawl = true) {
             const subRegexEmails = subHtml.match(emailRegex) || [];
             subRegexEmails.forEach(e => emailsFound.add(e.toLowerCase()));
 
-            if (emailsFound.size > 0) break;
+            // Phone & WhatsApp from subpage if not found on home
+            if (!result.phone) {
+                const subTel = subHtml.match(/href=["']tel:([^"'>\s]+)/i);
+                if (subTel && subTel[1]) {
+                    result.phone = subTel[1].replace(/[^\d+]/g, "").trim();
+                } else {
+                    const subWa = subHtml.match(/(?:api\.whatsapp\.com\/send\?phone=|wa\.me\/)(\d{8,15})/i);
+                    if (subWa && subWa[1]) {
+                        result.phone = "+" + subWa[1];
+                    }
+                }
+            }
+
+            if (emailsFound.size > 0 && result.phone) break;
         }
     }
 
