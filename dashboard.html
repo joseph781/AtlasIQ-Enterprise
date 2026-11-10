@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AtlasIQ Enterprise CRM – Silicon Valley Grade B2B Intelligence</title>
+    <link href="lib/tabulator/css/semantic-ui/tabulator_semantic-ui.min.css" rel="stylesheet" />
+    <link href="css/dashboard.css" rel="stylesheet" />
+    <script src="lib/jquery-3.1.1.min.js"></script>
+    <script src="lib/tabulator/js/tabulator.min.js"></script>
+    <script src="lib/xlsx.full.min.js"></script>
+    <script src="js/util.js"></script>
+</head>
+
+<body>
+    <!-- TOP NAVBAR -->
+    <header class="tl-navbar">
+        <div class="tl-nav-brand">
+            <div class="tl-brand-icon">🌐</div>
+            <div class="tl-brand-title">Atlas<span>IQ</span> CRM</div>
+            <span class="tl-nav-badge">Silicon Valley Enterprise v2.5</span>
+        </div>
+        <div class="tl-nav-actions">
+            <a href="index.html" target="_blank" class="tl-btn tl-btn-outline" style="text-decoration: none;" title="Abrir Guía y Manual Oficial">
+                📖 Manual Oficial
+            </a>
+            <button id="btn-sync-webhook" class="tl-btn tl-btn-primary" title="Enviar prospectos a Zapier / Make / HubSpot">
+                🚀 Sincronizar CRM / Webhook
+            </button>
+            <button id="btn-export-xlsx" class="tl-btn tl-btn-success">
+                📊 Exportar Excel (XLSX)
+            </button>
+            <button id="btn-export-csv" class="tl-btn tl-btn-outline">
+                📥 Exportar CSV
+            </button>
+            <button id="btn-settings" class="tl-btn tl-btn-ghost" title="Configurar Webhook y Ajustes">
+                ⚙️ Ajustes
+            </button>
+            <button id="btn-clear-data" class="tl-btn tl-btn-ghost" style="color: #ef4444;" title="Vaciar base de datos">
+                🗑 Limpiar
+            </button>
+        </div>
+    </header>
+
+    <!-- MAIN DASHBOARD CONTENT -->
+    <main class="tl-main-container">
+        <!-- KPI METRICS GRID -->
+        <section class="tl-kpi-grid">
+            <div class="tl-kpi-card">
+                <div class="tl-kpi-header">
+                    <span class="tl-kpi-label">Total Leads</span>
+                    <span class="tl-kpi-icon">👥</span>
+                </div>
+                <div class="tl-kpi-value" id="kpi-total-leads">0</div>
+                <div class="tl-kpi-sub">Prospectos en base de datos</div>
+            </div>
+
+            <div class="tl-kpi-card">
+                <div class="tl-kpi-header">
+                    <span class="tl-kpi-label">Emails Verificados</span>
+                    <span class="tl-kpi-icon">✉️</span>
+                </div>
+                <div class="tl-kpi-value" id="kpi-total-emails">0</div>
+                <div class="tl-kpi-sub highlight" id="kpi-email-pct">0% del total</div>
+            </div>
+
+            <div class="tl-kpi-card">
+                <div class="tl-kpi-header">
+                    <span class="tl-kpi-label">Teléfonos Directos</span>
+                    <span class="tl-kpi-icon">📞</span>
+                </div>
+                <div class="tl-kpi-value" id="kpi-total-phones">0</div>
+                <div class="tl-kpi-sub highlight" id="kpi-phone-pct">0% con WhatsApp/Llamada</div>
+            </div>
+
+            <div class="tl-kpi-card">
+                <div class="tl-kpi-header">
+                    <span class="tl-kpi-label">Oportunidad Alta (Score 75+)</span>
+                    <span class="tl-kpi-icon">🔥</span>
+                </div>
+                <div class="tl-kpi-value" id="kpi-high-score">0</div>
+                <div class="tl-kpi-sub">Prioridad inmediata de venta</div>
+            </div>
+
+            <div class="tl-kpi-card">
+                <div class="tl-kpi-header">
+                    <span class="tl-kpi-label">Reputación Promedio</span>
+                    <span class="tl-kpi-icon">⭐</span>
+                </div>
+                <div class="tl-kpi-value" id="kpi-avg-rating">0.0★</div>
+                <div class="tl-kpi-sub" id="kpi-avg-reviews">0 reseñas promedio</div>
+            </div>
+        </section>
+
+        <!-- TOOLBAR & FILTERS -->
+        <section class="tl-toolbar">
+            <div class="tl-search-box">
+                <span class="tl-search-icon">🔍</span>
+                <input type="text" id="filter-search" class="tl-search-input" placeholder="Buscar por empresa, rubro, teléfono, email, ciudad..." />
+            </div>
+
+            <div class="tl-filter-chips">
+                <span class="tl-chip active" data-filter="all">Todos</span>
+                <span class="tl-chip" data-filter="high-score">🔥 Score Alto (75+)</span>
+                <span class="tl-chip" data-filter="has-email">✉️ Con Email</span>
+                <span class="tl-chip" data-filter="has-phone">📞 Con Teléfono</span>
+                <span class="tl-chip" data-filter="has-website">🌐 Con Sitio Web</span>
+                <span class="tl-chip" data-filter="no-website">⚡ Sin Web (Oportunidad)</span>
+            </div>
+
+            <div class="tl-toolbar-actions">
+                <button id="btn-export-json" class="tl-btn tl-btn-outline" style="height: 32px; font-size: 12px;">
+                    { } JSON
+                </button>
+            </div>
+        </section>
+
+        <!-- DATA TABLE -->
+        <section class="tl-table-card">
+            <div id="example-table"></div>
+        </section>
+    </main>
+
+    <!-- LEAD INSPECTOR DRAWER (SLIDE-OVER) -->
+    <div class="tl-drawer-overlay" id="lead-drawer-overlay">
+        <aside class="tl-drawer" id="lead-drawer">
+            <div class="tl-drawer-header">
+                <div>
+                    <h2 class="tl-drawer-title" id="drawer-lead-name">Nombre de la Empresa</h2>
+                    <span class="tl-rating-pill" id="drawer-lead-rating">4.8★ (120 reseñas)</span>
+                </div>
+                <button class="tl-drawer-close" id="drawer-close-btn">&times;</button>
+            </div>
+
+            <div class="tl-drawer-body">
+                <!-- AI OPPORTUNITY CARD -->
+                <div class="tl-detail-card" style="border-left: 4px solid #2563eb;">
+                    <div class="tl-detail-title">
+                        <span>🤖 Diagnóstico de Oportunidad IA</span>
+                    </div>
+                    <div class="tl-detail-row">
+                        <span class="tl-detail-label">Score de Prospección:</span>
+                        <span class="tl-badge-score tl-score-high" id="drawer-ai-score">85</span>
+                    </div>
+                    <div class="tl-detail-row">
+                        <span class="tl-detail-label">Prioridad de Contacto:</span>
+                        <span class="tl-detail-val" id="drawer-ai-priority">Alta</span>
+                    </div>
+                    <div class="tl-detail-row" style="flex-direction: column; align-items: flex-start; gap: 4px;">
+                        <span class="tl-detail-label">Oportunidades Detectadas:</span>
+                        <div id="drawer-ai-opps" style="margin-top: 4px;"></div>
+                    </div>
+                </div>
+
+                <!-- CONTACT & PROFILE -->
+                <div class="tl-detail-card">
+                    <div class="tl-detail-title">
+                        <span>📞 Canales de Contacto Directo</span>
+                    </div>
+                    <div class="tl-detail-row">
+                        <span class="tl-detail-label">Teléfono:</span>
+                        <span class="tl-detail-val" id="drawer-lead-phone">-</span>
+                    </div>
+                    <div class="tl-detail-row">
+                        <span class="tl-detail-label">WhatsApp Directo:</span>
+                        <span id="drawer-whatsapp-btn">-</span>
+                    </div>
+                    <div class="tl-detail-row">
+                        <span class="tl-detail-label">Email Verificado:</span>
+                        <span class="tl-detail-val" id="drawer-lead-email">-</span>
+                    </div>
+                    <div class="tl-detail-row">
+                        <span class="tl-detail-label">Sitio Web:</span>
+                        <span class="tl-detail-val" id="drawer-lead-web">-</span>
+                    </div>
+                    <div class="tl-detail-row">
+                        <span class="tl-detail-label">Dirección:</span>
+                        <span class="tl-detail-val" id="drawer-lead-address" style="max-width: 60%;">-</span>
+                    </div>
+                </div>
+
+                <!-- SOCIAL & TECH STACK -->
+                <div class="tl-detail-card">
+                    <div class="tl-detail-title">
+                        <span>🌐 Redes Sociales y Tecnología</span>
+                    </div>
+                    <div class="tl-detail-row">
+                        <span class="tl-detail-label">Tech Stack Detectado:</span>
+                        <span class="tl-detail-val" id="drawer-lead-tech">No detectado</span>
+                    </div>
+                    <div class="tl-detail-row">
+                        <span class="tl-detail-label">Redes Sociales:</span>
+                        <div id="drawer-social-icons" style="display: flex; gap: 8px;"></div>
+                    </div>
+                </div>
+
+                <!-- OUTREACH PITCH & GEMINI AI GENERATOR -->
+                <div class="tl-detail-card">
+                    <div class="tl-detail-title">
+                        <span>⚡ Propuestas de Venta & Auditoría IA</span>
+                    </div>
+                    <div class="tl-pitch-tabs">
+                        <button class="tl-pitch-tab active" id="tab-pitch-wa">WhatsApp</button>
+                        <button class="tl-pitch-tab" id="tab-pitch-email">Email Frío</button>
+                        <button class="tl-pitch-tab" id="tab-pitch-gemini" style="background: linear-gradient(135deg, #eff6ff, #dbeafe); color: #1e40af; border: 1px solid #bfdbfe;">✨ Gemini IA en Vivo</button>
+                    </div>
+                    <div class="tl-pitch-box" id="drawer-pitch-text">Cargando propuesta...</div>
+                    <div id="gemini-controls" style="display: none; margin-top: 8px;">
+                        <button class="tl-btn tl-btn-primary" id="btn-run-gemini" style="width: 100%;">
+                            ✨ Generar Auditoría y Guión con Gemini
+                        </button>
+                    </div>
+                    <div style="display: flex; gap: 8px; margin-top: 8px;" id="standard-pitch-actions">
+                        <button class="tl-btn tl-btn-primary" id="btn-copy-pitch" style="flex: 1;">
+                            📋 Copiar Mensaje
+                        </button>
+                        <a href="#" target="_blank" class="tl-btn tl-btn-success" id="btn-send-wa" style="flex: 1;">
+                            💬 Abrir WhatsApp
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <!-- SETTINGS / WEBHOOK MODAL -->
+    <div class="tl-modal" id="settings-modal">
+        <h3 style="font-size: 16px; font-weight: 800;">⚙️ Configuración de AtlasIQ Enterprise</h3>
+        
+        <div>
+            <label style="font-size: 12px; font-weight: 600; color: #475569; display: block; margin-bottom: 4px;">
+                URL de Webhook (Zapier / Make / n8n / HubSpot):
+            </label>
+            <input type="url" id="setting-webhook-url" class="tl-search-input" placeholder="https://hook.eu1.make.com/..." />
+            <small style="font-size: 11px; color: #64748b; margin-top: 4px; display: block;">
+                Los prospectos se enviarán en formato JSON limpio con todos sus atributos.
+            </small>
+        </div>
+
+        <div style="margin-top: 10px;">
+            <label style="font-size: 12px; font-weight: 600; color: #475569; display: block; margin-bottom: 4px;">
+                Google Gemini API Key (Opcional para IA en vivo):
+            </label>
+            <input type="password" id="setting-gemini-key" class="tl-search-input" placeholder="AIzaSy..." />
+            <small style="font-size: 11px; color: #64748b; margin-top: 4px; display: block;">
+                Permite redactar diagnósticos estratégicos y guiones de venta hiperpersonalizados en 1 clic.
+            </small>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 14px;">
+            <button class="tl-btn tl-btn-outline" id="btn-modal-cancel">Cancelar</button>
+            <button class="tl-btn tl-btn-primary" id="btn-modal-save">Guardar Ajustes</button>
+        </div>
+    </div>
+
+    <script src="js/dashboard.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AtlasIQ Enterprise – Guía Oficial y Manual de Prospección B2B</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --primary-light: #eff6ff;
+            --accent: #10b981;
+            --accent-light: #ecfdf5;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #475569;
+            --text-light: #64748b;
+            --border: #e2e8f0;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.08), 0 2px 4px -2px rgba(0,0,0,0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(0,0,0,0.08), 0 8px 10px -6px rgba(0,0,0,0.04);
+            --radius-lg: 16px;
+            --radius-md: 10px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            line-height: 1.6;
+            scroll-behavior: smooth;
+        }
+
+        /* === TOPBAR === */
+        .topbar {
+            position: sticky;
+            top: 0;
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            z-index: 100;
+            padding: 12px 24px;
+        }
+
+        .topbar-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .brand-box {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+
+        .brand-logo {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #1d4ed8, #2563eb);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 20px;
+            font-weight: 900;
+        }
+
+        .brand-name {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--text-main);
+            letter-spacing: -0.5px;
+        }
+
+        .brand-name span {
+            color: var(--primary);
+        }
+
+        .topbar-badge {
+            font-size: 11px;
+            font-weight: 700;
+            background: var(--primary-light);
+            color: var(--primary);
+            padding: 3px 8px;
+            border-radius: 20px;
+            border: 1px solid #bfdbfe;
+            text-transform: uppercase;
+        }
+
+        .topbar-nav {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .topbar-nav a {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.15s;
+        }
+
+        .topbar-nav a:hover {
+            color: var(--primary);
+        }
+
+        .btn-crm-nav {
+            background: var(--primary);
+            color: #fff !important;
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-weight: 700 !important;
+            box-shadow: 0 2px 4px rgba(37, 99, 235, 0.25);
+            transition: transform 0.15s !important;
+        }
+
+        .btn-crm-nav:hover {
+            transform: translateY(-1px);
+            background: var(--primary-dark);
+        }
+
+        /* === HERO SECTION === */
+        .hero {
+            background: linear-gradient(180deg, #ffffff 0%, #f1f5f9 100%);
+            border-bottom: 1px solid var(--border);
+            padding: 64px 24px 50px;
+            text-align: center;
+        }
+
+        .hero-inner {
+            max-width: 860px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .hero-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #eff6ff;
+            color: #2563eb;
+            border: 1px solid #bfdbfe;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .hero-title {
+            font-size: 42px;
+            font-weight: 900;
+            line-height: 1.18;
+            letter-spacing: -1px;
+            color: #0f172a;
+        }
+
+        .hero-title span {
+            background: linear-gradient(135deg, #1d4ed8, #2563eb);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-subtitle {
+            font-size: 18px;
+            color: var(--text-muted);
+            max-width: 720px;
+            line-height: 1.5;
+        }
+
+        .hero-author-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 30px;
+            padding: 6px 16px;
+            box-shadow: var(--shadow-sm);
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-main);
+            margin-top: 6px;
+        }
+
+        .hero-author-badge span.company {
+            color: var(--primary);
+            font-weight: 800;
+        }
+
+        .hero-cta-box {
+            display: flex;
+            gap: 12px;
+            margin-top: 14px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .btn-cta {
+            height: 44px;
+            padding: 0 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.15s;
+        }
+
+        .btn-cta-primary {
+            background: var(--primary);
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+        }
+
+        .btn-cta-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .btn-cta-outline {
+            background: #fff;
+            color: var(--text-main);
+            border: 1px solid var(--border);
+        }
+
+        .btn-cta-outline:hover {
+            background: #f8fafc;
+            border-color: #cbd5e1;
+        }
+
+        /* === LAYOUT WITH SIDEBAR & CONTENT === */
+        .layout-container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 24px;
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 40px;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar-nav {
+            position: sticky;
+            top: 80px;
+            height: fit-content;
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 20px 16px;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .sidebar-title {
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            color: var(--text-light);
+            margin-bottom: 8px;
+            padding-left: 8px;
+        }
+
+        .sidebar-link {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-decoration: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            transition: all 0.15s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sidebar-link:hover {
+            background: #f1f5f9;
+            color: var(--primary);
+        }
+
+        /* Main Guide Content */
+        .content-area {
+            display: flex;
+            flex-direction: column;
+            gap: 36px;
+        }
+
+        .guide-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .guide-section-badge {
+            font-size: 11px;
+            font-weight: 800;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            display: inline-block;
+        }
+
+        .guide-heading {
+            font-size: 24px;
+            font-weight: 800;
+            color: #0f172a;
+            line-height: 1.3;
+            letter-spacing: -0.5px;
+        }
+
+        .guide-text {
+            font-size: 15px;
+            color: var(--text-muted);
+            line-height: 1.7;
+        }
+
+        /* Sector Grid */
+        .sector-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .sector-pill {
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Callout Box */
+        .callout-box {
+            background: #eff6ff;
+            border-left: 4px solid var(--primary);
+            border-radius: 0 8px 8px 0;
+            padding: 16px 20px;
+            font-size: 14px;
+            color: #1e3a8a;
+            line-height: 1.6;
+        }
+
+        .callout-box strong {
+            color: #1e40af;
+        }
+
+        /* Process Steps */
+        .process-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            margin-top: 10px;
+        }
+
+        .process-step-item {
+            display: flex;
+            gap: 14px;
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 16px 20px;
+        }
+
+        .step-number {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .step-content {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .step-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .step-desc {
+            font-size: 14px;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        /* Features Matrix */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+            margin-top: 12px;
+        }
+
+        .feature-box {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 20px;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .feature-box:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .feature-icon {
+            font-size: 26px;
+        }
+
+        .feature-box-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .feature-box-desc {
+            font-size: 13px;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        /* Installation Checklist Box */
+        .install-box {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #fff;
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .install-heading {
+            font-size: 22px;
+            font-weight: 800;
+            color: #fff;
+        }
+
+        .install-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .install-step-card {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 10px;
+            padding: 14px 18px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .install-step-card .num {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: #2563eb;
+            color: #fff;
+            font-weight: 800;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .install-step-card .text {
+            font-size: 14px;
+            color: #e2e8f0;
+        }
+
+        .install-step-card code {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: #93c5fd;
+            font-family: monospace;
+            font-size: 13px;
+        }
+
+        /* Author Credit Footer */
+        .author-card {
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            border: 1.5px solid #bfdbfe;
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 24px;
+            flex-wrap: wrap;
+        }
+
+        .author-info {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .author-title {
+            font-size: 20px;
+            font-weight: 900;
+            color: #1e3a8a;
+        }
+
+        .author-meta {
+            font-size: 14px;
+            color: #3b82f6;
+            font-weight: 600;
+        }
+
+        .author-desc {
+            font-size: 14px;
+            color: #1e293b;
+            max-width: 580px;
+            line-height: 1.5;
+        }
+
+        /* Footer */
+        .main-footer {
+            border-top: 1px solid var(--border);
+            padding: 32px 24px;
+            background: #fff;
+            text-align: center;
+            font-size: 13px;
+            color: var(--text-light);
+            margin-top: 50px;
+        }
+
+        @media (max-width: 860px) {
+            .layout-container {
+                grid-template-columns: 1fr;
+            }
+            .sidebar-nav {
+                display: none;
+            }
+            .hero-title {
+                font-size: 30px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- TOP NAVBAR -->
+    <header class="topbar">
+        <div class="topbar-content">
+            <a href="dashboard.html" class="brand-box">
+                <div class="brand-logo">🌐</div>
+                <div class="brand-name">Atlas<span>IQ</span></div>
+                <span class="topbar-badge">v2.5 Enterprise</span>
+            </a>
+            <nav class="topbar-nav">
+                <a href="#que-es">¿Qué es?</a>
+                <a href="#google-maps">Google Maps</a>
+                <a href="#scoring-ia">Scoring IA</a>
+                <a href="#proceso">Estrategia</a>
+                <a href="#instalacion">Instalación</a>
+                <a href="dashboard.html" class="btn-crm-nav">📊 Abrir CRM Dashboard</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- HERO SECTION -->
+    <section class="hero">
+        <div class="hero-inner">
+            <div class="hero-pill">
+                🚀 Sistema de Prospección B2B Profesional
+            </div>
+            <h1 class="hero-title">
+                Consigue prospectos <span>gratuitos e ilimitados</span>
+            </h1>
+            <p class="hero-subtitle">
+                Deja de esperar a que los clientes lleguen solos. Aprende a encontrar empresas que necesitan tus productos o servicios y construye tu propia base de prospectos de alta conversión.
+            </p>
+            <div class="hero-author-badge">
+                <span>Desarrollado por:</span>
+                <strong>Joseph Castillo (CEO)</strong>
+                <span>·</span>
+                <span class="company">WINDOWSTELECOM</span>
+            </div>
+            <div class="hero-cta-box">
+                <a href="dashboard.html" class="btn-cta btn-cta-primary">
+                    📊 Abrir CRM AtlasIQ
+                </a>
+                <a href="#instalacion" class="btn-cta btn-cta-outline">
+                    ⚙️ Guía de Instalación
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- MAIN TWO-COLUMN LAYOUT -->
+    <div class="layout-container">
+        <!-- STICKY SIDEBAR -->
+        <aside class="sidebar-nav">
+            <div class="sidebar-title">Contenido del Manual</div>
+            <a href="#problema" class="sidebar-link">1. El Problema Comercial</a>
+            <a href="#que-es" class="sidebar-link">2. Prospección en Frío</a>
+            <a href="#google-maps" class="sidebar-link">3. Directorio Google Maps</a>
+            <a href="#cliente-ideal" class="sidebar-link">4. Definir tu Cliente Ideal</a>
+            <a href="#scoring-ia" class="sidebar-link">5. Calificación con IA</a>
+            <a href="#estrategia" class="sidebar-link">6. De Prospectos a Clientes</a>
+            <a href="#atlasiq-features" class="sidebar-link">7. Qué es AtlasIQ</a>
+            <a href="#instalacion" class="sidebar-link">8. Instalación en Chrome</a>
+            <a href="#como-prospectar" class="sidebar-link">9. Cómo Prospectar</a>
+            <a href="#creditos" class="sidebar-link">10. Créditos y Autor</a>
+        </aside>
+
+        <!-- CONTENT AREA -->
+        <main class="content-area">
+            <!-- SECTION 1: EL PROBLEMA COMERCIAL -->
+            <article class="guide-card" id="problema">
+                <span class="guide-section-badge">Introducción</span>
+                <h2 class="guide-heading">El desafío de conseguir nuevos clientes B2B</h2>
+                <p class="guide-text">
+                    Si tienes una agencia, vendes servicios profesionales o tienes un negocio B2B, probablemente conoces este problema: <strong>conseguir clientes nuevos requiere tiempo, esfuerzo y, muchas veces, presupuesto publicitario</strong>.
+                </p>
+                <p class="guide-text">
+                    Publicamos en redes sociales, invertimos en anuncios, creamos contenido y esperamos que alguien se interese en nuestros servicios. Pero existe una alternativa mucho más directa y predecible: <strong>la prospección en frío</strong>.
+                </p>
+                <div class="callout-box">
+                    En lugar de esperar pasivamente a que los clientes nos encuentren, <strong>salimos a buscar activamente empresas</strong> que tienen necesidades reales que podemos resolver hoy mismo.
+                </div>
+            </article>
+
+            <!-- SECTION 2: QUÉ ES LA PROSPECCIÓN EN FRÍO -->
+            <article class="guide-card" id="que-es">
+                <span class="guide-section-badge">Fundamentos Comerciales</span>
+                <h2 class="guide-heading">1. ¿Qué es la prospección en frío y por qué sigue siendo vital?</h2>
+                <p class="guide-text">
+                    La prospección en frío consiste en identificar potenciales clientes con los que todavía no tenemos una relación comercial y establecer un primer contacto estratégico.
+                </p>
+                <div class="process-steps">
+                    <div class="process-step-item">
+                        <div class="step-number">🎯</div>
+                        <div class="step-content">
+                            <div class="step-title">Agencias de Marketing Digital</div>
+                            <div class="step-desc">Buscan restaurantes, clínicas o comercios locales que necesitan mejorar su presencia online, crear campañas o renovar su web.</div>
+                        </div>
+                    </div>
+                    <div class="process-step-item">
+                        <div class="step-number">💻</div>
+                        <div class="step-content">
+                            <div class="step-title">Empresas de Software y Desarrollo</div>
+                            <div class="step-desc">Identifican negocios que podrían beneficiarse de una aplicación móvil, automatizaciones o un portal de reservas.</div>
+                        </div>
+                    </div>
+                    <div class="process-step-item">
+                        <div class="step-number">💼</div>
+                        <div class="step-content">
+                            <div class="step-title">Consultores y Servicios Profesionales</div>
+                            <div class="step-desc">Localizan compañías con desafíos operativos, fiscales o estratégicos alineados con su oferta.</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="callout-box" style="margin-top: 10px;">
+                    La gran diferencia frente al marketing tradicional es que <strong>nosotros elegimos a quién contactar</strong>. No se trata de contactar a más personas, sino de <strong>contactar mejor</strong>.
+                </div>
+            </article>
+
+            <!-- SECTION 3: GOOGLE MAPS COMO DIRECTORIO -->
+            <article class="guide-card" id="google-maps">
+                <span class="guide-section-badge">Fuente de Datos</span>
+                <h2 class="guide-heading">2. Google Maps: El mayor directorio de oportunidades comerciales</h2>
+                <p class="guide-text">
+                    Google Maps no es solo para encontrar un restaurante o una gasolinera: es la <strong>base de datos comercial más actualizada del planeta</strong>. Cada negocio verificado cuenta con ubicación, sitio web, teléfono, reseñas y actividad reciente.
+                </p>
+                <p class="guide-text">
+                    Ejemplos de búsquedas con alto potencial comercial:
+                </p>
+                <div class="sector-grid">
+                    <div class="sector-pill">🍽 Restaurantes y Bares</div>
+                    <div class="sector-pill">🦷 Clínicas y Consultorios</div>
+                    <div class="sector-pill">🏋️ Gimnasios y Fitness</div>
+                    <div class="sector-pill">🏢 Inmobiliarias</div>
+                    <div class="sector-pill">🎓 Escuelas y Academias</div>
+                    <div class="sector-pill">🚚 Empresas de Transporte</div>
+                    <div class="sector-pill">🏨 Hoteles y Alojamientos</div>
+                    <div class="sector-pill">⚖️ Despachos y Abogados</div>
+                </div>
+                <p class="guide-text" style="margin-top: 10px;">
+                    Basta con buscar <em>«Clínicas dentales en Madrid»</em> o <em>«Restaurantes en Guadalajara»</em> para tener acceso a cientos de oportunidades comerciales con necesidades concretas.
+                </p>
+            </article>
+
+            <!-- SECTION 4: DEFINE A QUIÉN VENDERLE -->
+            <article class="guide-card" id="cliente-ideal">
+                <span class="guide-section-badge">Estrategia ICP</span>
+                <h2 class="guide-heading">3. Define primero a quién quieres venderle (Tu Cliente Ideal)</h2>
+                <p class="guide-text">
+                    Antes de recopilar prospectos, necesitas definir tu <strong>Cliente Ideal (ICP)</strong>. No todos los negocios son buenos prospectos para todos los productos o servicios.
+                </p>
+                <p class="guide-text">
+                    Por ejemplo, si desarrollas aplicaciones móviles o sistemas de pedidos para restaurantes, busca características como:
+                </p>
+                <div class="sector-grid">
+                    <div class="sector-pill">✅ Varias sucursales activas</div>
+                    <div class="sector-pill">✅ Servicio a domicilio propio</div>
+                    <div class="sector-pill">✅ Menús digitales interactivos</div>
+                    <div class="sector-pill">✅ Programas de fidelización</div>
+                    <div class="sector-pill">✅ Gestión de pedidos recurrentes</div>
+                </div>
+                <div class="callout-box" style="margin-top: 12px;">
+                    <strong>Regla de oro:</strong> Cuanto mejor definas tu mercado, menos tiempo perderás contactando empresas que nunca contratarían tus servicios.
+                </div>
+            </article>
+
+            <!-- SECTION 5: SCORING E INTELIGENCIA ARTIFICIAL -->
+            <article class="guide-card" id="scoring-ia">
+                <span class="guide-section-badge">Inteligencia Artificial</span>
+                <h2 class="guide-heading">4. Utiliza Inteligencia Artificial para calificar prospectos</h2>
+                <p class="guide-text">
+                    Encontrar empresas es solo el primer paso. El verdadero desafío es <strong>saber cuáles merecen tu atención inmediata</strong>. Aquí es donde la IA y los algoritmos predictivos marcan la diferencia.
+                </p>
+                <p class="guide-text">
+                    AtlasIQ aplica un sistema de <strong>Scoring Comercial (0 a 100)</strong> basado en:
+                </p>
+                <div class="feature-grid">
+                    <div class="feature-box">
+                        <div class="feature-icon">🌐</div>
+                        <div class="feature-box-title">Presencia Digital y Web</div>
+                        <div class="feature-box-desc">Detecta si la empresa carece de sitio web (oportunidad de diseño) o si usa CMS tradicionales y carece de pixeles de conversión.</div>
+                    </div>
+                    <div class="feature-box">
+                        <div class="feature-icon">⭐</div>
+                        <div class="feature-box-title">Reputación y Reseñas</div>
+                        <div class="feature-box-desc">Analiza calificaciones altas (4.5★) con pocas opiniones (oportunidad de reputación y reseñas locales).</div>
+                    </div>
+                    <div class="feature-box">
+                        <div class="feature-icon">📞</div>
+                        <div class="feature-box-title">Contactabilidad Directa</div>
+                        <div class="feature-box-desc">Verifica la presencia de teléfono directo para WhatsApp y correos corporativos reales.</div>
+                    </div>
+                </div>
+            </article>
+
+            <!-- SECTION 6: ESTRATEGIA DE ACERCAMIENTO -->
+            <article class="guide-card" id="estrategia">
+                <span class="guide-section-badge">Metodología de Ventas</span>
+                <h2 class="guide-heading">5. De encontrar prospectos a conseguir clientes reales</h2>
+                <p class="guide-text">
+                    Una lista de mil empresas no tiene valor si no sabes cómo abordarlas. Esta es la metodología en 5 pasos recomendada:
+                </p>
+                <div class="process-steps">
+                    <div class="process-step-item">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <div class="step-title">Investiga antes de contactar</div>
+                            <div class="step-desc">Revisa el sitio web, las opiniones y las características del negocio.</div>
+                        </div>
+                    </div>
+                    <div class="process-step-item">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <div class="step-title">Identifica una necesidad real</div>
+                            <div class="step-desc">Busca oportunidades concretas donde tu solución genere retorno de inversión. No inventes problemas.</div>
+                        </div>
+                    </div>
+                    <div class="process-step-item">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <div class="step-title">Personaliza el mensaje</div>
+                            <div class="step-desc">Evita los correos masivos genéricos. Explica brevemente por qué los contactas y qué valor puedes aportarles.</div>
+                        </div>
+                    </div>
+                    <div class="process-step-item">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <div class="step-title">Sé profesional y respetuoso</div>
+                            <div class="step-desc">La prospección nunca debe ser spam. Respeta las normativas de privacidad y el tiempo del destinatario.</div>
+                        </div>
+                    </div>
+                    <div class="process-step-item">
+                        <div class="step-number">5</div>
+                        <div class="step-content">
+                            <div class="step-title">Organiza el seguimiento continuo</div>
+                            <div class="step-desc">Registra los estados de contacto en tu CRM. La mayoría de las ventas se cierran en el seguimiento, no en el primer mensaje.</div>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+            <!-- SECTION 7: QUÉ ES ATLASIQ -->
+            <article class="guide-card" id="atlasiq-features">
+                <span class="guide-section-badge">La Solución</span>
+                <h2 class="guide-heading">6. AtlasIQ: La herramienta definitiva de prospección</h2>
+                <p class="guide-text">
+                    <strong>AtlasIQ</strong> fue desarrollada precisamente para automatizar y simplificar todo este flujo: extraer negocios de Google Maps, enriquecer sus datos con correos y redes, calcular su scoring comercial y organizarlos en un CRM moderno.
+                </p>
+                <div class="feature-grid">
+                    <div class="feature-box">
+                        <div class="feature-icon">⚡</div>
+                        <div class="feature-box-title">Intercepción de Red RPC</div>
+                        <div class="feature-box-desc">Captura prospectos directamente desde la capa de red interna de Google Maps a máxima velocidad.</div>
+                    </div>
+                    <div class="feature-box">
+                        <div class="feature-icon">🤖</div>
+                        <div class="feature-box-title">Scoring y Pitches IA</div>
+                        <div class="feature-box-desc">Califica cada empresa de 0 a 100 y genera propuestas listas para enviar por WhatsApp o Email.</div>
+                    </div>
+                    <div class="feature-box">
+                        <div class="feature-icon">📊</div>
+                        <div class="feature-box-title">CRM y Métricas en Vivo</div>
+                        <div class="feature-box-desc">Panel con KPIs de conversión, filtros por email/teléfono y cajón lateral de inspección 360°.</div>
+                    </div>
+                    <div class="feature-box">
+                        <div class="feature-icon">🚀</div>
+                        <div class="feature-box-title">Sincronización Webhook</div>
+                        <div class="feature-box-desc">Envía prospectos en un clic a Zapier, Make.com, HubSpot o GoHighLevel.</div>
+                    </div>
+                    <div class="feature-box">
+                        <div class="feature-icon">🔒</div>
+                        <div class="feature-box-title">100% Local y Privada</div>
+                        <div class="feature-box-desc">Se ejecuta en tu propio navegador. Tus datos y prospectos permanecen bajo tu control.</div>
+                    </div>
+                    <div class="feature-box">
+                        <div class="feature-icon">📥</div>
+                        <div class="feature-box-title">Exportación Completa</div>
+                        <div class="feature-box-desc">Descarga en CSV con codificación UTF-8 BOM para Excel, archivos XLSX o formato JSON.</div>
+                    </div>
+                </div>
+            </article>
+
+            <!-- SECTION 8: INSTALACIÓN EN GOOGLE CHROME -->
+            <article class="guide-card install-box" id="instalacion">
+                <div class="install-heading">⚙️ Cómo instalar AtlasIQ en Google Chrome</div>
+                <p style="font-size: 14px; color: #94a3b8;">
+                    La extensión se instala en menos de 1 minuto en modo desarrollador sin necesidad de conocimientos técnicos:
+                </p>
+                <div class="install-steps">
+                    <div class="install-step-card">
+                        <div class="num">1</div>
+                        <div class="text">Conserva la carpeta de <strong>AtlasIQ</strong> descomprimida en tu computadora.</div>
+                    </div>
+                    <div class="install-step-card">
+                        <div class="num">2</div>
+                        <div class="text">Abre Chrome y navega a la dirección: <code>chrome://extensions</code></div>
+                    </div>
+                    <div class="install-step-card">
+                        <div class="num">3</div>
+                        <div class="text">En la esquina superior derecha, activa el interruptor <strong>Modo de desarrollador</strong>.</div>
+                    </div>
+                    <div class="install-step-card">
+                        <div class="num">4</div>
+                        <div class="text">Haz clic en el botón <strong>Cargar descomprimida</strong> (Load unpacked).</div>
+                    </div>
+                    <div class="install-step-card">
+                        <div class="num">5</div>
+                        <div class="text">Selecciona la carpeta de <strong>AtlasIQ</strong>. ¡Listo! Chrome cargará la extensión.</div>
+                    </div>
+                </div>
+            </article>
+
+            <!-- SECTION 9: CÓMO EMPEZAR A PROSPECTAR -->
+            <article class="guide-card" id="como-prospectar">
+                <span class="guide-section-badge">Paso a Paso</span>
+                <h2 class="guide-heading">7. Cómo empezar a prospectar con AtlasIQ</h2>
+                <div class="process-steps">
+                    <div class="process-step-item">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <div class="step-title">Abre Google Maps</div>
+                            <div class="step-desc">Ve a Google Maps o haz clic en el icono de AtlasIQ para buscar un rubro (ej. <em>«Clínicas en Madrid»</em>).</div>
+                        </div>
+                    </div>
+                    <div class="process-step-item">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <div class="step-title">Inicia la Extracción desde el Dock Flotante</div>
+                            <div class="step-desc">El dock flotante aparecerá al lado del panel de búsqueda. Ajusta el límite o velocidad y presiona <strong>▶ Iniciar Extracción</strong>.</div>
+                        </div>
+                    </div>
+                    <div class="process-step-item">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <div class="step-title">Abre el CRM Dashboard</div>
+                            <div class="step-desc">Presiona <strong>📊 Ver en CRM</strong> para analizar los prospectos calificados, explorar redes y tech stack.</div>
+                        </div>
+                    </div>
+                    <div class="process-step-item">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <div class="step-title">Genera Pitches y Contacta</div>
+                            <div class="step-desc">Usa el generador de propuestas de 1 clic para abrir WhatsApp Web con el mensaje pre-cargado o sincroniza con tu CRM vía Webhook.</div>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+            <!-- SECTION 10: CRÉDITOS Y EMPRESA -->
+            <article class="author-card" id="creditos">
+                <div class="author-info">
+                    <div class="author-meta">PROYECTO OFICIAL</div>
+                    <div class="author-title">AtlasIQ Enterprise</div>
+                    <div class="author-desc">
+                        Desarrollada por <strong>Joseph Castillo (CEO)</strong> y respaldada por <strong>WINDOWSTELECOM</strong>, con el objetivo de dotar a las empresas de herramientas profesionales de prospección automatizada con tecnología de punta.
+                    </div>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <a href="dashboard.html" class="btn-cta btn-cta-primary" style="height: 40px; font-size: 13px;">
+                        📊 Abrir CRM AtlasIQ
+                    </a>
+                </div>
+            </article>
+        </main>
+    </div>
+
+    <!-- MAIN FOOTER -->
+    <footer class="main-footer">
+        <p><strong>AtlasIQ Enterprise</strong> · Diseñado y desarrollado por <strong>Joseph Castillo</strong> · CEO de <strong>WINDOWSTELECOM</strong></p>
+        <p style="margin-top: 6px; font-size: 12px; color: #94a3b8;">Tecnología comercial para explorar nuevas oportunidades, investigar, conectar y convertir prospectos en clientes.</p>
+    </footer>
+</body>
+
+</html>
+

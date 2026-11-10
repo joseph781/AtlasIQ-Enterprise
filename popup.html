@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AtlasIQ Pro</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-sub: #64748b;
+            --border: #e2e8f0;
+            --success: #10b981;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            width: 310px;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text-main);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+            padding: 14px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 16px;
+            font-weight: 800;
+            color: #fff;
+            letter-spacing: -0.3px;
+        }
+
+        .badge {
+            font-size: 10px;
+            font-weight: 700;
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            padding: 2px 7px;
+            border-radius: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .body {
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .stats-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 12px 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .stats-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stats-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-sub);
+            text-transform: uppercase;
+        }
+
+        .stats-count {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--primary);
+            line-height: 1.2;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 12px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .card-title {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-sub);
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+
+        .input-group {
+            position: relative;
+        }
+
+        .input {
+            width: 100%;
+            height: 36px;
+            border: 1px solid var(--border);
+            border-radius: 7px;
+            padding: 0 10px;
+            font-size: 13px;
+            color: var(--text-main);
+            background: #f8fafc;
+            outline: none;
+            transition: all 0.15s;
+        }
+
+        .input:focus {
+            border-color: var(--primary);
+            background: #fff;
+        }
+
+        .chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .chip {
+            font-size: 11px;
+            font-weight: 600;
+            background: #f1f5f9;
+            color: var(--text-sub);
+            padding: 3px 8px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.15s;
+            border: 1px solid var(--border);
+        }
+
+        .chip:hover {
+            background: #e2e8f0;
+            color: var(--text-main);
+        }
+
+        .btn {
+            width: 100%;
+            height: 36px;
+            border: none;
+            border-radius: 7px;
+            font-size: 13px;
+            font-weight: 700;
+            color: #fff;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.15s;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            box-shadow: 0 2px 4px rgba(37, 99, 235, 0.25);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+        }
+
+        .btn-success {
+            background: var(--success);
+            box-shadow: 0 2px 4px rgba(16, 185, 129, 0.25);
+        }
+
+        .btn-success:hover {
+            filter: brightness(1.08);
+        }
+
+        .footer {
+            padding: 0 14px 14px;
+            text-align: center;
+            font-size: 11px;
+            color: var(--text-sub);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <div class="brand">
+            🌐 Atlas<span>IQ</span>
+        </div>
+        <span class="badge">v2.5 PRO</span>
+    </div>
+
+    <div class="body">
+        <!-- LEADS IN MEMORY METRIC -->
+        <div class="stats-card">
+            <div class="stats-info">
+                <span class="stats-label">Base de Prospectos</span>
+                <span class="stats-count" id="stored-leads-count">0</span>
+            </div>
+            <button id="open-crm-btn" class="btn btn-primary" style="width: auto; height: 32px; padding: 0 12px; font-size: 12px;">
+                📊 Abrir CRM
+            </button>
+        </div>
+
+        <!-- SEARCH FORM -->
+        <div class="card">
+            <div class="card-title">🔍 Búsqueda en Google Maps</div>
+            <div class="input-group">
+                <input type="text" id="query-input" class="input" placeholder="Ej: Clínicas dentales en Madrid" value="Restaurantes en Guadalajara" />
+            </div>
+
+            <div class="chips">
+                <span class="chip" data-query="Restaurantes en ">🍽 Restaurantes</span>
+                <span class="chip" data-query="Clínicas Dentales en ">🦷 Dentistas</span>
+                <span class="chip" data-query="Inmobiliarias en ">🏢 Inmobiliarias</span>
+                <span class="chip" data-query="Agencias de Marketing en ">📈 Agencias</span>
+            </div>
+
+            <button id="search-btn" class="btn btn-success">
+                ▶ Explorar en Google Maps
+            </button>
+        </div>
+    </div>
+
+    <div class="footer">
+        <a href="index.html" target="_blank" style="color: #2563eb; text-decoration: none; font-weight: 700; margin-bottom: 4px; display: inline-block;">📖 Manual Oficial de AtlasIQ</a><br />
+        Desarrollada por <strong>Joseph Castillo (CEO)</strong> · <strong>WINDOWSTELECOM</strong>
+    </div>
+
+    <script src="js/popup.js"></script>
+</body>
+
+</html>
