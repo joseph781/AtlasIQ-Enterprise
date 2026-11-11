@@ -60,3 +60,4 @@ const client = args[1] || "Cliente AtlasIQ";
 const days = parseInt(args[2]) || 365;
 
 generateLicense(devId, client, days);
+

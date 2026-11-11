@@ -395,3 +395,4 @@ function closeLicenseModal() {
     if (modal) modal.classList.remove("open");
     if (backdrop) backdrop.classList.remove("open");
 }
+

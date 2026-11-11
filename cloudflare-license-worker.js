@@ -132,3 +132,4 @@ export default {
         return new Response(JSON.stringify({ error: "Ruta no encontrada" }), { status: 404, headers: corsHeaders });
     }
 };
+
