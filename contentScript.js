@@ -302,13 +302,29 @@ function createFloatingDock() {
     btnStop.addEventListener("click", () => stopExtraction());
     btnExport.addEventListener("click", () => {
         persistLeadsToStorage(true);
-        chrome.storage.local.set({ leads: leads, lastSync: Date.now() }, () => {
-            chrome.runtime.sendMessage({ action: "openPage" }, (res) => {
-                if (chrome.runtime.lastError) {
-                    window.open(chrome.runtime.getURL("dashboard.html"), "_blank");
+        try {
+            chrome.storage.local.set({ leads: leads, lastSync: Date.now() }, () => {
+                try {
+                    chrome.runtime.sendMessage({ action: "openPage" }, (res) => {
+                        if (chrome.runtime.lastError) {
+                            try {
+                                window.open(chrome.runtime.getURL("dashboard.html"), "_blank");
+                            } catch (e) {
+                                alert("⚠️ AtlasIQ se ha actualizado en el navegador.\n\nPor favor presiona F5 o recarga esta pestaña de Google Maps para sincronizar con el CRM.");
+                            }
+                        }
+                    });
+                } catch (e) {
+                    try {
+                        window.open(chrome.runtime.getURL("dashboard.html"), "_blank");
+                    } catch (e2) {
+                        alert("⚠️ AtlasIQ se ha actualizado en el navegador.\n\nPor favor presiona F5 o recarga esta pestaña de Google Maps para sincronizar con el CRM.");
+                    }
                 }
             });
-        });
+        } catch (err) {
+            alert("⚠️ La extensión AtlasIQ se ha recargado o actualizado en el navegador.\n\nPor favor presiona F5 (Recargar) en esta pestaña de Google Maps para sincronizarla con el CRM.");
+        }
     });
     btnClear.addEventListener("click", () => {
         if (confirm("¿Deseas reiniciar la lista de prospectos?")) {

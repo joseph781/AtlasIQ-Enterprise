@@ -310,7 +310,7 @@ function openOrFocusDashboard() {
                 chrome.windows.update(existingTab.windowId, { focused: true });
             }
         } else {
-            chrome.tabs.create({ url: "dashboard.html" });
+            chrome.tabs.create({ url: chrome.runtime.getURL("dashboard.html") });
         }
     });
 }
