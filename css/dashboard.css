@@ -1674,6 +1674,89 @@ body {
     color: #cbd5e1;
 }
 
+/* Score Pills in Dark Mode */
+[data-theme="dark"] .tl-score-high {
+    background: #064e3b !important;
+    color: #6ee7b7 !important;
+    border: 1px solid #059669 !important;
+}
+
+[data-theme="dark"] .tl-score-med {
+    background: #451a03 !important;
+    color: #fde68a !important;
+    border: 1px solid #78350f !important;
+}
+
+[data-theme="dark"] .tl-score-low {
+    background: #1e293b !important;
+    color: #cbd5e1 !important;
+    border: 1px solid #334155 !important;
+}
+
+/* Live MX DNS Verification Badges in Dark Mode */
+[data-theme="dark"] .tl-mx-badge.valid {
+    background: #064e3b !important;
+    color: #34d399 !important;
+    border-color: #059669 !important;
+}
+
+[data-theme="dark"] .tl-mx-badge.invalid {
+    background: #450a0a !important;
+    color: #f87171 !important;
+    border-color: #991b1b !important;
+}
+
+[data-theme="dark"] .tl-mx-badge.checking {
+    background: #172554 !important;
+    color: #60a5fa !important;
+    border-color: #2563eb !important;
+}
+
+[data-theme="dark"] .tl-btn-verify-mx {
+    background: #1e293b !important;
+    color: #f8fafc !important;
+    border-color: #334155 !important;
+}
+
+/* Saturation Badges in Dark Mode */
+[data-theme="dark"] .tl-sat-badge {
+    border: 1px solid transparent;
+}
+
+[data-theme="dark"] .tl-sat-badge[style*="#ecfdf5"],
+[data-theme="dark"] .tl-sat-badge.sat-blue {
+    background: #064e3b !important;
+    color: #6ee7b7 !important;
+    border-color: #059669 !important;
+}
+
+[data-theme="dark"] .tl-sat-badge[style*="#fef2f2"],
+[data-theme="dark"] .tl-sat-badge.sat-red {
+    background: #450a0a !important;
+    color: #f87171 !important;
+    border-color: #991b1b !important;
+}
+
+[data-theme="dark"] .tl-sat-badge[style*="#fffbeb"],
+[data-theme="dark"] .tl-sat-badge.sat-yellow {
+    background: #451a03 !important;
+    color: #fde68a !important;
+    border-color: #78350f !important;
+}
+
+/* License Badges in Dark Mode */
+[data-theme="dark"] .tl-license-badge.active {
+    background: rgba(16, 185, 129, 0.15) !important;
+    border-color: rgba(16, 185, 129, 0.4) !important;
+    color: #34d399 !important;
+}
+
+[data-theme="dark"] .tl-license-badge.expired {
+    background: rgba(239, 68, 68, 0.15) !important;
+    border-color: rgba(239, 68, 68, 0.4) !important;
+    color: #f87171 !important;
+}
+
 /* ========================================================================== */
 /* === SILICON VALLEY PROFESSIONAL RESPONSIVE & MOBILE DESIGN SYSTEM ======= */
 /* ========================================================================== */
