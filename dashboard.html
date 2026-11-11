@@ -8,6 +8,13 @@
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <title>AtlasIQ Enterprise CRM – Silicon Valley Grade B2B Intelligence</title>
+    <script>
+        // Inmediatamente aplicar el tema guardado para evitar parpadeos
+        (function() {
+            var savedTheme = localStorage.getItem("atlasiq-theme") || "light";
+            document.documentElement.setAttribute("data-theme", savedTheme);
+        })();
+    </script>
     <link href="lib/tabulator/css/semantic-ui/tabulator_semantic-ui.min.css" rel="stylesheet" />
     <link href="lib/leaflet/leaflet.css" rel="stylesheet" />
     <link href="css/dashboard.css" rel="stylesheet" />
@@ -37,6 +44,9 @@
             </div>
         </div>
         <div class="tl-nav-actions">
+            <button id="btn-toggle-theme" class="tl-btn tl-btn-outline" title="Alternar Modo Oscuro / Claro" style="font-weight: 700;">
+                🌙 Modo Oscuro
+            </button>
             <button id="btn-open-maps-search" class="tl-btn tl-btn-outline" style="border-color: #3b82f6; color: #1d4ed8;" title="Abrir Google Maps para prospectar en esta zona">
                 🗺️ Explorar en Maps
             </button>
@@ -147,7 +157,7 @@
         <section class="tl-filter-row-secondary">
             <div class="tl-filter-group-left">
                 <div style="display: flex; align-items: center; gap: 6px;">
-                    <label for="filter-niche" style="font-size: 12px; font-weight: 700; color: #475569;">🏷️ Nicho:</label>
+                    <label for="filter-niche" style="font-size: 12px; font-weight: 700; color: var(--text-secondary);">🏷️ Nicho:</label>
                     <select id="filter-niche" class="tl-select-filter" style="min-width: 170px;">
                         <option value="all" selected>Todos los Nichos (Todos)</option>
                     </select>
@@ -159,7 +169,7 @@
                 </label>
 
                 <div style="display: flex; align-items: center; gap: 6px;">
-                    <label for="filter-distance" style="font-size: 12px; font-weight: 700; color: #475569;">📍 Distancia Máx:</label>
+                    <label for="filter-distance" style="font-size: 12px; font-weight: 700; color: var(--text-secondary);">📍 Distancia Máx:</label>
                     <select id="filter-distance" class="tl-select-filter">
                         <option value="all" selected>Cualquier distancia (Todas)</option>
                         <option value="1">&lt; 1 km (Hiper-local)</option>
@@ -262,14 +272,14 @@
 
                 <!-- DETAILED NICHE BREAKDOWN TABLE IN CRM -->
                 <div style="margin-top: 6px; border-top: 1px solid var(--border-color); padding-top: 14px;">
-                    <div style="font-size: 13px; font-weight: 800; color: #0f172a; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between;">
+                    <div style="font-size: 13px; font-weight: 800; color: var(--text-primary); margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between;">
                         <span>📊 Detalle de Nichos en el Cuadrante Escrapeado:</span>
-                        <span style="font-size: 11px; color: #64748b; font-weight: normal;">Haz clic en cualquier nicho para filtrarlo al instante</span>
+                        <span style="font-size: 11px; color: var(--text-muted); font-weight: normal;">Haz clic en cualquier nicho para filtrarlo al instante</span>
                     </div>
                     <div id="sat-niche-breakdown-container" style="overflow-x: auto;">
-                        <table style="width: 100%; border-collapse: collapse; font-size: 12px; background: #fff; border-radius: 8px; overflow: hidden; border: 1px solid var(--border-color);">
+                        <table style="width: 100%; border-collapse: collapse; font-size: 12px; background: var(--bg-card); border-radius: 8px; overflow: hidden; border: 1px solid var(--border-color);">
                             <thead>
-                                <tr style="background: #f1f5f9; text-align: left; color: #475569; font-weight: 700; border-bottom: 1px solid var(--border-color);">
+                                <tr style="background: var(--bg-main); text-align: left; color: var(--text-secondary); font-weight: 700; border-bottom: 1px solid var(--border-color);">
                                     <th style="padding: 8px 12px;">Nicho / Rubro</th>
                                     <th style="padding: 8px 12px; text-align: center;">Total Negocios</th>
                                     <th style="padding: 8px 12px; text-align: center;">Proximidad Promedio</th>
@@ -279,7 +289,7 @@
                                 </tr>
                             </thead>
                             <tbody id="sat-niche-tbody">
-                                <tr><td colspan="6" style="padding: 12px; text-align: center; color: #94a3b8;">Cargando análisis de nichos...</td></tr>
+                                <tr><td colspan="6" style="padding: 12px; text-align: center; color: var(--text-muted);">Cargando análisis de nichos...</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -316,19 +326,19 @@
         </section>
 
         <!-- INTERACTIVE GEOMAP VIEW -->
-        <section class="tl-map-card" id="view-section-map" style="display: none; background: #fff; border-radius: var(--radius-lg); border: 1.5px solid var(--border-color); padding: 16px; box-shadow: var(--shadow-md); position: relative;">
+        <section class="tl-map-card" id="view-section-map" style="display: none; background: var(--bg-card); border-radius: var(--radius-lg); border: 1.5px solid var(--border-color); padding: 16px; box-shadow: var(--shadow-md); position: relative;">
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
                 <div style="display: flex; align-items: center; gap: 8px;">
                     <span style="font-size: 18px;">🗺️</span>
-                    <strong style="font-size: 15px; color: #0f172a;">Radar Geoespacial y Concentración de Clientes</strong>
+                    <strong style="font-size: 15px; color: var(--text-primary);">Radar Geoespacial y Concentración de Clientes</strong>
                     <span class="tl-badge-score tl-score-high" id="map-counter-badge" style="font-size: 11px;">0 Pines en mapa</span>
                 </div>
                 <div style="display: flex; align-items: center; gap: 12px;">
-                    <label class="tl-checkbox-label" style="background: #fff;">
+                    <label class="tl-checkbox-label">
                         <input type="checkbox" id="check-map-heatmap" checked />
                         <span>🔥 Capa de Calor (Densidad)</span>
                     </label>
-                    <label class="tl-checkbox-label" style="background: #fff;">
+                    <label class="tl-checkbox-label">
                         <input type="checkbox" id="check-map-markers" checked />
                         <span>📍 Pines de Prospectos</span>
                     </label>
@@ -338,24 +348,24 @@
                 </div>
             </div>
             <div id="atlasiq-map" style="height: 600px; width: 100%; border-radius: var(--radius-md); border: 1px solid var(--border-color); z-index: 10;"></div>
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 10px; font-size: 11px; color: #64748b;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 10px; font-size: 11px; color: var(--text-muted);">
                 <div>
                     <strong>Leyenda de Oportunidad:</strong> 
                     <span style="color: #10b981; font-weight: 700; margin-left: 6px;">🟢 Score Alto (75+)</span> · 
                     <span style="color: #f59e0b; font-weight: 700; margin-left: 6px;">🟡 Score Medio (45-74)</span> · 
-                    <span style="color: #64748b; font-weight: 700; margin-left: 6px;">⚪ Score Bajo (&lt;45)</span>
+                    <span style="color: #94a3b8; font-weight: 700; margin-left: 6px;">⚪ Score Bajo (&lt;45)</span>
                 </div>
                 <div>Haz clic en cualquier pin para ver el diagnóstico y abrir WhatsApp</div>
             </div>
         </section>
 
         <!-- PIPELINE KANBAN VIEW -->
-        <section class="tl-kanban-card" id="view-section-kanban" style="display: none; background: #fff; border-radius: var(--radius-lg); border: 1.5px solid var(--border-color); padding: 18px; box-shadow: var(--shadow-md);">
+        <section class="tl-kanban-card" id="view-section-kanban" style="display: none; background: var(--bg-card); border-radius: var(--radius-lg); border: 1.5px solid var(--border-color); padding: 18px; box-shadow: var(--shadow-md);">
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
                 <div style="display: flex; align-items: center; gap: 8px;">
                     <span style="font-size: 18px;">📊</span>
-                    <strong style="font-size: 15px; color: #0f172a;">Pipeline de Ventas y Seguimiento de Leads (Kanban)</strong>
-                    <span style="font-size: 12px; color: #64748b;">Arrastra los prospectos entre columnas para actualizar su estado de venta</span>
+                    <strong style="font-size: 15px; color: var(--text-primary);">Pipeline de Ventas y Seguimiento de Leads (Kanban)</strong>
+                    <span style="font-size: 12px; color: var(--text-muted);">Arrastra los prospectos entre columnas para actualizar su estado de venta</span>
                 </div>
                 <div style="display: flex; gap: 8px;">
                     <button id="btn-kanban-reset-all" class="tl-btn tl-btn-outline" style="height: 28px; font-size: 11px; color: #64748b;" title="Mover todos los prospectos de nuevo a 'Nuevo Prospecto'">
@@ -541,7 +551,7 @@
                             💬 Abrir WhatsApp
                         </a>
                     </div>
-                    <button id="btn-download-pdf-audit" class="tl-btn tl-btn-outline" style="width: 100%; margin-top: 10px; border-color: #0f172a; color: #0f172a; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px;" title="Generar informe ejecutivo de auditoría en PDF de marca blanca">
+                    <button id="btn-download-pdf-audit" class="tl-btn tl-btn-outline" style="width: 100%; margin-top: 10px; border-color: var(--text-primary); color: var(--text-primary); font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px;" title="Generar informe ejecutivo de auditoría en PDF de marca blanca">
                         📄 Descargar Auditoría PDF (Marca Blanca)
                     </button>
                 </div>
@@ -551,24 +561,24 @@
 
     <!-- SETTINGS / WEBHOOK MODAL -->
     <div class="tl-modal" id="settings-modal">
-        <h3 style="font-size: 16px; font-weight: 800;">⚙️ Configuración de AtlasIQ Enterprise</h3>
+        <h3 style="font-size: 16px; font-weight: 800; color: var(--text-primary);">⚙️ Configuración de AtlasIQ Enterprise</h3>
         
         <div>
-            <label style="font-size: 12px; font-weight: 600; color: #475569; display: block; margin-bottom: 4px;">
+            <label style="font-size: 12px; font-weight: 600; color: var(--text-secondary); display: block; margin-bottom: 4px;">
                 URL de Webhook (Zapier / Make / n8n / HubSpot):
             </label>
             <input type="url" id="setting-webhook-url" class="tl-search-input" placeholder="https://hook.eu1.make.com/..." />
-            <small style="font-size: 11px; color: #64748b; margin-top: 4px; display: block;">
+            <small style="font-size: 11px; color: var(--text-muted); margin-top: 4px; display: block;">
                 Los prospectos se enviarán en formato JSON limpio con todos sus atributos.
             </small>
         </div>
 
         <div style="margin-top: 10px;">
-            <label style="font-size: 12px; font-weight: 600; color: #475569; display: block; margin-bottom: 4px;">
+            <label style="font-size: 12px; font-weight: 600; color: var(--text-secondary); display: block; margin-bottom: 4px;">
                 Google Gemini API Key (Opcional para IA en vivo):
             </label>
             <input type="password" id="setting-gemini-key" class="tl-search-input" placeholder="AIzaSy..." />
-            <small style="font-size: 11px; color: #64748b; margin-top: 4px; display: block;">
+            <small style="font-size: 11px; color: var(--text-muted); margin-top: 4px; display: block;">
                 Permite redactar diagnósticos estratégicos y guiones de venta hiperpersonalizados en 1 clic.
             </small>
         </div>
@@ -584,29 +594,29 @@
         <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">
             <div style="display: flex; align-items: center; gap: 8px;">
                 <span style="font-size: 20px;">⚡</span>
-                <h3 style="font-size: 16px; font-weight: 800; color: #0f172a;">Cola de Prospección Rápida de WhatsApp</h3>
+                <h3 style="font-size: 16px; font-weight: 800; color: var(--text-primary);">Cola de Prospección Rápida de WhatsApp</h3>
             </div>
             <span class="tl-badge-score tl-score-high" id="speed-queue-counter">0 / 0</span>
         </div>
 
         <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 6px;">
             <!-- Current Target Lead Info -->
-            <div style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 12px;">
+            <div style="background: var(--bg-main); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px;">
                 <div style="display: flex; align-items: flex-start; justify-content: space-between;">
                     <div>
-                        <h4 id="speed-lead-name" style="font-size: 15px; font-weight: 800; color: #0f172a;">Empresa</h4>
-                        <div id="speed-lead-meta" style="font-size: 11px; color: #64748b; margin-top: 2px;">Categoría · Distancia</div>
+                        <h4 id="speed-lead-name" style="font-size: 15px; font-weight: 800; color: var(--text-primary);">Empresa</h4>
+                        <div id="speed-lead-meta" style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">Categoría · Distancia</div>
                     </div>
                     <span id="speed-lead-score" class="tl-badge-score tl-score-high">85</span>
                 </div>
-                <div style="margin-top: 8px; font-size: 12px; color: #334155;">
-                    📞 Teléfono: <strong id="speed-lead-phone">-</strong>
+                <div style="margin-top: 8px; font-size: 12px; color: var(--text-secondary);">
+                    📞 Teléfono: <strong id="speed-lead-phone" style="color: var(--text-primary);">-</strong>
                 </div>
             </div>
 
             <!-- Pitch Preview Box -->
             <div>
-                <label style="font-size: 12px; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">
+                <label style="font-size: 12px; font-weight: 700; color: var(--text-secondary); display: block; margin-bottom: 4px;">
                     Mensaje Personalizado de Apertura:
                 </label>
                 <div class="tl-pitch-box" id="speed-pitch-box" style="max-height: 140px; font-size: 12px;"></div>
@@ -640,8 +650,8 @@
             <div style="display: flex; align-items: center; gap: 8px;">
                 <span style="font-size: 20px;">🛡️</span>
                 <div>
-                    <h3 style="font-size: 16px; font-weight: 800; color: #0f172a;">Activación de AtlasIQ Enterprise</h3>
-                    <small style="color: #64748b; font-size: 11px;">WINDOWSTELECOM · Licenciamiento Anual Protegido por Dispositivo</small>
+                    <h3 style="font-size: 16px; font-weight: 800; color: var(--text-primary);">Activación de AtlasIQ Enterprise</h3>
+                    <small style="color: var(--text-muted); font-size: 11px;">WINDOWSTELECOM · Licenciamiento Anual Protegido por Dispositivo</small>
                 </div>
             </div>
             <button class="tl-btn tl-btn-ghost" id="btn-close-license-modal" style="font-size: 14px; height: 26px; padding: 0 6px;">✕</button>
@@ -649,15 +659,41 @@
 
         <div style="display: flex; flex-direction: column; gap: 14px; margin-top: 8px;">
             <!-- Step 1: Device ID -->
-            <div style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 12px;">
-                <label style="font-size: 11px; font-weight: 700; color: #475569; text-transform: uppercase; display: block; margin-bottom: 4px;">
+            <div style="background: var(--bg-main); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px;">
+                <label style="font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; display: block; margin-bottom: 4px;">
                     1. Tu ID Único de Dispositivo:
                 </label>
                 <div style="display: flex; gap: 8px; align-items: center;">
-                    <div id="license-modal-device-id" style="flex: 1; font-family: monospace; font-size: 14px; font-weight: 800; background: #fff; border: 1px solid #cbd5e1; border-radius: 6px; padding: 8px 12px; color: #1e40af; user-select: all;">
+                    <div id="license-modal-device-id" style="flex: 1; font-family: monospace; font-size: 14px; font-weight: 800; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 6px; padding: 8px 12px; color: #3b82f6; user-select: all;">
                         Cargando...
                     </div>
                     <button class="tl-btn tl-btn-outline" id="btn-copy-device-id" style="height: 36px; font-size: 11px; white-space: nowrap;">
+                        📋 Copiar ID
+                    </button>
+                </div>
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 8px;">
+                    <span style="font-size: 11px; color: var(--text-muted);">Envía este ID a WINDOWSTELECOM:</span>
+                    <a href="#" target="_blank" id="link-whatsapp-license" class="tl-btn tl-btn-success" style="height: 26px; font-size: 11px; padding: 0 10px; text-decoration: none;">
+                        💬 Enviar por WhatsApp
+                    </a>
+                </div>
+            </div>
+
+            <!-- Step 2: License Input -->
+            <div>
+                <label style="font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; display: block; margin-bottom: 4px;">
+                    2. Clave de Activación Anual:
+                </label>
+                <input type="text" id="input-license-key" class="tl-search-input" placeholder="Pega aquí tu clave: ATQ-LIC-..." style="font-family: monospace; font-size: 12px; height: 38px;" />
+            </div>
+
+            <div id="license-alert-msg" class="tl-license-alert" style="display: none;"></div>
+
+            <button class="tl-btn tl-btn-primary" id="btn-submit-license" style="height: 40px; font-size: 13px; font-weight: 800;">
+                🚀 Activar Licencia por 1 Año
+            </button>
+        </div>
+    </div>
                         📋 Copiar ID
                     </button>
                 </div>

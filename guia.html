@@ -6,6 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover" />
     <meta name="theme-color" content="#2563eb" />
     <title>AtlasIQ Enterprise – Guía Oficial y Manual de Prospección B2B</title>
+    <script>
+        (function() {
+            var savedTheme = localStorage.getItem("atlasiq-theme") || "light";
+            document.documentElement.setAttribute("data-theme", savedTheme);
+        })();
+    </script>
     <style>
         :root {
             --primary: #2563eb;
@@ -24,6 +30,132 @@
             --shadow-xl: 0 20px 25px -5px rgba(0,0,0,0.08), 0 8px 10px -6px rgba(0,0,0,0.04);
             --radius-lg: 16px;
             --radius-md: 10px;
+        }
+
+        /* === LUXURY OBSIDIAN DARK THEME === */
+        [data-theme="dark"] {
+            --primary: #3b82f6;
+            --primary-dark: #60a5fa;
+            --primary-light: #172554;
+            --accent: #10b981;
+            --accent-light: #064e3b;
+            --bg: #0b0f19;
+            --card-bg: #111827;
+            --text-main: #f8fafc;
+            --text-muted: #cbd5e1;
+            --text-light: #94a3b8;
+            --border: #1e293b;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.4);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.5);
+            --shadow-xl: 0 20px 25px -5px rgba(0,0,0,0.7);
+        }
+
+        [data-theme="dark"] body {
+            background-color: var(--bg);
+            color: var(--text-main);
+        }
+
+        [data-theme="dark"] .topbar {
+            background: rgba(17, 24, 39, 0.94);
+            border-bottom-color: #1e293b;
+        }
+
+        [data-theme="dark"] .brand-name {
+            color: #f8fafc;
+        }
+
+        [data-theme="dark"] .hero {
+            background: linear-gradient(180deg, #111827 0%, #0b0f19 100%);
+            border-bottom-color: #1e293b;
+        }
+
+        [data-theme="dark"] .hero-title {
+            color: #f8fafc;
+        }
+
+        [data-theme="dark"] .hero-subtitle {
+            color: #cbd5e1;
+        }
+
+        [data-theme="dark"] .hero-author-badge {
+            background: #111827;
+            border-color: #1e293b;
+            color: #f8fafc;
+        }
+
+        [data-theme="dark"] .btn-cta-outline {
+            background: #1e293b;
+            color: #f8fafc;
+            border-color: #334155;
+        }
+
+        [data-theme="dark"] .sidebar-nav {
+            background: #111827;
+            border-color: #1e293b;
+        }
+
+        [data-theme="dark"] .sidebar-nav a {
+            color: #cbd5e1;
+        }
+
+        [data-theme="dark"] .sidebar-nav a:hover {
+            background: #1e293b;
+            color: #f8fafc;
+        }
+
+        [data-theme="dark"] .guide-card {
+            background: #111827;
+            border-color: #1e293b;
+        }
+
+        [data-theme="dark"] .guide-heading {
+            color: #f8fafc;
+        }
+
+        [data-theme="dark"] .feature-box {
+            background: #0b0f19;
+            border-color: #1e293b;
+        }
+
+        [data-theme="dark"] .feature-box-title {
+            color: #f8fafc;
+        }
+
+        [data-theme="dark"] .feature-box-desc {
+            color: #94a3b8;
+        }
+
+        [data-theme="dark"] .sector-card {
+            background: #0b0f19;
+            border-color: #1e293b;
+        }
+
+        [data-theme="dark"] .sector-name {
+            color: #f8fafc;
+        }
+
+        [data-theme="dark"] .author-card {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border-color: #334155;
+        }
+
+        [data-theme="dark"] .author-title {
+            color: #f8fafc;
+        }
+
+        [data-theme="dark"] .author-desc {
+            color: #cbd5e1;
+        }
+
+        [data-theme="dark"] .main-footer {
+            background: #0b0f19;
+            border-top-color: #1e293b;
+            color: #94a3b8;
+        }
+
+        [data-theme="dark"] .topbar-nav a {
+            color: #cbd5e1;
+            background: #1e293b;
         }
 
         * {
@@ -745,6 +877,9 @@
                 <a href="#scoring-ia">Scoring IA</a>
                 <a href="#proceso">Estrategia</a>
                 <a href="#instalacion">Instalación</a>
+                <button id="btn-toggle-theme" class="btn-cta btn-cta-outline" style="height: 32px; padding: 0 10px; font-size: 12px; border-radius: 6px; cursor: pointer;" title="Alternar Modo Oscuro / Claro">
+                    🌙 Modo Oscuro
+                </button>
                 <a href="dashboard.html" class="btn-crm-nav">📊 Abrir CRM Dashboard</a>
             </nav>
         </div>
@@ -1100,6 +1235,31 @@
         <p><strong>AtlasIQ Enterprise</strong> · Diseñado y desarrollado por <strong>Joseph Castillo</strong> · CEO de <strong>WINDOWSTELECOM</strong></p>
         <p style="margin-top: 6px; font-size: 12px; color: #94a3b8;">Tecnología comercial para explorar nuevas oportunidades, investigar, conectar y convertir prospectos en clientes.</p>
     </footer>
+
+    <script>
+        (function() {
+            function updateThemeBtn(theme) {
+                var btn = document.getElementById("btn-toggle-theme");
+                if (btn) {
+                    btn.innerHTML = theme === "dark" ? "☀️ Modo Claro" : "🌙 Modo Oscuro";
+                }
+            }
+            var currentTheme = localStorage.getItem("atlasiq-theme") || "light";
+            document.documentElement.setAttribute("data-theme", currentTheme);
+            updateThemeBtn(currentTheme);
+
+            var btn = document.getElementById("btn-toggle-theme");
+            if (btn) {
+                btn.addEventListener("click", function() {
+                    var active = document.documentElement.getAttribute("data-theme") || "light";
+                    var next = active === "dark" ? "light" : "dark";
+                    document.documentElement.setAttribute("data-theme", next);
+                    localStorage.setItem("atlasiq-theme", next);
+                    updateThemeBtn(next);
+                });
+            }
+        })();
+    </script>
 </body>
 
 </html>

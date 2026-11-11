@@ -6,6 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover" />
     <meta name="theme-color" content="#1e3a8a" />
     <title>AtlasIQ Pro</title>
+    <script>
+        (function() {
+            var savedTheme = localStorage.getItem("atlasiq-theme") || "light";
+            document.documentElement.setAttribute("data-theme", savedTheme);
+        })();
+    </script>
     <style>
         :root {
             --primary: #2563eb;
@@ -15,6 +21,17 @@
             --text-main: #0f172a;
             --text-sub: #64748b;
             --border: #e2e8f0;
+            --success: #10b981;
+        }
+
+        [data-theme="dark"] {
+            --primary: #3b82f6;
+            --primary-hover: #60a5fa;
+            --bg: #0b0f19;
+            --card-bg: #111827;
+            --text-main: #f8fafc;
+            --text-sub: #cbd5e1;
+            --border: #1e293b;
             --success: #10b981;
         }
 
@@ -31,6 +48,17 @@
             background: var(--bg);
             color: var(--text-main);
             margin: 0 auto;
+        }
+
+        [data-theme="dark"] .btn-secondary {
+            background: #1e293b;
+            color: #cbd5e1;
+            border-color: #334155;
+        }
+
+        [data-theme="dark"] .btn-secondary:hover {
+            background: #334155;
+            color: #ffffff;
         }
 
         /* Mobile standalone view auto-adapt */

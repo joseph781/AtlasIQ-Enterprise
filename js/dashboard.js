@@ -69,7 +69,7 @@ function initTable() {
                     const row = cell.getRow().getData();
                     const name = cell.getValue() || "Sin nombre";
                     const mapLink = row.mapsUrl ? `<a href="${row.mapsUrl}" target="_blank" title="Ver en Google Maps" style="margin-left: 6px; text-decoration: none;">📍</a>` : "";
-                    return `<strong style="color: #0f172a;">${name}</strong>${mapLink}`;
+                    return `<strong class="tl-table-name">${name}</strong>${mapLink}`;
                 }
             },
             {
@@ -170,7 +170,7 @@ function initTable() {
                         if (row.tech_stack.includes("Shopify")) techBadge = ' <span style="background: #e0f2fe; color: #0284c7; padding: 1px 4px; border-radius: 4px; font-size: 10px;">Shopify</span>';
                         else if (row.tech_stack.includes("WordPress")) techBadge = ' <span style="background: #e2e8f0; color: #334155; padding: 1px 4px; border-radius: 4px; font-size: 10px;">WP</span>';
                     }
-                    return `<a href="${val}" target="_blank" style="color: #0f172a; text-decoration: underline;">${domain}</a>${techBadge}`;
+                    return `<a href="${val}" target="_blank" class="tl-table-link">${domain}</a>${techBadge}`;
                 }
             },
             {
@@ -181,7 +181,7 @@ function initTable() {
                 formatter: (cell) => {
                     const val = cell.getValue();
                     if (!val) return '<span style="color: #94a3b8;">-</span>';
-                    return `<span style="color: #475569; font-size: 12px;">${val}</span>`;
+                    return `<span class="tl-table-category">${val}</span>`;
                 }
             },
             {
@@ -574,24 +574,24 @@ function renderNicheBreakdownTable() {
         const noWebPct = total > 0 ? Math.round((noWebCount / total) * 100) : 0;
 
         html += `
-            <tr style="border-bottom: 1px solid #f1f5f9; transition: background 0.15s;">
-                <td style="padding: 8px 12px; font-weight: 700; color: #1e293b;">
+            <tr class="tl-niche-tr">
+                <td class="tl-niche-name" style="padding: 8px 12px;">
                     ${catName}
                 </td>
-                <td style="padding: 8px 12px; text-align: center; font-weight: 800; color: #0f172a;">
+                <td class="tl-niche-total" style="padding: 8px 12px; text-align: center;">
                     ${total}
                 </td>
-                <td style="padding: 8px 12px; text-align: center; color: #475569;">
+                <td class="tl-niche-dist" style="padding: 8px 12px; text-align: center;">
                     📍 ${avgDistText}
                 </td>
                 <td style="padding: 8px 12px; text-align: center;">
                     ${satBadge}
                 </td>
-                <td style="padding: 8px 12px; text-align: center; color: ${noWebPct > 50 ? '#ef4444' : '#475569'}; font-weight: 600;">
+                <td style="padding: 8px 12px; text-align: center; color: ${noWebPct > 50 ? '#ef4444' : 'var(--text-secondary)'}; font-weight: 600;">
                     ${noWebPct}% (${noWebCount}/${total})
                 </td>
                 <td style="padding: 8px 12px; text-align: center;">
-                    <button class="tl-btn tl-btn-outline" onclick="selectAndFilterNiche('${catName.replace(/'/g, "\\'")}')" style="height: 24px; font-size: 11px; padding: 0 8px; border-color: #3b82f6; color: #1d4ed8;">
+                    <button class="tl-btn tl-btn-outline" onclick="selectAndFilterNiche('${catName.replace(/'/g, "\\'")}')" style="height: 24px; font-size: 11px; padding: 0 8px;">
                         Filtrar ↗
                     </button>
                 </td>
@@ -615,6 +615,27 @@ window.selectAndFilterNiche = function(nicheName) {
 /**
  * Interactive Leaflet Map & Heatmap Controller ($0 Cost)
  */
+let mapTileLayer = null;
+
+function setMapTileLayer(theme) {
+    if (!leafletMap || typeof L === "undefined") return;
+    if (mapTileLayer) {
+        leafletMap.removeLayer(mapTileLayer);
+    }
+    const isDark = theme === "dark";
+    const tileUrl = isDark 
+        ? "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+        : "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
+    const attribution = isDark
+        ? '&copy; <a href="https://carto.com/">CARTO</a> &copy; OpenStreetMap'
+        : '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>';
+    
+    mapTileLayer = L.tileLayer(tileUrl, {
+        maxZoom: 19,
+        attribution: attribution
+    }).addTo(leafletMap);
+}
+
 function initLeafletMap() {
     const mapEl = document.getElementById("atlasiq-map");
     if (!mapEl || leafletMap || typeof L === "undefined") return;
@@ -629,11 +650,8 @@ function initLeafletMap() {
         zoomControl: true
     });
 
-    // Free OpenStreetMap Tile Layer
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        maxZoom: 19,
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    }).addTo(leafletMap);
+    const activeTheme = document.documentElement.getAttribute("data-theme") || "light";
+    setMapTileLayer(activeTheme);
 
     mapMarkerLayer = L.layerGroup().addTo(leafletMap);
 }
@@ -699,11 +717,11 @@ function updateMapData(leadsToRender) {
 
             const popupContent = `
                 <div style="font-family: inherit; font-size: 12px; line-height: 1.4; min-width: 220px; padding: 2px;">
-                    <div style="font-size: 14px; font-weight: 800; color: #0f172a; margin-bottom: 2px;">${lead.name}</div>
-                    <div style="color: #64748b; font-size: 11px; margin-bottom: 6px;">
+                    <div class="tl-map-popup-title">${lead.name}</div>
+                    <div class="tl-map-popup-sub">
                         ★ ${lead.averageRating || 'N/A'} · ${lead.category || 'General'}
                     </div>
-                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 6px 8px; margin-bottom: 8px;">
+                    <div class="tl-map-popup-box">
                         <div>📍 Distancia: <strong>${distStr}</strong></div>
                         <div>📞 Teléfono: <strong>${lead.phone || 'No detectado'}</strong></div>
                         <div>🌐 Sitio Web: <strong>${webStr}</strong></div>
@@ -782,16 +800,16 @@ function renderKanbanBoard(leadsToRender) {
 
         card.innerHTML = `
             <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 6px;">
-                <strong style="font-size: 13px; color: #0f172a; line-height: 1.3; cursor: pointer;" onclick="window.openLeadDrawerById('${encodeURIComponent(leadKey)}')">${lead.name}</strong>
+                <strong class="tl-kanban-lead-title" style="font-size: 13px; line-height: 1.3; cursor: pointer;" onclick="window.openLeadDrawerById('${encodeURIComponent(leadKey)}')">${lead.name}</strong>
                 <span class="tl-badge-score ${scoreClass}" style="font-size: 10px; padding: 1px 5px;">${score}</span>
             </div>
-            <div style="font-size: 11px; color: #64748b; display: flex; justify-content: space-between;">
+            <div class="tl-kanban-lead-meta" style="font-size: 11px; display: flex; justify-content: space-between;">
                 <span>★ ${lead.averageRating || '-'} · ${lead.category || 'General'}</span>
                 <span>📍 ${distStr}</span>
             </div>
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 4px; padding-top: 6px; border-top: 1px solid #f1f5f9;">
-                <div style="font-size: 11px; color: #334155;">
-                    ${lead.phone ? `📞 ${lead.phone}` : '<span style="color: #94a3b8;">Sin teléfono</span>'}
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 4px; padding-top: 6px; border-top: 1px solid var(--border-color);">
+                <div class="tl-kanban-lead-phone" style="font-size: 11px;">
+                    ${lead.phone ? `📞 ${lead.phone}` : '<span style="color: var(--text-muted);">Sin teléfono</span>'}
                 </div>
                 <div style="display: flex; gap: 4px;">
                     ${pInfo.whatsappUrl ? `<a href="${pInfo.whatsappUrl}" target="_blank" class="tl-btn tl-btn-outline" style="height: 22px; font-size: 10px; padding: 0 5px;" title="WhatsApp">💬</a>` : ''}
@@ -1180,8 +1198,48 @@ async function verifyAllLeadsMx() {
     });
 }
 
+/**
+ * Silicon Valley Grade Theme Manager (Modo Claro & Modo Oscuro)
+ */
+function initThemeManager() {
+    const savedTheme = localStorage.getItem("atlasiq-theme") || "light";
+    setTheme(savedTheme);
+
+    const toggleBtn = document.getElementById("btn-toggle-theme");
+    if (toggleBtn) {
+        toggleBtn.addEventListener("click", () => {
+            const currentTheme = document.documentElement.getAttribute("data-theme") || "light";
+            const nextTheme = currentTheme === "dark" ? "light" : "dark";
+            setTheme(nextTheme);
+        });
+    }
+}
+
+function setTheme(theme) {
+    document.documentElement.setAttribute("data-theme", theme);
+    document.body.setAttribute("data-theme", theme);
+    localStorage.setItem("atlasiq-theme", theme);
+
+    const toggleBtn = document.getElementById("btn-toggle-theme");
+    if (toggleBtn) {
+        if (theme === "dark") {
+            toggleBtn.innerHTML = "☀️ Modo Claro";
+            toggleBtn.setAttribute("title", "Cambiar a Modo Claro");
+        } else {
+            toggleBtn.innerHTML = "🌙 Modo Oscuro";
+            toggleBtn.setAttribute("title", "Cambiar a Modo Oscuro");
+        }
+    }
+
+    // Adapt Leaflet Map tile layer dynamically if map exists
+    if (typeof setMapTileLayer === "function" && leafletMap) {
+        setMapTileLayer(theme);
+    }
+}
+
 // DOM Ready Initializer
 document.addEventListener("DOMContentLoaded", () => {
+    initThemeManager();
     initTable();
     initLocationAndDistances();
     loadDashboardData();
