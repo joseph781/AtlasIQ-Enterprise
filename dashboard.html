@@ -15,6 +15,7 @@
     <script src="lib/leaflet/leaflet-heat.js"></script>
     <script src="lib/jspdf/jspdf.umd.min.js"></script>
     <script src="js/util.js"></script>
+    <script src="js/license.js"></script>
 </head>
 
 <body>
@@ -27,6 +28,9 @@
             <div class="tl-user-location-badge" id="header-user-location" title="Ubicación geográfica detectada">
                 <span class="tl-loc-dot"></span>
                 <span id="user-location-text">Detectando ubicación...</span>
+            </div>
+            <div class="tl-license-badge" id="header-license-badge" title="Haz clic para ver detalles de licencia">
+                <span id="header-license-text">🛡️ Licencia Anual</span>
             </div>
         </div>
         <div class="tl-nav-actions">
@@ -624,6 +628,57 @@
                     </button>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- LICENSE ACTIVATION & DEVICE ID MODAL -->
+    <div class="tl-modal" id="license-modal" style="width: 520px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-color); padding-bottom: 12px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 20px;">🛡️</span>
+                <div>
+                    <h3 style="font-size: 16px; font-weight: 800; color: #0f172a;">Activación de AtlasIQ Enterprise</h3>
+                    <small style="color: #64748b; font-size: 11px;">WINDOWSTELECOM · Licenciamiento Anual Protegido por Dispositivo</small>
+                </div>
+            </div>
+            <button class="tl-btn tl-btn-ghost" id="btn-close-license-modal" style="font-size: 14px; height: 26px; padding: 0 6px;">✕</button>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 14px; margin-top: 8px;">
+            <!-- Step 1: Device ID -->
+            <div style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 12px;">
+                <label style="font-size: 11px; font-weight: 700; color: #475569; text-transform: uppercase; display: block; margin-bottom: 4px;">
+                    1. Tu ID Único de Dispositivo:
+                </label>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                    <div id="license-modal-device-id" style="flex: 1; font-family: monospace; font-size: 14px; font-weight: 800; background: #fff; border: 1px solid #cbd5e1; border-radius: 6px; padding: 8px 12px; color: #1e40af; user-select: all;">
+                        Cargando...
+                    </div>
+                    <button class="tl-btn tl-btn-outline" id="btn-copy-device-id" style="height: 36px; font-size: 11px; white-space: nowrap;">
+                        📋 Copiar ID
+                    </button>
+                </div>
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 8px;">
+                    <span style="font-size: 11px; color: #64748b;">Envía este ID a WINDOWSTELECOM:</span>
+                    <a href="#" target="_blank" id="link-whatsapp-license" class="tl-btn tl-btn-success" style="height: 26px; font-size: 11px; padding: 0 10px; text-decoration: none;">
+                        💬 Enviar por WhatsApp
+                    </a>
+                </div>
+            </div>
+
+            <!-- Step 2: License Input -->
+            <div>
+                <label style="font-size: 11px; font-weight: 700; color: #475569; text-transform: uppercase; display: block; margin-bottom: 4px;">
+                    2. Clave de Activación Anual:
+                </label>
+                <input type="text" id="input-license-key" class="tl-search-input" placeholder="Pega aquí tu clave: ATQ-LIC-..." style="font-family: monospace; font-size: 12px; height: 38px;" />
+            </div>
+
+            <div id="license-alert-msg" class="tl-license-alert" style="display: none;"></div>
+
+            <button class="tl-btn tl-btn-primary" id="btn-submit-license" style="height: 40px; font-size: 13px; font-weight: 800;">
+                🚀 Activar Licencia por 1 Año
+            </button>
         </div>
     </div>
 

@@ -590,6 +590,57 @@ body {
     display: block;
 }
 
+/* License Badge in Header */
+.tl-license-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 10px;
+    border-radius: 9999px;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+}
+
+.tl-license-badge.active {
+    background: #ecfdf5;
+    color: #065f46;
+    border-color: #a7f3d0;
+}
+.tl-license-badge.active:hover {
+    background: #d1fae5;
+}
+
+.tl-license-badge.expired {
+    background: #fef2f2;
+    color: #991b1b;
+    border-color: #fecaca;
+    animation: tlPulse 2s infinite;
+}
+
+/* License Alert Box */
+.tl-license-alert {
+    padding: 10px 14px;
+    border-radius: 6px;
+    font-size: 12px;
+    line-height: 1.4;
+    font-weight: 500;
+}
+
+.tl-license-alert.success {
+    background: #ecfdf5;
+    color: #065f46;
+    border: 1px solid #a7f3d0;
+}
+
+.tl-license-alert.error {
+    background: #fef2f2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+}
+
 /* Live MX DNS Verification Badges */
 .tl-mx-badge {
     display: inline-flex;

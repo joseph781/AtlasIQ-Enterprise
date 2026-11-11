@@ -283,7 +283,22 @@ function createFloatingDock() {
         max_limit = parseInt(e.target.value) || 0;
     });
 
-    btnStart.addEventListener("click", () => startExtraction());
+    btnStart.addEventListener("click", async () => {
+        if (typeof checkCurrentLicense === "function") {
+            btnStart.disabled = true;
+            btnStart.textContent = "⏳ Verificando...";
+            const licStatus = await checkCurrentLicense();
+            btnStart.disabled = false;
+            btnStart.innerHTML = `▶ Iniciar Extracción`;
+
+            if (!licStatus.active) {
+                alert(`🛡️ AtlasIQ Enterprise - Activación Requerida\n\n${licStatus.reason || "Tu copia anual no está activada en este equipo."}\n\nTu ID de Dispositivo es:\n${licStatus.deviceId}\n\nSe abrirá el CRM para que introduzcas tu Clave de Licencia Anual de WINDOWSTELECOM.`);
+                window.open(chrome.runtime.getURL("dashboard.html"), "_blank");
+                return;
+            }
+        }
+        startExtraction();
+    });
     btnStop.addEventListener("click", () => stopExtraction());
     btnExport.addEventListener("click", () => {
         persistLeadsToStorage(true);

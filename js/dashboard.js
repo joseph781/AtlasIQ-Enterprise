@@ -1175,6 +1175,7 @@ document.addEventListener("DOMContentLoaded", () => {
     initTable();
     initLocationAndDistances();
     loadDashboardData();
+    if (typeof initLicenseUi === "function") initLicenseUi();
 
     // Real-time synchronization when new leads are scraped
     if (typeof chrome !== "undefined" && chrome.storage && chrome.storage.onChanged) {

@@ -34,4 +34,34 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("open-crm-btn").addEventListener("click", () => {
         chrome.tabs.create({ url: "dashboard.html" });
     });
+
+    // Check License Status in Popup
+    if (typeof checkCurrentLicense === "function") {
+        checkCurrentLicense().then(lic => {
+            const statusEl = document.getElementById("popup-license-status");
+            const btnEl = document.getElementById("btn-popup-license-open");
+            if (statusEl) {
+                if (lic.active) {
+                    statusEl.textContent = `🛡️ Activa (${lic.daysRemaining}d)`;
+                    statusEl.style.color = "#10b981";
+                    if (btnEl) btnEl.textContent = "Ver";
+                } else {
+                    statusEl.textContent = "⚠️ No Activada";
+                    statusEl.style.color = "#ef4444";
+                    if (btnEl) {
+                        btnEl.textContent = "Activar";
+                        btnEl.style.borderColor = "#ef4444";
+                        btnEl.style.color = "#ef4444";
+                    }
+                }
+            }
+        });
+    }
+
+    const openLicBtn = document.getElementById("btn-popup-license-open");
+    if (openLicBtn) {
+        openLicBtn.addEventListener("click", () => {
+            chrome.tabs.create({ url: "dashboard.html" });
+        });
+    }
 });
