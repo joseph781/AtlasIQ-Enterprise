@@ -219,3 +219,19 @@
     margin: 2px 0;
     border: none;
 }
+
+/* Responsive adjustment for small screens */
+@media (max-width: 800px) {
+    .atlasiq-dock-container {
+        left: 12px !important;
+        right: 12px !important;
+        top: 64px !important;
+        width: auto !important;
+    }
+
+    .atlasiq-dock-card {
+        width: 100% !important;
+        max-width: 360px !important;
+        margin: 0 auto;
+    }
+}

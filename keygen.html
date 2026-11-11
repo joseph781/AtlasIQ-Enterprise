@@ -3,7 +3,8 @@
 
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#111827" />
     <title>WINDOWSTELECOM – Generador Maestro de Licencias AtlasIQ</title>
     <style>
         :root {
@@ -197,6 +198,62 @@
             font-size: 11px;
             color: #6b7280;
             margin-top: 24px;
+        }
+
+        /* === MOBILE RESPONSIVE OPTIMIZATION === */
+        @media (max-width: 600px) {
+            body {
+                padding: 12px;
+                align-items: flex-start;
+            }
+
+            .keygen-card {
+                padding: 20px 16px;
+                border-radius: 14px;
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            }
+
+            h1 {
+                font-size: 19px;
+            }
+
+            .subtitle {
+                font-size: 12px;
+            }
+
+            input, select {
+                font-size: 16px !important; /* Prevents auto-zoom in iOS Safari */
+                padding: 12px 14px;
+            }
+
+            .btn-generate {
+                height: 48px;
+                font-size: 15px;
+            }
+
+            .action-row {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .btn-action {
+                width: 100%;
+                height: 44px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 14px;
+            }
+
+            .key-display {
+                font-size: 11px;
+                padding: 10px;
+            }
+
+            .wa-box {
+                font-size: 11px;
+                max-height: 120px;
+            }
         }
     </style>
 </head>

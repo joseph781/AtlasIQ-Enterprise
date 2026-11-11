@@ -51,8 +51,9 @@ const storageAdapter = (typeof chrome !== "undefined" && chrome.storage && chrom
 };
 
 function initTable() {
+    const isMobile = window.innerWidth < 768;
     table = new Tabulator("#example-table", {
-        layout: "fitColumns",
+        layout: isMobile ? "fitDataFill" : "fitColumns",
         placeholder: "No se encontraron prospectos. Inicia una búsqueda en Google Maps con AtlasIQ.",
         selectable: true,
         pagination: "local",
@@ -63,6 +64,7 @@ function initTable() {
                 title: "Empresa",
                 field: "name",
                 widthGrow: 2.2,
+                minWidth: 160,
                 formatter: (cell) => {
                     const row = cell.getRow().getData();
                     const name = cell.getValue() || "Sin nombre";
@@ -73,7 +75,8 @@ function initTable() {
             {
                 title: "Calificación",
                 field: "averageRating",
-                width: 120,
+                width: 110,
+                minWidth: 95,
                 hozAlign: "center",
                 formatter: (cell) => {
                     const val = cell.getValue();
@@ -86,7 +89,8 @@ function initTable() {
             {
                 title: "Score IA",
                 field: "lead_score",
-                width: 100,
+                width: 90,
+                minWidth: 80,
                 hozAlign: "center",
                 sorter: "number",
                 formatter: (cell) => {
@@ -101,6 +105,7 @@ function initTable() {
                 title: "Teléfono",
                 field: "phone",
                 widthGrow: 1.5,
+                minWidth: 125,
                 formatter: (cell) => {
                     const val = cell.getValue();
                     if (!val) return '<span style="color: #94a3b8;">-</span>';
@@ -114,6 +119,7 @@ function initTable() {
                 title: "Email Verificado",
                 field: "email",
                 widthGrow: 1.8,
+                minWidth: 160,
                 formatter: (cell) => {
                     const val = cell.getValue();
                     const row = cell.getRow().getData();
@@ -153,6 +159,7 @@ function initTable() {
                 title: "Sitio Web",
                 field: "website",
                 widthGrow: 1.6,
+                minWidth: 130,
                 formatter: (cell) => {
                     const val = cell.getValue();
                     const row = cell.getRow().getData();
@@ -170,6 +177,7 @@ function initTable() {
                 title: "Rubro / Categoría",
                 field: "category",
                 widthGrow: 1.4,
+                minWidth: 130,
                 formatter: (cell) => {
                     const val = cell.getValue();
                     if (!val) return '<span style="color: #94a3b8;">-</span>';
@@ -179,7 +187,8 @@ function initTable() {
             {
                 title: "📍 Distancia",
                 field: "distanceKm",
-                width: 110,
+                width: 100,
+                minWidth: 90,
                 hozAlign: "center",
                 sorter: "number",
                 formatter: (cell) => {
@@ -191,7 +200,8 @@ function initTable() {
             },
             {
                 title: "Acción",
-                width: 105,
+                width: 100,
+                minWidth: 90,
                 hozAlign: "center",
                 formatter: () => {
                     return `<button class="tl-btn tl-btn-primary" style="height: 26px; font-size: 11px; padding: 0 8px;">Detalle ↗</button>`;

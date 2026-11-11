@@ -3,7 +3,8 @@
 
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#1e3a8a" />
     <title>AtlasIQ Pro</title>
     <style>
         :root {
@@ -24,10 +25,20 @@
         }
 
         body {
-            width: 310px;
+            width: 320px;
+            max-width: 100vw;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background: var(--bg);
             color: var(--text-main);
+            margin: 0 auto;
+        }
+
+        /* Mobile standalone view auto-adapt */
+        @media screen and (max-width: 600px) {
+            body {
+                width: 100%;
+                min-height: 100vh;
+            }
         }
 
         .header {

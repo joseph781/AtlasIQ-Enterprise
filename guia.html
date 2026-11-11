@@ -3,7 +3,8 @@
 
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#2563eb" />
     <title>AtlasIQ Enterprise – Guía Oficial y Manual de Prospección B2B</title>
     <style>
         :root {
@@ -582,15 +583,148 @@
             margin-top: 50px;
         }
 
+        /* === COMPREHENSIVE RESPONSIVE MOBILE SYSTEM === */
         @media (max-width: 860px) {
+            .topbar {
+                padding: 10px 14px;
+            }
+
+            .topbar-content {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 10px;
+            }
+
+            .brand-box {
+                justify-content: space-between;
+                width: 100%;
+            }
+
+            .topbar-nav {
+                display: flex;
+                overflow-x: auto;
+                flex-wrap: nowrap;
+                gap: 8px;
+                padding-bottom: 4px;
+                width: 100%;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: none;
+            }
+
+            .topbar-nav::-webkit-scrollbar {
+                display: none;
+            }
+
+            .topbar-nav a {
+                white-space: nowrap;
+                font-size: 12px;
+                padding: 6px 10px;
+                border-radius: 6px;
+                background: #f1f5f9;
+                flex-shrink: 0;
+            }
+
+            .btn-crm-nav {
+                background: var(--primary) !important;
+                color: #fff !important;
+            }
+
+            .hero {
+                padding: 36px 16px 28px;
+            }
+
+            .hero-title {
+                font-size: 28px;
+                line-height: 1.22;
+                letter-spacing: -0.5px;
+            }
+
+            .hero-subtitle {
+                font-size: 15px;
+            }
+
+            .hero-author-badge {
+                font-size: 12px;
+                padding: 4px 12px;
+            }
+
+            .hero-cta-box {
+                flex-direction: column;
+                width: 100%;
+                gap: 8px;
+            }
+
+            .btn-cta {
+                width: 100%;
+                height: 44px;
+                font-size: 14px;
+            }
+
             .layout-container {
                 grid-template-columns: 1fr;
+                padding: 0 14px;
+                gap: 20px;
             }
+
             .sidebar-nav {
                 display: none;
             }
+
+            .guide-card {
+                padding: 20px 16px;
+                border-radius: 12px;
+            }
+
+            .guide-heading {
+                font-size: 20px;
+            }
+
+            .table-wrapper {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                width: 100%;
+            }
+
+            .author-card {
+                padding: 20px 16px;
+                flex-direction: column;
+                align-items: stretch;
+                text-align: center;
+                gap: 16px;
+            }
+
+            .author-card a {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
             .hero-title {
-                font-size: 30px;
+                font-size: 24px;
+            }
+
+            .hero-subtitle {
+                font-size: 13px;
+            }
+
+            .guide-card {
+                padding: 16px 12px;
+            }
+
+            .install-step-card {
+                padding: 10px 12px;
+                gap: 10px;
+                font-size: 13px;
+            }
+
+            .process-step-item {
+                gap: 10px;
+            }
+
+            .step-number {
+                width: 32px;
+                height: 32px;
+                font-size: 13px;
             }
         }
     </style>
