@@ -5,7 +5,6 @@ Thumbs.db
 
 # Temp & Artifacts
 .archify/
-generate_icons.py
 *.log
 *.zip
 

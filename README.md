@@ -36,12 +36,16 @@ AtlasIQ-Enterprise-v2.5/
 │   ├── util.js                   # Scoring v4.0, Gemini 2.5/Nano, PageSpeed v5, DoH MX/SPF/DMARC, PDF
 │   ├── license.js                # Verificador público ECDSA P-256 (0 secretos expuestos)
 │   └── theme-init.js / guide-ui.js # Preloaders de tema compatibles con CSP MV3
-├── admin-server/                 # 🔒 PRIVADO (NUNCA ENVIAR AL CLIENTE)
+├── admin-server/                 # 🔒 PRIVADO (Ignorado en Git / NUNCA ENVIAR AL CLIENTE)
+│   ├── cloud-vault-keygen.html   # Bóveda Cloud cifrada AES-256-GCM + PBKDF2 (250k rondas)
 │   ├── keygen.html               # Panel visual offline ECDSA P-256 para emitir licencias ATQ4.
 │   ├── keygen.js                 # Generador CLI Node.js de licencias firmadas
-│   └── cloudflare-license-worker.js # Worker Edge: control de asientos KV + Micrositios con tracking
+│   └── cloudflare-license-worker.js # Worker Edge opcional: control KV + Micrositios con tracking
 ├── mcp-server/
 │   └── atlasiq-mcp.mjs           # Servidor MCP stdio sin dependencias para agentes de IA
+├── SUBIR-A-LA-NUBE.bat           # Lanzador 1-clic: empaqueta + audita + GitHub + Cloudflare
+├── deploy-cloud.ps1              # Motor PowerShell de despliegue directo PC -> GitHub & Cloudflare
+├── package-cloudflare.ps1        # Empaquetador completo Cloud -> AtlasIQ-Cloudflare-Production-v4.0.zip
 └── package-client.ps1            # Empaquetador limpio -> AtlasIQ-Enterprise-v4.0-Client.zip
 ```
 

@@ -14,19 +14,15 @@ $ClientItems = @(
     "bg.js",
     "injected.js",
     "contentScript.js",
-    "contentScript2.js",
     "offscreen.html",
     "sidepanel.html",
     "dashboard.html",
     "popup.html",
     "index.html",
-    "guia.html",
-    "help.html",
     "css",
     "js",
     "lib",
-    "icons",
-    "_locales"
+    "icons"
 )
 
 foreach ($item in $ClientItems) {

@@ -76,8 +76,6 @@ if (-not $SkipCloudflare) {
         $WebItems = @(
             "index.html",
             "dashboard.html",
-            "guia.html",
-            "help.html",
             "popup.html",
             "sidepanel.html",
             "css",

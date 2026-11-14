@@ -18,8 +18,6 @@ New-Item -ItemType Directory -Path $StageDir | Out-Null
 $WebItems = @(
     "index.html",
     "dashboard.html",
-    "guia.html",
-    "help.html",
     "popup.html",
     "sidepanel.html",
     "css",
