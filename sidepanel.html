@@ -36,12 +36,15 @@
         .kpi { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 8px; text-align: center; }
         .kpi-lbl { font-size: 10px; color: var(--sub); font-weight: 700; text-transform: uppercase; }
         .kpi-val { font-size: 17px; font-weight: 800; margin-top: 2px; }
-        .panel { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 10px; display: flex; flex-direction: column; gap: 8px; }
+        .panel { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 10px; display: flex; flex-direction: column; gap: 7px; }
+        .panel-lbl { font-size: 10px; font-weight: 800; color: var(--sub); text-transform: uppercase; letter-spacing: 0.3px; }
+        .gps-pill { font-size: 10.5px; font-weight: 700; color: var(--success); background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.3); padding: 5px 8px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; }
         .row { display: flex; gap: 6px; align-items: center; }
-        select { flex: 1; height: 32px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg); color: var(--text); font-size: 12px; padding: 0 8px; }
-        .btn { height: 34px; border-radius: 7px; border: none; font-size: 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; color: #fff; text-decoration: none; padding: 0 10px; }
+        input, select { flex: 1; height: 32px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg); color: var(--text); font-size: 12px; padding: 0 8px; outline: none; }
+        .btn { height: 33px; border-radius: 7px; border: none; font-size: 11.5px; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; color: #fff; text-decoration: none; padding: 0 10px; }
         .btn-blue { background: var(--primary); width: 100%; }
-        .btn-green { background: var(--success); width: 100%; }
+        .btn-green { background: linear-gradient(135deg, #059669, #10b981); width: 100%; }
+        .btn-outline { background: transparent; color: var(--text); border: 1px solid var(--border); width: 100%; }
         .btn-red { background: #ef4444; width: 100%; display: none; }
         .chips { display: flex; gap: 5px; flex-wrap: wrap; }
         .chip { font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 99px; border: 1px solid var(--border); background: var(--card); color: var(--sub); cursor: pointer; }
@@ -81,17 +84,25 @@
     </div>
 
     <div class="panel">
+        <div class="panel-lbl">📍 Opción 1: Desde Mi Ubicación Actual</div>
+        <div class="gps-pill">
+            <span id="sp-gps-label">📍 Detectando tu ubicación...</span>
+        </div>
+        <div class="row">
+            <input type="text" id="sp-niche" placeholder="¿Qué negocio buscas? Ej: Clínicas" value="Restaurantes" />
+        </div>
         <div class="row">
             <select id="sp-grid">
-                <option value="single">Barrido: Zona Actual</option>
-                <option value="2x2">Barrido: Malla 2×2 (4 Zonas)</option>
-                <option value="3x3">Barrido: Malla H3 3×3 (9 Zonas)</option>
-                <option value="4x4">Barrido: Malla 4×4 (16 Zonas)</option>
+                <option value="single">Barrido: Zona Inmediata (~2 km)</option>
+                <option value="2x2">Barrido: Malla 2×2 (~5 km)</option>
+                <option value="3x3">Barrido: Malla H3 3×3 (~10 km)</option>
+                <option value="4x4">Barrido: Malla 4×4 (~16 km)</option>
             </select>
         </div>
-        <button class="btn btn-blue" id="sp-btn-start">▶ Lanzar Extracción en Pestaña Activa</button>
+        <button class="btn btn-green" id="sp-btn-gps-start">📍 1. Escanear desde Mi Ubicación</button>
+        <button class="btn btn-blue" id="sp-btn-start">▶ 2. Extraer Vista Actual del Mapa</button>
         <button class="btn btn-red" id="sp-btn-stop">⏹ Detener Extracción</button>
-        <button class="btn btn-green" id="sp-btn-crm">📊 Abrir CRM Ejecutivo Completo</button>
+        <button class="btn btn-outline" id="sp-btn-crm">📊 Abrir CRM Ejecutivo Completo</button>
     </div>
 
     <div class="chips">

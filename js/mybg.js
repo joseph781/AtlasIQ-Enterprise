@@ -451,28 +451,56 @@ function openOrFocusDashboard() {
     });
 }
 
+async function resolveIpLocationFallback() {
+    try {
+        const r = await fetch("https://ipwho.is/", { signal: AbortSignal.timeout(4500) });
+        if (r.ok) {
+            const locData = await r.json();
+            if (locData && locData.success !== false && locData.latitude && locData.longitude) {
+                const loc = {
+                    lat: Number(locData.latitude),
+                    lon: Number(locData.longitude),
+                    city: locData.city || "",
+                    region: locData.region || "",
+                    country: locData.country || "",
+                    source: "ip",
+                    label: `${locData.city || locData.region || "Ubicación"}, ${locData.country || ""}`.trim().replace(/^,|,$/g, ""),
+                    detectedAt: Date.now()
+                };
+                await chrome.storage.local.set({ user_location: loc });
+                return loc;
+            }
+        }
+    } catch (_) {}
+
+    try {
+        const r2 = await fetch("https://get.geojs.io/v1/ip/geo.json", { signal: AbortSignal.timeout(4500) });
+        if (r2.ok) {
+            const d2 = await r2.json();
+            if (d2 && d2.latitude && d2.longitude) {
+                const loc2 = {
+                    lat: parseFloat(d2.latitude),
+                    lon: parseFloat(d2.longitude),
+                    city: d2.city || "",
+                    region: d2.region || "",
+                    country: d2.country || "",
+                    source: "ip",
+                    label: `${d2.city || d2.region || "Ubicación"}, ${d2.country || ""}`.trim().replace(/^,|,$/g, ""),
+                    detectedAt: Date.now()
+                };
+                await chrome.storage.local.set({ user_location: loc2 });
+                return loc2;
+            }
+        }
+    } catch (_) {}
+
+    return null;
+}
+
 function primeUserLocation() {
     chrome.storage.local.get(["user_location"], (data) => {
         if (!data.user_location) {
-            fetch("https://ipwho.is/")
-                .then(r => r.json())
-                .then(locData => {
-                    if (locData && locData.success !== false && locData.latitude && locData.longitude) {
-                        chrome.storage.local.set({
-                            user_location: {
-                                lat: locData.latitude,
-                                lon: locData.longitude,
-                                city: locData.city || "",
-                                region: locData.region || "",
-                                country: locData.country || "",
-                                source: "ip",
-                                label: `${locData.city || locData.region || "Ubicación"}, ${locData.country || ""}`.trim().replace(/^,|,$/g, ""),
-                                detectedAt: Date.now()
-                            }
-                        });
-                    }
-                })
-                .catch(() => {});
+            resolveIpLocationFallback();
         }
     });
 }
@@ -530,6 +558,28 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                 sendResponse(enrichment);
             } catch (err) {
                 sendResponse({ error: err.message });
+            }
+        })();
+        return true;
+    }
+
+    if (request.action === "resolveUserLocation") {
+        (async () => {
+            try {
+                if (!request.forceRefresh) {
+                    const stored = await chrome.storage.local.get(["user_location"]);
+                    if (stored?.user_location?.lat && stored?.user_location?.lon) {
+                        const age = Date.now() - (stored.user_location.detectedAt || 0);
+                        if (age < 1800000) {
+                            sendResponse({ ok: true, location: stored.user_location });
+                            return;
+                        }
+                    }
+                }
+                const loc = await resolveIpLocationFallback();
+                sendResponse({ ok: Boolean(loc), location: loc });
+            } catch (e) {
+                sendResponse({ ok: false, error: e.message });
             }
         })();
         return true;

@@ -346,26 +346,28 @@ function initTable() {
  * 2. GEOLOCATION, O(N) SPATIAL PROXIMITY & DATA LOADER
  * ============================================================================
  */
-function initLocationAndDistances() {
+function initLocationAndDistances(forceHighAccuracy = false) {
+    const badge = document.getElementById("header-user-location");
+    const textEl = document.getElementById("user-location-text");
+    if (badge) badge.style.cursor = "pointer";
+    if (forceHighAccuracy && textEl) textEl.textContent = "Actualizando GPS...";
+
     detectUserLocation((loc) => {
         if (loc) {
             userLocation = loc;
-            const badge = document.getElementById("header-user-location");
-            const textEl = document.getElementById("user-location-text");
             if (textEl) {
                 textEl.textContent = loc.label || `${loc.city || ""}, ${loc.country || ""}`.trim().replace(/^,|,$/g, "");
             }
             if (badge) {
-                badge.title = `Ubicación detectada: Lat ${loc.lat.toFixed(4)}, Lon ${loc.lon.toFixed(4)} (${String(loc.source || "ip").toUpperCase()})`;
+                badge.title = `Punto Cero Activo: Lat ${loc.lat.toFixed(4)}, Lon ${loc.lon.toFixed(4)} (${String(loc.source || "ip").toUpperCase()}) — Haz clic para actualizar GPS`;
             }
             storageAdapter.set({ user_location: loc });
         } else {
-            const textEl = document.getElementById("user-location-text");
             if (textEl) textEl.textContent = "Centroide del Cuadrante";
         }
         recalculateDistances();
         applyFilters();
-    });
+    }, { highAccuracy: forceHighAccuracy });
 }
 
 function recalculateDistances() {
@@ -857,7 +859,36 @@ function updateMapData(leadsToRender) {
     const badge = document.getElementById("map-counter-badge");
     if (badge) badge.textContent = `${validLeads.length} Pines`;
 
-    if (validLeads.length === 0) return;
+    // Render User's Current Reference Point ("Punto Cero") Marker if available
+    if (userLocation && !isNaN(parseFloat(userLocation.lat)) && !isNaN(parseFloat(userLocation.lon)) && mapMarkerLayer) {
+        const uLat = parseFloat(userLocation.lat);
+        const uLon = parseFloat(userLocation.lon);
+        const originIcon = L.divIcon({
+            className: "tl-map-origin-div",
+            html: `<div style="background:#06b6d4;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;border:3px solid #ffffff;box-shadow:0 0 0 6px rgba(6,182,212,0.28),0 4px 10px rgba(0,0,0,0.5);" title="Tu Ubicación de Referencia (Punto Cero)">📍</div>`,
+            iconSize: [30, 30],
+            iconAnchor: [15, 15],
+            popupAnchor: [0, -15]
+        });
+        const originPopup = `
+            <div style="font-family:inherit;font-size:12px;line-height:1.4;min-width:200px;padding:2px;">
+                <div class="tl-map-popup-title">📍 Tu Ubicación Actual (Punto Cero)</div>
+                <div class="tl-map-popup-sub">${escapeHtml(userLocation.label || "Referencia activa")}</div>
+                <div class="tl-map-popup-box">
+                    <div>Latitud: <strong>${uLat.toFixed(5)}</strong></div>
+                    <div>Longitud: <strong>${uLon.toFixed(5)}</strong></div>
+                </div>
+            </div>
+        `;
+        mapMarkerLayer.addLayer(L.marker([uLat, uLon], { icon: originIcon, zIndexOffset: 1000 }).bindPopup(originPopup));
+    }
+
+    if (validLeads.length === 0) {
+        if (userLocation && !isNaN(parseFloat(userLocation.lat)) && !isNaN(parseFloat(userLocation.lon))) {
+            leafletMap.setView([parseFloat(userLocation.lat), parseFloat(userLocation.lon)], 14, { animate: false });
+        }
+        return;
+    }
 
     const latLngBounds = [];
     const heatPoints = [];
@@ -1748,13 +1779,17 @@ document.addEventListener("DOMContentLoaded", () => {
         if (satPanel) satPanel.style.display = "none";
     });
 
-    // Explore in Google Maps
+    // Explore in Google Maps (Reference Point #1: User's Current Location)
+    document.getElementById("header-user-location")?.addEventListener("click", () => {
+        initLocationAndDistances(true);
+    });
+
     document.getElementById("btn-open-maps-search")?.addEventListener("click", () => {
-        const center = clusterCentroid || userLocation;
+        const center = userLocation || clusterCentroid;
         const currentNiche = document.getElementById("filter-niche")?.value;
         const queryTerm = (currentNiche && currentNiche !== "all") ? currentNiche : "negocios y empresas";
         let mapsUrl = `https://www.google.com/maps/search/${encodeURIComponent(queryTerm)}`;
-        if (center) mapsUrl += `/@${center.lat},${center.lon},14z`;
+        if (center) mapsUrl += `/@${Number(center.lat).toFixed(6)},${Number(center.lon).toFixed(6)},15z/data=!3m1!4b1`;
         window.open(mapsUrl, "_blank", "noopener");
     });
 

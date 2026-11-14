@@ -9,6 +9,7 @@ const leads_map = new Map();
 let extraction_speed = "medium";
 let grid_mode = "single"; // single | 2x2 | 3x3 | 4x4
 let max_limit = 0;
+let anchor_coords = null; // { lat, lng, label } when anchored on user's current location
 
 // UI References
 let uiLeadsCountEl = null;
@@ -19,6 +20,8 @@ let uiPulseDotEl = null;
 let uiStartBtnEl = null;
 let uiStopBtnEl = null;
 let uiExportBtnEl = null;
+let uiGpsCoordEl = null;
+let uiGpsNicheEl = null;
 
 // Pain-point dictionary for automated negative-review & snippet mining
 const PAIN_POINT_KEYWORDS = [
@@ -58,8 +61,8 @@ function getLeadDeduplicationKey(lead) {
     return null;
 }
 
-// Hydrate existing leads on load & listen for external resets
-chrome.storage.local.get(["leads"], (res) => {
+// Hydrate existing leads & saved user reference location on load
+chrome.storage.local.get(["leads", "user_location"], (res) => {
     if (res && Array.isArray(res.leads)) {
         leads = res.leads;
         leads_map.clear();
@@ -72,7 +75,49 @@ chrome.storage.local.get(["leads"], (res) => {
         });
         updateUiCounters();
     }
+    if (res && res.user_location && res.user_location.lat && res.user_location.lon) {
+        updateGpsCoordBadge(res.user_location);
+    }
 });
+
+function updateGpsCoordBadge(loc) {
+    if (!uiGpsCoordEl || !loc || !loc.lat || !loc.lon) return;
+    uiGpsCoordEl.textContent = `${Number(loc.lat).toFixed(3)}, ${Number(loc.lon).toFixed(3)}`;
+}
+
+async function resolveMyCoordinates(forceRefresh = false) {
+    // 1. Attempt high-accuracy browser GPS first
+    if (navigator.geolocation) {
+        const gpsPos = await new Promise((resolve) => {
+            navigator.geolocation.getCurrentPosition(
+                (p) => resolve({
+                    lat: p.coords.latitude,
+                    lon: p.coords.longitude,
+                    accuracy: p.coords.accuracy,
+                    source: "gps",
+                    label: `GPS Exacto (${p.coords.latitude.toFixed(4)}, ${p.coords.longitude.toFixed(4)})`,
+                    detectedAt: Date.now()
+                }),
+                () => resolve(null),
+                { enableHighAccuracy: true, timeout: 4500, maximumAge: forceRefresh ? 0 : 120000 }
+            );
+        });
+        if (gpsPos) {
+            chrome.storage.local.set({ user_location: gpsPos });
+            updateGpsCoordBadge(gpsPos);
+            return gpsPos;
+        }
+    }
+
+    // 2. Fallback to Service Worker geolocation resolver (cached GPS or IP)
+    return new Promise((resolve) => {
+        chrome.runtime.sendMessage({ action: "resolveUserLocation", forceRefresh }, (res) => {
+            const loc = res?.location || null;
+            if (loc) updateGpsCoordBadge(loc);
+            resolve(loc);
+        });
+    });
+}
 
 chrome.storage.onChanged.addListener((changes, area) => {
     if (area === "local" && changes.leads && Array.isArray(changes.leads.newValue)) {
@@ -351,6 +396,21 @@ function createFloatingDock() {
         </div>
     `;
 
+    // OPTION 1 (PRIMARY): Reference from User's Current Location
+    const gpsBox = document.createElement("div");
+    gpsBox.className = "atlasiq-gps-box";
+    const existingMapsQuery = (document.querySelector("#searchboxinput, input[name='q']")?.value || "")
+        .split(/\s+(?:en|de|cerca|near|in)\s+/i)[0]
+        .trim();
+    gpsBox.innerHTML = `
+        <div class="atlasiq-gps-head">
+            <span>📍 1. Desde Mi Ubicación</span>
+            <span class="atlasiq-gps-coord" id="tl_gps_coord">GPS Listo</span>
+        </div>
+        <input type="text" class="atlasiq-input" id="tl_inp_gps_niche" placeholder="¿Qué buscas cerca de ti? Ej: Clínicas" style="width:100%;" />
+        <button type="button" class="atlasiq-btn atlasiq-btn-gps" id="tl_btn_gps_start">📍 Ubicarme e Iniciar Scrapeo</button>
+    `;
+
     const gridRow = document.createElement("div");
     gridRow.className = "atlasiq-row";
     gridRow.innerHTML = `
@@ -387,7 +447,7 @@ function createFloatingDock() {
     const btnStart = document.createElement("button");
     btnStart.className = "atlasiq-btn atlasiq-btn-start";
     btnStart.id = "tl_btn_start";
-    btnStart.textContent = "▶ Iniciar Deep Harvester";
+    btnStart.textContent = "▶ 2. Extraer Vista Actual del Mapa";
 
     const btnStop = document.createElement("button");
     btnStop.className = "atlasiq-btn atlasiq-btn-stop";
@@ -396,7 +456,7 @@ function createFloatingDock() {
     btnStop.style.display = "none";
 
     const btnExport = document.createElement("button");
-    btnExport.className = "atlasiq-btn atlasiq-btn-export";
+    btnExport.className = "atlasiq-btn atlasiq-btn-crm-dark";
     btnExport.id = "tl_btn_export";
     btnExport.textContent = "📊 Abrir CRM v4.0 (0)";
 
@@ -409,6 +469,7 @@ function createFloatingDock() {
     secondaryRow.appendChild(btnClear);
 
     bodyWrap.appendChild(statsBar);
+    bodyWrap.appendChild(gpsBox);
     bodyWrap.appendChild(gridRow);
     bodyWrap.appendChild(speedRow);
     bodyWrap.appendChild(limitRow);
@@ -433,6 +494,14 @@ function createFloatingDock() {
     uiStartBtnEl = btnStart;
     uiStopBtnEl = btnStop;
     uiExportBtnEl = btnExport;
+    uiGpsCoordEl = document.getElementById("tl_gps_coord");
+    uiGpsNicheEl = document.getElementById("tl_inp_gps_niche");
+    if (uiGpsNicheEl && existingMapsQuery && !/\d+\.\d+/.test(existingMapsQuery)) {
+        uiGpsNicheEl.value = existingMapsQuery;
+    }
+    chrome.storage.local.get(["user_location"], (r) => {
+        if (r?.user_location) updateGpsCoordBadge(r.user_location);
+    });
 
     // Make Header Draggable
     enableDockDrag(container, header);
@@ -461,20 +530,94 @@ function createFloatingDock() {
         max_limit = parseInt(e.target.value) || 0;
     });
 
-    btnStart.addEventListener("click", async () => {
+    async function ensureLicenseBeforeStart(triggerBtn, idleLabel) {
         if (typeof checkCurrentLicense === "function") {
-            btnStart.disabled = true;
-            btnStart.textContent = "⏳ Verificando ECDSA...";
+            triggerBtn.disabled = true;
+            triggerBtn.textContent = "⏳ Verificando ECDSA...";
             const licStatus = await checkCurrentLicense();
-            btnStart.disabled = false;
-            btnStart.textContent = "▶ Iniciar Deep Harvester";
+            triggerBtn.disabled = false;
+            triggerBtn.textContent = idleLabel;
 
             if (!licStatus.active) {
                 alert(`🛡️ AtlasIQ Enterprise v4.0 - Activación Requerida\n\n${licStatus.reason || "Activa tu licencia ECDSA."}\n\nID de Dispositivo: ${licStatus.deviceId}`);
                 chrome.runtime.sendMessage({ action: "openPage" });
-                return;
+                return false;
             }
         }
+        return true;
+    }
+
+    const btnGpsStart = document.getElementById("tl_btn_gps_start");
+    btnGpsStart.addEventListener("click", async () => {
+        const okLic = await ensureLicenseBeforeStart(btnGpsStart, "📍 Ubicarme e Iniciar Scrapeo");
+        if (!okLic) return;
+
+        const mapBoxVal = (document.querySelector("#searchboxinput, input[name='q']")?.value || "").trim();
+        const niche = (uiGpsNicheEl?.value || "").trim() || mapBoxVal;
+        if (!niche) {
+            if (uiGpsNicheEl) {
+                uiGpsNicheEl.focus();
+                uiGpsNicheEl.placeholder = "Escribe primero qué buscar (ej: Clínicas)";
+            }
+            return;
+        }
+
+        btnGpsStart.disabled = true;
+        btnGpsStart.textContent = "⏳ Obteniendo tu GPS...";
+        setDockStatus("Fijando tu ubicación actual...", true);
+
+        const loc = await resolveMyCoordinates(true);
+        btnGpsStart.disabled = false;
+        btnGpsStart.textContent = "📍 Ubicarme e Iniciar Scrapeo";
+
+        if (!loc || !loc.lat || !loc.lon) {
+            alert("No se pudo detectar tu ubicación actual. Verifica la conexión o permisos de ubicación.");
+            setDockStatus("Error al detectar GPS");
+            return;
+        }
+
+        const lat = Number(loc.lat);
+        const lon = Number(loc.lon);
+        const zoom = grid_mode === "single" ? 15 : (grid_mode === "2x2" ? 14 : 13);
+
+        // Check if Maps is already centered near user's coordinates (~0.8km) with same query
+        const cur = getCurrentMapCenterAndQuery();
+        const nearCurrent = cur.lat !== null && cur.lng !== null &&
+            Math.abs(cur.lat - lat) < 0.008 && Math.abs(cur.lng - lon) < 0.008 &&
+            cur.query.toLowerCase() === niche.toLowerCase();
+
+        if (nearCurrent && findMapsScrollContainer()) {
+            anchor_coords = { lat, lng: lon, label: loc.label || "Mi Ubicación" };
+            startExtraction();
+        } else {
+            const mission = {
+                autoStart: true,
+                useMyLocation: true,
+                lat,
+                lon,
+                zoom,
+                gridMode: grid_mode,
+                speed: extraction_speed,
+                maxLimit: max_limit,
+                query: niche,
+                createdAt: Date.now()
+            };
+            chrome.storage.local.set({ atlasiq_pending_mission: mission, user_location: loc }, () => {
+                window.location.href = `https://www.google.com/maps/search/${encodeURIComponent(niche)}/@${lat.toFixed(6)},${lon.toFixed(6)},${zoom}z/data=!3m1!4b1`;
+            });
+        }
+    });
+
+    if (uiGpsNicheEl) {
+        uiGpsNicheEl.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") btnGpsStart.click();
+        });
+    }
+
+    btnStart.addEventListener("click", async () => {
+        const okLic = await ensureLicenseBeforeStart(btnStart, "▶ 2. Extraer Vista Actual del Mapa");
+        if (!okLic) return;
+        anchor_coords = null;
         startExtraction();
     });
 
@@ -544,19 +687,24 @@ function setDockStatus(text, isActive = false) {
 function getCurrentMapCenterAndQuery() {
     let lat = null;
     let lng = null;
-    const urlMatch = window.location.href.match(/@([-\d.]+),([-\d.]+)/);
-    if (urlMatch) {
-        lat = parseFloat(urlMatch[1]);
-        lng = parseFloat(urlMatch[2]);
-    } else if (leads.length > 0) {
-        const withCoords = leads.find(l => l.latitude && l.longitude);
-        if (withCoords) {
-            lat = parseFloat(withCoords.latitude);
-            lng = parseFloat(withCoords.longitude);
+    if (anchor_coords && typeof anchor_coords.lat === "number" && typeof anchor_coords.lng === "number") {
+        lat = anchor_coords.lat;
+        lng = anchor_coords.lng;
+    } else {
+        const urlMatch = window.location.href.match(/@([-\d.]+),([-\d.]+)/);
+        if (urlMatch) {
+            lat = parseFloat(urlMatch[1]);
+            lng = parseFloat(urlMatch[2]);
+        } else if (leads.length > 0) {
+            const withCoords = leads.find(l => l.latitude && l.longitude);
+            if (withCoords) {
+                lat = parseFloat(withCoords.latitude);
+                lng = parseFloat(withCoords.longitude);
+            }
         }
     }
     const searchInput = document.querySelector("#searchboxinput, input[name='q']");
-    const query = searchInput ? searchInput.value.trim() : "";
+    const query = searchInput ? searchInput.value.trim() : (uiGpsNicheEl?.value?.trim() || "");
     return { lat, lng, query };
 }
 
@@ -584,7 +732,7 @@ function buildGeoGridOffsets(mode) {
 async function triggerMapsSearchAtCoordinate(query, lat, lng) {
     try {
         // Update URL coordinate state and trigger Maps search button or 'Search this area'
-        const newUrl = `https://www.google.com/maps/search/${encodeURIComponent(query)}/@${lat.toFixed(5)},${lng.toFixed(5)},15z`;
+        const newUrl = `https://www.google.com/maps/search/${encodeURIComponent(query)}/@${lat.toFixed(5)},${lng.toFixed(5)},15z/data=!3m1!4b1`;
         window.history.replaceState(null, "", newUrl);
 
         const searchInput = document.querySelector("#searchboxinput, input[name='q']");
@@ -1200,3 +1348,48 @@ setInterval(() => {
 }, 2000);
 
 createFloatingDock();
+
+// Pick up pending Location-First auto-mission launched from Popup, SidePanel, or Dock GPS jump
+chrome.storage.local.get(["atlasiq_pending_mission"], async (res) => {
+    const m = res?.atlasiq_pending_mission;
+    if (!m || !m.createdAt || (Date.now() - m.createdAt > 45000)) return;
+
+    chrome.storage.local.remove(["atlasiq_pending_mission"]);
+
+    if (m.gridMode) {
+        grid_mode = m.gridMode;
+        const sel = document.getElementById("tl_sel_grid");
+        if (sel) sel.value = grid_mode;
+    }
+    if (m.speed) {
+        extraction_speed = m.speed;
+        const selSp = document.getElementById("tl_sel_speed");
+        if (selSp) selSp.value = extraction_speed;
+    }
+    if (m.maxLimit) {
+        max_limit = m.maxLimit;
+        const inpLim = document.getElementById("tl_inp_limit");
+        if (inpLim) inpLim.value = String(max_limit);
+    }
+    if (m.query && uiGpsNicheEl) {
+        uiGpsNicheEl.value = m.query;
+    }
+    if (m.useMyLocation && m.lat && m.lon) {
+        anchor_coords = { lat: Number(m.lat), lng: Number(m.lon), label: "Mi Ubicación" };
+        updateGpsCoordBadge({ lat: m.lat, lon: m.lon });
+        setDockStatus(`📍 Punto Cero fijado (${Number(m.lat).toFixed(3)}, ${Number(m.lon).toFixed(3)})`, true);
+    }
+
+    if (m.autoStart) {
+        if (typeof checkCurrentLicense === "function") {
+            const lic = await checkCurrentLicense();
+            if (!lic.active) {
+                setDockStatus("⚠️ Activa tu licencia ECDSA para iniciar");
+                return;
+            }
+        }
+        setDockStatus("📍 Cargando resultados en tu ubicación...", true);
+        await new Promise(r => setTimeout(r, 2600));
+        startExtraction();
+    }
+});

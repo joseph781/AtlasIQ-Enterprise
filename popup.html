@@ -28,14 +28,14 @@
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            width: 340px;
+            width: 356px;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background: var(--bg);
             color: var(--text-main);
         }
         .header {
             background: linear-gradient(135deg, #0f172a 0%, #1d4ed8 100%);
-            padding: 14px 16px;
+            padding: 13px 16px;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -43,44 +43,93 @@
         .brand { font-size: 16px; font-weight: 800; color: #fff; display: flex; align-items: center; gap: 7px; }
         .brand span { color: #60a5fa; }
         .badge { font-size: 10px; font-weight: 800; background: rgba(255,255,255,0.18); color: #fff; padding: 2px 8px; border-radius: 99px; }
-        .body { padding: 14px; display: flex; flex-direction: column; gap: 11px; }
+        .body { padding: 12px 14px; display: flex; flex-direction: column; gap: 10px; }
         .stats-card {
             background: var(--card-bg);
             border: 1px solid var(--border);
             border-radius: 10px;
-            padding: 11px 13px;
+            padding: 10px 12px;
             display: flex;
             align-items: center;
             justify-content: space-between;
             gap: 8px;
         }
-        .stats-label { font-size: 10.5px; font-weight: 700; color: var(--text-sub); text-transform: uppercase; }
-        .stats-count { font-size: 20px; font-weight: 800; color: var(--primary); }
+        .stats-label { font-size: 10px; font-weight: 700; color: var(--text-sub); text-transform: uppercase; }
+        .stats-count { font-size: 19px; font-weight: 800; color: var(--primary); }
         .card {
             background: var(--card-bg);
             border: 1px solid var(--border);
             border-radius: 10px;
-            padding: 12px 13px;
+            padding: 11px 12px;
             display: flex;
             flex-direction: column;
-            gap: 9px;
+            gap: 8px;
         }
-        .card-title { font-size: 11px; font-weight: 700; color: var(--text-sub); text-transform: uppercase; }
-        .input {
+        .card-title { font-size: 10.5px; font-weight: 800; color: var(--text-sub); text-transform: uppercase; letter-spacing: 0.3px; }
+        .mode-tabs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 5px;
+            background: var(--bg);
+            padding: 3px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+        .mode-tab {
+            border: none;
+            border-radius: 6px;
+            padding: 6px 8px;
+            font-size: 11.5px;
+            font-weight: 800;
+            cursor: pointer;
+            background: transparent;
+            color: var(--text-sub);
+            transition: all 0.15s;
+        }
+        .mode-tab.active {
+            background: var(--primary);
+            color: #ffffff;
+            box-shadow: 0 2px 6px rgba(37, 99, 235, 0.3);
+        }
+        .gps-strip {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 6px;
+            padding: 6px 9px;
+            border-radius: 7px;
+            background: rgba(16, 185, 129, 0.12);
+            border: 1px solid rgba(16, 185, 129, 0.35);
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--success);
+        }
+        .gps-refresh {
+            border: none;
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+            border-radius: 5px;
+            padding: 2px 6px;
+            font-size: 11px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+        .input, .select {
             width: 100%;
-            height: 36px;
+            height: 35px;
             border: 1px solid var(--border);
             border-radius: 7px;
             padding: 0 10px;
-            font-size: 13px;
+            font-size: 12.5px;
+            font-weight: 600;
             color: var(--text-main);
             background: var(--bg);
             outline: none;
         }
         .chips { display: flex; flex-wrap: wrap; gap: 5px; }
         .chip {
-            font-size: 11px;
-            font-weight: 600;
+            font-size: 10.5px;
+            font-weight: 700;
             background: var(--bg);
             color: var(--text-sub);
             padding: 3px 8px;
@@ -88,13 +137,23 @@
             cursor: pointer;
             border: 1px solid var(--border);
         }
+        .chip:hover { border-color: var(--primary); color: var(--primary); }
+        .auto-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-sub);
+            cursor: pointer;
+        }
         .btn {
             width: 100%;
-            height: 35px;
+            height: 36px;
             border: none;
             border-radius: 7px;
             font-size: 12.5px;
-            font-weight: 700;
+            font-weight: 800;
             color: #fff;
             cursor: pointer;
             display: flex;
@@ -104,10 +163,9 @@
             text-decoration: none;
         }
         .btn-primary { background: var(--primary); }
-        .btn-success { background: var(--success); }
+        .btn-success { background: linear-gradient(135deg, #059669, #10b981); }
         .btn-outline { background: transparent; color: var(--text-main); border: 1px solid var(--border); }
-        .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
-        .footer { padding: 0 14px 13px; text-align: center; font-size: 11px; color: var(--text-sub); }
+        .footer { padding: 0 14px 12px; text-align: center; font-size: 10.5px; color: var(--text-sub); }
     </style>
 </head>
 <body>
@@ -123,25 +181,49 @@
                 <div class="stats-count" id="stored-leads-count">0</div>
             </div>
             <div style="display:flex;gap:6px;">
-                <button id="open-sidepanel-btn" class="btn btn-outline" style="width:auto;height:32px;padding:0 10px;font-size:11.5px;" title="Abrir Copilot lateral">
+                <button id="open-sidepanel-btn" class="btn btn-outline" style="width:auto;height:31px;padding:0 9px;font-size:11px;" title="Abrir Copilot lateral">
                     🧭 Copilot
                 </button>
-                <button id="open-crm-btn" class="btn btn-primary" style="width:auto;height:32px;padding:0 12px;font-size:12px;">
+                <button id="open-crm-btn" class="btn btn-primary" style="width:auto;height:31px;padding:0 11px;font-size:11.5px;">
                     📊 CRM
                 </button>
             </div>
         </div>
 
         <div class="card">
-            <div class="card-title">🔍 Lanzador de Misión en Google Maps</div>
-            <input type="text" id="query-input" class="input" placeholder="Ej: Clínicas dentales en Madrid" value="Clínicas dentales en Madrid" />
-            <div class="chips">
-                <span class="chip" data-query="Clínicas Dentales en ">🦷 Clínicas</span>
-                <span class="chip" data-query="Restaurantes en ">🍽 Restaurantes</span>
-                <span class="chip" data-query="Inmobiliarias en ">🏢 Inmobiliarias</span>
-                <span class="chip" data-query="Gimnasios en ">🏋️ Gimnasios</span>
+            <div class="card-title">1. Punto de Referencia para Scrapeo</div>
+            <div class="mode-tabs">
+                <button type="button" class="mode-tab active" id="mode-gps-btn">📍 1. Mi Ubicación</button>
+                <button type="button" class="mode-tab" id="mode-city-btn">🌍 2. Otra Ciudad</button>
             </div>
-            <button id="search-btn" class="btn btn-success">▶ Lanzar Deep Harvester en Maps</button>
+
+            <div class="gps-strip" id="gps-status-strip">
+                <span id="gps-status-text">📍 Detectando tu ubicación actual...</span>
+                <button type="button" class="gps-refresh" id="btn-refresh-gps" title="Actualizar GPS exacto">↻ GPS</button>
+            </div>
+
+            <input type="text" id="query-input" class="input" placeholder="¿Qué buscas cerca de ti? Ej: Clínicas dentales" value="Clínicas dentales" />
+
+            <div class="chips">
+                <span class="chip" data-niche="Clínicas dentales">🦷 Clínicas</span>
+                <span class="chip" data-niche="Restaurantes">🍽 Restaurantes</span>
+                <span class="chip" data-niche="Inmobiliarias">🏢 Inmobiliarias</span>
+                <span class="chip" data-niche="Gimnasios">🏋️ Gimnasios</span>
+            </div>
+
+            <select id="popup-grid-select" class="select">
+                <option value="single" data-zoom="15" selected>📍 Zona Inmediata (~2 km · Estándar)</option>
+                <option value="2x2" data-zoom="14">🧭 Radio Urbano (~5 km · Malla 2×2)</option>
+                <option value="3x3" data-zoom="13">🌐 Radio Ciudad (~10 km · Malla H3 3×3)</option>
+                <option value="4x4" data-zoom="13">🚀 Radio Metropolitano (~16 km · Malla 4×4)</option>
+            </select>
+
+            <label class="auto-row">
+                <input type="checkbox" id="popup-autostart" checked />
+                <span>⚡ Iniciar scrapeo automático al abrir el mapa</span>
+            </label>
+
+            <button id="search-btn" class="btn btn-success">📍 Escanear desde Mi Ubicación Actual</button>
         </div>
 
         <div class="stats-card" id="popup-license-card">
@@ -160,6 +242,7 @@
         <strong>Joseph Castillo (CEO)</strong> · <strong>WINDOWSTELECOM</strong>
     </div>
 
+    <script src="js/util.js"></script>
     <script src="js/license.js"></script>
     <script src="js/popup.js"></script>
 </body>

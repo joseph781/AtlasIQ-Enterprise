@@ -726,7 +726,8 @@ function analyzeMarketSaturation(leads, targetNiche = "all", referenceCenter = n
     };
 }
 
-function detectUserLocation(callback) {
+function detectUserLocation(callback, options = {}) {
+    const forceHighAccuracy = Boolean(options && options.highAccuracy);
     if (typeof navigator !== "undefined" && navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
             (pos) => {
@@ -735,12 +736,16 @@ function detectUserLocation(callback) {
                     lon: pos.coords.longitude,
                     accuracy: pos.coords.accuracy,
                     source: "gps",
-                    label: "GPS Preciso",
+                    label: `GPS Exacto (${pos.coords.latitude.toFixed(4)}, ${pos.coords.longitude.toFixed(4)})`,
                     detectedAt: Date.now()
                 });
             },
             () => fetchIpGeolocation(callback),
-            { timeout: 5000, maximumAge: 300000 }
+            {
+                enableHighAccuracy: forceHighAccuracy,
+                timeout: forceHighAccuracy ? 7000 : 5000,
+                maximumAge: forceHighAccuracy ? 0 : 180000
+            }
         );
     } else {
         fetchIpGeolocation(callback);
@@ -754,8 +759,8 @@ async function fetchIpGeolocation(callback) {
             const data = await res.json();
             if (data && data.success !== false && data.latitude && data.longitude) {
                 if (callback) callback({
-                    lat: data.latitude,
-                    lon: data.longitude,
+                    lat: Number(data.latitude),
+                    lon: Number(data.longitude),
                     city: data.city || "",
                     region: data.region || "",
                     country: data.country || "",
@@ -767,6 +772,27 @@ async function fetchIpGeolocation(callback) {
             }
         }
     } catch (e) {}
+
+    try {
+        const res2 = await fetch("https://get.geojs.io/v1/ip/geo.json", { signal: AbortSignal.timeout(4000) });
+        if (res2.ok) {
+            const data2 = await res2.json();
+            if (data2 && data2.latitude && data2.longitude) {
+                if (callback) callback({
+                    lat: parseFloat(data2.latitude),
+                    lon: parseFloat(data2.longitude),
+                    city: data2.city || "",
+                    region: data2.region || "",
+                    country: data2.country || "",
+                    source: "ip",
+                    label: `${data2.city || data2.region || "Ubicación"}, ${data2.country || ""}`.trim().replace(/^,|,$/g, ""),
+                    detectedAt: Date.now()
+                });
+                return;
+            }
+        }
+    } catch (e) {}
+
     if (callback) callback(null);
 }
 
