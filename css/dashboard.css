@@ -730,6 +730,20 @@ body {
     box-shadow: 0 2px 4px rgba(37, 99, 235, 0.25);
 }
 
+/* Dark Tactical Radar Filter for Map Tiles Only (Preserves Vibrant Heatmap & Pins) */
+[data-theme="dark"] #atlasiq-map {
+    background: #0b0f19;
+}
+
+[data-theme="dark"] #atlasiq-map .leaflet-tile-pane {
+    filter: invert(100%) hue-rotate(180deg) brightness(94%) contrast(92%) saturate(85%);
+}
+
+#atlasiq-map .leaflet-heatmap-layer {
+    opacity: 0.88;
+    pointer-events: none;
+}
+
 /* Leaflet Custom DivIcon Pin */
 .tl-map-pin-div {
     display: flex;
@@ -2249,3 +2263,65 @@ button, .tl-btn, .tl-chip, .tl-view-tab {
 }
 
 
+
+
+/* === v4.0 EXECUTIVE BI ANALYTICS & DEEP OSINT BADGES === */
+.tl-bi-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+}
+
+.tl-bi-box {
+    background: var(--bg-card);
+    border: 1.5px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 16px;
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.tl-bi-title {
+    font-size: 13.5px;
+    font-weight: 800;
+    color: var(--text-primary);
+}
+
+.tl-echart-canvas {
+    width: 100%;
+    height: 300px;
+}
+
+.tl-pill-unclaimed {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 10px;
+    font-weight: 800;
+    padding: 2px 6px;
+    border-radius: 5px;
+    background: rgba(239, 68, 68, 0.14);
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.35);
+}
+
+.tl-pill-ads {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 10px;
+    font-weight: 800;
+    padding: 2px 6px;
+    border-radius: 5px;
+    background: rgba(16, 185, 129, 0.14);
+    color: #10b981;
+    border: 1px solid rgba(16, 185, 129, 0.35);
+}
+
+@media (max-width: 960px) {
+    .tl-bi-grid {
+        grid-template-columns: 1fr;
+    }
+}

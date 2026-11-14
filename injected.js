@@ -1,125 +1,117 @@
 /**
- * AtlasIQ Professional - MAIN World Network Interceptor
- * Grade: Silicon Valley Enterprise
- * 
- * Captures high-frequency Google Maps RPC Protobuf/JSON streams directly from the network layer.
- * Eliminates DOM lag, bypasses class name obfuscation, and extracts complete lead metadata.
+ * AtlasIQ Enterprise v4.0 - MAIN World Deep RPC & Reviews Stream Interceptor
+ * Captures Search Feeds, Place Detail Streams, and UGC Review Payloads directly from network transport.
  */
-(function() {
-  if (window.__atlasiq_network_hooked) return;
-  window.__atlasiq_network_hooked = true;
+(function () {
+    if (window.__atlasiq_network_hooked) return;
+    window.__atlasiq_network_hooked = true;
 
-  console.info("%c[AtlasIQ Enterprise]%c Network Interception Layer Active (MAIN World)", "color:#2563eb;font-weight:bold;", "color:#10b981;font-weight:bold;");
+    console.info(
+        "%c[AtlasIQ Enterprise v4.0]%c Deep RPC + Reviews Network Layer Active (MAIN World)",
+        "color:#3b82f6;font-weight:800;",
+        "color:#10b981;font-weight:700;"
+    );
 
-  const searchDataHistory = [];
-  const MAX_HISTORY = 40;
+    const searchDataHistory = [];
+    const MAX_HISTORY = 75;
 
-  function isMapsSearchUrl(url) {
-    if (!url) return false;
-    const u = url.toString().toLowerCase();
-    return u.includes("/search") || 
-           u.includes("/maps/rpc") || 
-           u.includes("batchexecute") || 
-           u.includes("/maps/preview") ||
-           u.includes("search?") ||
-           u.includes("viewport");
-  }
-
-  function broadcastData(data, url, source) {
-    if (!data || typeof data !== "string" || data.length < 50) return;
-    
-    // Save to ring buffer
-    searchDataHistory.push({ data, url, source, timestamp: Date.now() });
-    if (searchDataHistory.length > MAX_HISTORY) searchDataHistory.shift();
-
-    try {
-      window.postMessage({
-        type: "atlasiq_search_data",
-        data: data,
-        url: url,
-        source: source,
-        timestamp: Date.now()
-      }, "*");
-    } catch (err) {
-      console.warn("[AtlasIQ] postMessage error:", err);
-    }
-  }
-
-  // Answer requests for buffered search data
-  window.addEventListener("message", function(event) {
-    if (!event.data) return;
-    if (event.data.type === "atlasiq_request_history" || event.data.type === "request_history") {
-      searchDataHistory.forEach(item => {
-        try {
-          window.postMessage({
-            type: "atlasiq_search_data",
-            data: item.data,
-            url: item.url,
-            source: "history",
-            timestamp: item.timestamp
-          }, "*");
-        } catch (e) {}
-      });
-    }
-  });
-
-  // 1. Intercept XMLHttpRequest
-  try {
-    const origOpen = XMLHttpRequest.prototype.open;
-    const origSend = XMLHttpRequest.prototype.send;
-
-    XMLHttpRequest.prototype.open = function(method, url) {
-      this._atlasiq_url = url ? url.toString() : "";
-      return origOpen.apply(this, arguments);
-    };
-
-    XMLHttpRequest.prototype.send = function() {
-      const handleState = () => {
-        try {
-          if (this.readyState === 4 && (this.status === 200 || this.status === 0)) {
-            const url = this._atlasiq_url || "";
-            if (isMapsSearchUrl(url)) {
-              broadcastData(this.responseText, url, "xhr");
-            }
-          }
-        } catch (e) {
-          // Silent catch to prevent interference with Maps
+    function classifyMapsUrl(url) {
+        if (!url) return null;
+        const u = url.toString().toLowerCase();
+        if (u.includes("listugcposts") || u.includes("reviews")) return "reviews";
+        if (u.includes("/maps/preview/place") || u.includes("place?")) return "place_detail";
+        if (
+            u.includes("/search") ||
+            u.includes("/maps/rpc") ||
+            u.includes("batchexecute") ||
+            u.includes("/maps/preview") ||
+            u.includes("search?") ||
+            u.includes("listentities") ||
+            u.includes("viewport")
+        ) {
+            return "search_feed";
         }
-      };
-
-      this.addEventListener("readystatechange", handleState, false);
-      this.addEventListener("load", handleState, false);
-      return origSend.apply(this, arguments);
-    };
-  } catch (err) {
-    console.error("[AtlasIQ] Error hooking XMLHttpRequest:", err);
-  }
-
-  // 2. Intercept Fetch API
-  try {
-    if (window.fetch) {
-      const origFetch = window.fetch;
-      window.fetch = async function(...args) {
-        const response = await origFetch.apply(this, args);
-        try {
-          let url = "";
-          if (typeof args[0] === "string") {
-            url = args[0];
-          } else if (args[0] && args[0].url) {
-            url = args[0].url;
-          }
-
-          if (isMapsSearchUrl(url)) {
-            const clone = response.clone();
-            clone.text().then(text => {
-              broadcastData(text, url, "fetch");
-            }).catch(() => {});
-          }
-        } catch (e) {}
-        return response;
-      };
+        return null;
     }
-  } catch (err) {
-    console.error("[AtlasIQ] Error hooking window.fetch:", err);
-  }
+
+    function broadcastData(data, url, source, streamKind) {
+        if (!data || typeof data !== "string" || data.length < 50) return;
+
+        const packet = {
+            type: "atlasiq_search_data",
+            streamKind: streamKind || "search_feed",
+            data,
+            url,
+            source,
+            timestamp: Date.now()
+        };
+
+        searchDataHistory.push(packet);
+        if (searchDataHistory.length > MAX_HISTORY) searchDataHistory.shift();
+
+        try {
+            window.postMessage(packet, "*");
+        } catch (err) {}
+    }
+
+    window.addEventListener("message", function (event) {
+        if (!event.data) return;
+        if (event.data.type === "atlasiq_request_history" || event.data.type === "request_history") {
+            searchDataHistory.forEach((pkt) => {
+                try {
+                    window.postMessage({ ...pkt, source: "history" }, "*");
+                } catch (e) {}
+            });
+        }
+    });
+
+    // 1. Hook XMLHttpRequest
+    try {
+        const origOpen = XMLHttpRequest.prototype.open;
+        const origSend = XMLHttpRequest.prototype.send;
+
+        XMLHttpRequest.prototype.open = function (method, url) {
+            this._atlasiq_url = url ? url.toString() : "";
+            return origOpen.apply(this, arguments);
+        };
+
+        XMLHttpRequest.prototype.send = function () {
+            const handleDone = () => {
+                try {
+                    if (this.readyState === 4 && (this.status === 200 || this.status === 0)) {
+                        const url = this._atlasiq_url || "";
+                        const kind = classifyMapsUrl(url);
+                        if (kind && typeof this.responseText === "string") {
+                            broadcastData(this.responseText, url, "xhr", kind);
+                        }
+                    }
+                } catch (e) {}
+            };
+            this.addEventListener("load", handleDone, false);
+            return origSend.apply(this, arguments);
+        };
+    } catch (err) {}
+
+    // 2. Hook Fetch API
+    try {
+        if (window.fetch) {
+            const origFetch = window.fetch;
+            window.fetch = async function (...args) {
+                const response = await origFetch.apply(this, args);
+                try {
+                    let url = "";
+                    if (typeof args[0] === "string") url = args[0];
+                    else if (args[0] && args[0].url) url = args[0].url;
+
+                    const kind = classifyMapsUrl(url);
+                    if (kind) {
+                        response.clone().text().then((txt) => {
+                            broadcastData(txt, url, "fetch", kind);
+                        }).catch(() => {});
+                    }
+                } catch (e) {}
+                return response;
+            };
+        }
+    } catch (err) {}
 })();

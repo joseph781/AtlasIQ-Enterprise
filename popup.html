@@ -1,17 +1,10 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover" />
-    <meta name="theme-color" content="#1e3a8a" />
-    <title>AtlasIQ Pro</title>
-    <script>
-        (function() {
-            var savedTheme = localStorage.getItem("atlasiq-theme") || "light";
-            document.documentElement.setAttribute("data-theme", savedTheme);
-        })();
-    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AtlasIQ Enterprise v4.0</title>
+    <script src="js/theme-init.js"></script>
     <style>
         :root {
             --primary: #2563eb;
@@ -23,7 +16,6 @@
             --border: #e2e8f0;
             --success: #10b981;
         }
-
         [data-theme="dark"] {
             --primary: #3b82f6;
             --primary-hover: #60a5fa;
@@ -34,150 +26,46 @@
             --border: #1e293b;
             --success: #10b981;
         }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            width: 320px;
-            max-width: 100vw;
+            width: 340px;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background: var(--bg);
             color: var(--text-main);
-            margin: 0 auto;
         }
-
-        [data-theme="dark"] .btn-secondary {
-            background: #1e293b;
-            color: #cbd5e1;
-            border-color: #334155;
-        }
-
-        [data-theme="dark"] .btn-secondary:hover {
-            background: #334155;
-            color: #ffffff;
-        }
-
-        [data-theme="dark"] .input {
-            background: #0b0f19;
-            color: #f8fafc;
-            border-color: #334155;
-        }
-
-        [data-theme="dark"] .input:focus {
-            background: #111827;
-            border-color: #3b82f6;
-        }
-
-        [data-theme="dark"] .chip {
-            background: #1e293b;
-            color: #cbd5e1;
-            border-color: #334155;
-        }
-
-        [data-theme="dark"] .chip:hover {
-            background: #334155;
-            color: #f8fafc;
-        }
-
-        /* Mobile standalone view auto-adapt */
-        @media screen and (max-width: 600px) {
-            body {
-                width: 100%;
-                min-height: 100vh;
-            }
-        }
-
         .header {
-            background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+            background: linear-gradient(135deg, #0f172a 0%, #1d4ed8 100%);
             padding: 14px 16px;
             display: flex;
             align-items: center;
             justify-content: space-between;
         }
-
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 16px;
-            font-weight: 800;
-            color: #fff;
-            letter-spacing: -0.3px;
-        }
-
-        .badge {
-            font-size: 10px;
-            font-weight: 700;
-            background: rgba(255, 255, 255, 0.2);
-            color: #fff;
-            padding: 2px 7px;
-            border-radius: 12px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .body {
-            padding: 14px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
+        .brand { font-size: 16px; font-weight: 800; color: #fff; display: flex; align-items: center; gap: 7px; }
+        .brand span { color: #60a5fa; }
+        .badge { font-size: 10px; font-weight: 800; background: rgba(255,255,255,0.18); color: #fff; padding: 2px 8px; border-radius: 99px; }
+        .body { padding: 14px; display: flex; flex-direction: column; gap: 11px; }
         .stats-card {
             background: var(--card-bg);
             border: 1px solid var(--border);
             border-radius: 10px;
-            padding: 12px 14px;
+            padding: 11px 13px;
             display: flex;
             align-items: center;
             justify-content: space-between;
+            gap: 8px;
         }
-
-        .stats-info {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .stats-label {
-            font-size: 11px;
-            font-weight: 600;
-            color: var(--text-sub);
-            text-transform: uppercase;
-        }
-
-        .stats-count {
-            font-size: 20px;
-            font-weight: 800;
-            color: var(--primary);
-            line-height: 1.2;
-        }
-
+        .stats-label { font-size: 10.5px; font-weight: 700; color: var(--text-sub); text-transform: uppercase; }
+        .stats-count { font-size: 20px; font-weight: 800; color: var(--primary); }
         .card {
             background: var(--card-bg);
             border: 1px solid var(--border);
             border-radius: 10px;
-            padding: 12px 14px;
+            padding: 12px 13px;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 9px;
         }
-
-        .card-title {
-            font-size: 11px;
-            font-weight: 700;
-            color: var(--text-sub);
-            text-transform: uppercase;
-            letter-spacing: 0.4px;
-        }
-
-        .input-group {
-            position: relative;
-        }
-
+        .card-title { font-size: 11px; font-weight: 700; color: var(--text-sub); text-transform: uppercase; }
         .input {
             width: 100%;
             height: 36px;
@@ -186,45 +74,26 @@
             padding: 0 10px;
             font-size: 13px;
             color: var(--text-main);
-            background: #f8fafc;
+            background: var(--bg);
             outline: none;
-            transition: all 0.15s;
         }
-
-        .input:focus {
-            border-color: var(--primary);
-            background: #fff;
-        }
-
-        .chips {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-        }
-
+        .chips { display: flex; flex-wrap: wrap; gap: 5px; }
         .chip {
             font-size: 11px;
             font-weight: 600;
-            background: #f1f5f9;
+            background: var(--bg);
             color: var(--text-sub);
             padding: 3px 8px;
             border-radius: 12px;
             cursor: pointer;
-            transition: all 0.15s;
             border: 1px solid var(--border);
         }
-
-        .chip:hover {
-            background: #e2e8f0;
-            color: var(--text-main);
-        }
-
         .btn {
             width: 100%;
-            height: 36px;
+            height: 35px;
             border: none;
             border-radius: 7px;
-            font-size: 13px;
+            font-size: 12.5px;
             font-weight: 700;
             color: #fff;
             cursor: pointer;
@@ -232,81 +101,53 @@
             align-items: center;
             justify-content: center;
             gap: 6px;
-            transition: all 0.15s;
             text-decoration: none;
         }
-
-        .btn-primary {
-            background: var(--primary);
-            box-shadow: 0 2px 4px rgba(37, 99, 235, 0.25);
-        }
-
-        .btn-primary:hover {
-            background: var(--primary-hover);
-        }
-
-        .btn-success {
-            background: var(--success);
-            box-shadow: 0 2px 4px rgba(16, 185, 129, 0.25);
-        }
-
-        .btn-success:hover {
-            filter: brightness(1.08);
-        }
-
-        .footer {
-            padding: 0 14px 14px;
-            text-align: center;
-            font-size: 11px;
-            color: var(--text-sub);
-        }
+        .btn-primary { background: var(--primary); }
+        .btn-success { background: var(--success); }
+        .btn-outline { background: transparent; color: var(--text-main); border: 1px solid var(--border); }
+        .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+        .footer { padding: 0 14px 13px; text-align: center; font-size: 11px; color: var(--text-sub); }
     </style>
 </head>
-
 <body>
     <div class="header">
-        <div class="brand">
-            🌐 Atlas<span>IQ</span>
-        </div>
-        <span class="badge">v2.5 PRO</span>
+        <div class="brand">🌐 Atlas<span>IQ</span></div>
+        <span class="badge">v4.0 EXTREME</span>
     </div>
 
     <div class="body">
-        <!-- LEADS IN MEMORY METRIC -->
         <div class="stats-card">
-            <div class="stats-info">
-                <span class="stats-label">Base de Prospectos</span>
-                <span class="stats-count" id="stored-leads-count">0</span>
+            <div>
+                <div class="stats-label">Prospectos Activos</div>
+                <div class="stats-count" id="stored-leads-count">0</div>
             </div>
-            <button id="open-crm-btn" class="btn btn-primary" style="width: auto; height: 32px; padding: 0 12px; font-size: 12px;">
-                📊 Abrir CRM
-            </button>
+            <div style="display:flex;gap:6px;">
+                <button id="open-sidepanel-btn" class="btn btn-outline" style="width:auto;height:32px;padding:0 10px;font-size:11.5px;" title="Abrir Copilot lateral">
+                    🧭 Copilot
+                </button>
+                <button id="open-crm-btn" class="btn btn-primary" style="width:auto;height:32px;padding:0 12px;font-size:12px;">
+                    📊 CRM
+                </button>
+            </div>
         </div>
 
-        <!-- SEARCH FORM -->
         <div class="card">
-            <div class="card-title">🔍 Búsqueda en Google Maps</div>
-            <div class="input-group">
-                <input type="text" id="query-input" class="input" placeholder="Ej: Clínicas dentales en Madrid" value="Restaurantes en Guadalajara" />
-            </div>
-
+            <div class="card-title">🔍 Lanzador de Misión en Google Maps</div>
+            <input type="text" id="query-input" class="input" placeholder="Ej: Clínicas dentales en Madrid" value="Clínicas dentales en Madrid" />
             <div class="chips">
+                <span class="chip" data-query="Clínicas Dentales en ">🦷 Clínicas</span>
                 <span class="chip" data-query="Restaurantes en ">🍽 Restaurantes</span>
-                <span class="chip" data-query="Clínicas Dentales en ">🦷 Dentistas</span>
                 <span class="chip" data-query="Inmobiliarias en ">🏢 Inmobiliarias</span>
-                <span class="chip" data-query="Agencias de Marketing en ">📈 Agencias</span>
+                <span class="chip" data-query="Gimnasios en ">🏋️ Gimnasios</span>
             </div>
-
-            <button id="search-btn" class="btn btn-success">
-                ▶ Explorar en Google Maps
-            </button>
+            <button id="search-btn" class="btn btn-success">▶ Lanzar Deep Harvester en Maps</button>
         </div>
 
-        <!-- LICENSE STATUS CARD -->
-        <div class="stats-card" id="popup-license-card" style="cursor: pointer;" title="Gestionar Licencia Anual">
-            <div class="stats-info">
-                <span class="stats-label">Licencia WINDOWSTELECOM</span>
-                <span id="popup-license-status" style="font-size: 12px; font-weight: 800; color: #64748b;">Verificando...</span>
+        <div class="stats-card" id="popup-license-card">
+            <div>
+                <div class="stats-label">Seguridad ECDSA P-256</div>
+                <div id="popup-license-status" style="font-size: 12px; font-weight: 800; color: var(--text-sub);">Verificando...</div>
             </div>
             <button id="btn-popup-license-open" class="btn btn-outline" style="width: auto; height: 28px; padding: 0 10px; font-size: 11px;">
                 Gestionar
@@ -315,12 +156,11 @@
     </div>
 
     <div class="footer">
-        <a href="index.html" target="_blank" style="color: #2563eb; text-decoration: none; font-weight: 700; margin-bottom: 4px; display: inline-block;">📖 Manual Oficial de AtlasIQ</a><br />
-        Desarrollada por <strong>Joseph Castillo (CEO)</strong> · <strong>WINDOWSTELECOM</strong>
+        <a href="index.html" target="_blank" style="color: var(--primary); text-decoration: none; font-weight: 700;">📖 Manual Oficial</a> ·
+        <strong>Joseph Castillo (CEO)</strong> · <strong>WINDOWSTELECOM</strong>
     </div>
 
     <script src="js/license.js"></script>
     <script src="js/popup.js"></script>
 </body>
-
 </html>

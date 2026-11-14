@@ -9,7 +9,10 @@ generate_icons.py
 *.log
 *.zip
 
+# Confidential CEO Vault & Private Signing Keys (NEVER push to public GitHub)
+admin-server/
+wt-vault-*/
+
 # Git & IDE
 .vscode/
 .idea/
-

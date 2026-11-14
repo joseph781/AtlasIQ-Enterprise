@@ -6,15 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover" />
     <meta name="theme-color" content="#2563eb" />
     <meta name="mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <title>AtlasIQ Enterprise CRM – Silicon Valley Grade B2B Intelligence</title>
-    <script>
-        // Inmediatamente aplicar el tema guardado para evitar parpadeos
-        (function() {
-            var savedTheme = localStorage.getItem("atlasiq-theme") || "light";
-            document.documentElement.setAttribute("data-theme", savedTheme);
-        })();
-    </script>
+    <title>AtlasIQ Enterprise v4.0 – Autonomous Geo-Revenue OS & AI CRM</title>
+    <script src="js/theme-init.js"></script>
     <link href="lib/tabulator/css/semantic-ui/tabulator_semantic-ui.min.css" rel="stylesheet" />
     <link href="lib/leaflet/leaflet.css" rel="stylesheet" />
     <link href="css/dashboard.css" rel="stylesheet" />
@@ -23,7 +16,9 @@
     <script src="lib/xlsx.full.min.js"></script>
     <script src="lib/leaflet/leaflet.js"></script>
     <script src="lib/leaflet/leaflet-heat.js"></script>
+    <script src="lib/echarts.min.js"></script>
     <script src="lib/jspdf/jspdf.umd.min.js"></script>
+    <script src="js/db.js"></script>
     <script src="js/util.js"></script>
     <script src="js/license.js"></script>
 </head>
@@ -33,42 +28,42 @@
     <header class="tl-navbar">
         <div class="tl-nav-brand">
             <div class="tl-brand-icon">🌐</div>
-            <div class="tl-brand-title">Atlas<span>IQ</span> CRM</div>
-            <span class="tl-nav-badge">Silicon Valley Enterprise v2.5</span>
+            <div class="tl-brand-title">Atlas<span>IQ</span> OS</div>
+            <span class="tl-nav-badge">Geo-Revenue v4.0 Extreme</span>
             <div class="tl-user-location-badge" id="header-user-location" title="Ubicación geográfica detectada">
                 <span class="tl-loc-dot"></span>
                 <span id="user-location-text">Detectando ubicación...</span>
             </div>
-            <div class="tl-license-badge" id="header-license-badge" title="Haz clic para ver detalles de licencia">
-                <span id="header-license-text">🛡️ Licencia Anual</span>
+            <div class="tl-license-badge" id="header-license-badge" title="Haz clic para ver detalles de licencia ECDSA P-256">
+                <span id="header-license-text">🛡️ ECDSA P-256</span>
             </div>
         </div>
         <div class="tl-nav-actions">
             <button id="btn-toggle-theme" class="tl-btn tl-btn-outline" title="Alternar Modo Oscuro / Claro" style="font-weight: 700;">
-                🌙 Modo Oscuro
+                ☀️ Modo Claro
             </button>
-            <button id="btn-open-maps-search" class="tl-btn tl-btn-outline" style="border-color: #3b82f6; color: #1d4ed8;" title="Abrir Google Maps para prospectar en esta zona">
+            <button id="btn-open-maps-search" class="tl-btn tl-btn-outline" style="border-color: #3b82f6; color: #3b82f6;" title="Abrir Google Maps para prospectar en esta zona">
                 🗺️ Explorar en Maps
             </button>
             <a href="index.html" target="_blank" class="tl-btn tl-btn-outline" style="text-decoration: none;" title="Abrir Guía y Manual Oficial">
-                📖 Manual Oficial
+                📖 Manual
             </a>
-            <button id="btn-sync-webhook" class="tl-btn tl-btn-primary" title="Enviar prospectos a Zapier / Make / HubSpot">
-                🚀 Sincronizar CRM / Webhook
+            <button id="btn-sync-webhook" class="tl-btn tl-btn-primary" title="Enviar prospectos a Zapier / Make / n8n / GoHighLevel / HubSpot">
+                🚀 Sync Webhook / CRM
             </button>
             <button id="btn-export-xlsx" class="tl-btn tl-btn-success">
-                📊 Exportar Excel (XLSX)
+                📊 Excel (XLSX)
             </button>
             <button id="btn-export-csv" class="tl-btn tl-btn-outline">
-                📥 Exportar CSV
+                📥 CSV
             </button>
             <button id="btn-export-vcard" class="tl-btn tl-btn-outline" title="Exportar contactos a la agenda del móvil (.vcf)">
-                📱 vCard Móvil
+                📱 vCard
             </button>
-            <button id="btn-settings" class="tl-btn tl-btn-ghost" title="Configurar Webhook y Ajustes">
+            <button id="btn-settings" class="tl-btn tl-btn-ghost" title="Configurar IA, Marca Blanca, Edge Worker y Webhook">
                 ⚙️ Ajustes
             </button>
-            <button id="btn-clear-data" class="tl-btn tl-btn-ghost" style="color: #ef4444;" title="Vaciar base de datos">
+            <button id="btn-clear-data" class="tl-btn tl-btn-ghost" style="color: #ef4444;" title="Vaciar base de datos IndexedDB">
                 🗑 Limpiar
             </button>
         </div>
@@ -80,43 +75,43 @@
         <section class="tl-kpi-grid">
             <div class="tl-kpi-card">
                 <div class="tl-kpi-header">
-                    <span class="tl-kpi-label">Total Leads</span>
+                    <span class="tl-kpi-label">Total Prospectos (AtlasDB)</span>
                     <span class="tl-kpi-icon">👥</span>
                 </div>
                 <div class="tl-kpi-value" id="kpi-total-leads">0</div>
-                <div class="tl-kpi-sub">Prospectos en base de datos</div>
+                <div class="tl-kpi-sub">Motor IndexedDB de alta escala</div>
             </div>
 
             <div class="tl-kpi-card">
                 <div class="tl-kpi-header">
-                    <span class="tl-kpi-label">Emails Verificados</span>
+                    <span class="tl-kpi-label">Emails & OSINT</span>
                     <span class="tl-kpi-icon">✉️</span>
                 </div>
                 <div class="tl-kpi-value" id="kpi-total-emails">0</div>
-                <div class="tl-kpi-sub highlight" id="kpi-email-pct">0% del total</div>
+                <div class="tl-kpi-sub highlight" id="kpi-email-pct">0% con buzón detectado</div>
             </div>
 
             <div class="tl-kpi-card">
                 <div class="tl-kpi-header">
-                    <span class="tl-kpi-label">Teléfonos Directos</span>
+                    <span class="tl-kpi-label">Líneas WhatsApp / Voz</span>
                     <span class="tl-kpi-icon">📞</span>
                 </div>
                 <div class="tl-kpi-value" id="kpi-total-phones">0</div>
-                <div class="tl-kpi-sub highlight" id="kpi-phone-pct">0% con WhatsApp/Llamada</div>
+                <div class="tl-kpi-sub highlight" id="kpi-phone-pct">0% accionables hoy</div>
             </div>
 
             <div class="tl-kpi-card">
                 <div class="tl-kpi-header">
-                    <span class="tl-kpi-label">Oportunidad Alta (Score 75+)</span>
+                    <span class="tl-kpi-label">Hot Leads (Score 75+)</span>
                     <span class="tl-kpi-icon">🔥</span>
                 </div>
                 <div class="tl-kpi-value" id="kpi-high-score">0</div>
-                <div class="tl-kpi-sub">Prioridad inmediata de venta</div>
+                <div class="tl-kpi-sub" id="kpi-unclaimed-sub">Prioridad inmediata de cierre</div>
             </div>
 
             <div class="tl-kpi-card">
                 <div class="tl-kpi-header">
-                    <span class="tl-kpi-label">Reputación Promedio</span>
+                    <span class="tl-kpi-label">Reputación del Mercado</span>
                     <span class="tl-kpi-icon">⭐</span>
                 </div>
                 <div class="tl-kpi-value" id="kpi-avg-rating">0.0★</div>
@@ -128,28 +123,33 @@
         <section class="tl-toolbar">
             <div class="tl-search-box">
                 <span class="tl-search-icon">🔍</span>
-                <input type="text" id="filter-search" class="tl-search-input" placeholder="Buscar por empresa, rubro, teléfono, email, ciudad..." />
+                <input type="text" id="filter-search" class="tl-search-input" placeholder="Buscar empresa, decisor, RIF/NIF/RFC, rubro, stack, email, quejas..." />
             </div>
 
             <div class="tl-filter-chips">
                 <span class="tl-chip active" data-filter="all">Todos</span>
-                <span class="tl-chip" data-filter="high-score">🔥 Score Alto (75+)</span>
+                <span class="tl-chip" data-filter="high-score">🔥 Score 75+</span>
+                <span class="tl-chip" data-filter="unclaimed">🏴 No Reclamados</span>
+                <span class="tl-chip" data-filter="ads-active">💰 Pagan Ads</span>
                 <span class="tl-chip" data-filter="has-email">✉️ Con Email</span>
                 <span class="tl-chip" data-filter="has-phone">📞 Con Teléfono</span>
-                <span class="tl-chip" data-filter="has-website">🌐 Con Sitio Web</span>
-                <span class="tl-chip" data-filter="no-website">⚡ Sin Web (Oportunidad)</span>
+                <span class="tl-chip" data-filter="no-website">⚡ Sin Web</span>
             </div>
 
             <div class="tl-toolbar-actions">
-                <button id="btn-start-speed-outreach" class="tl-btn tl-btn-success" style="height: 32px; font-size: 12px; font-weight: 700;" title="Iniciar sesión de prospección guiada por WhatsApp">
-                    ⚡ Prospección Rápida
+                <button id="btn-start-speed-outreach" class="tl-btn tl-btn-success" style="height: 32px; font-size: 12px; font-weight: 700;" title="Iniciar sesión guiada de WhatsApp">
+                    ⚡ Cola Rápida WA
                 </button>
-                <button id="btn-verify-all-emails" class="tl-btn tl-btn-outline" style="height: 32px; font-size: 12px;" title="Verificar servidores de correo MX de los emails en vivo ($0 DoH Cloudflare)">
-                    📧 Validar MX Emails
+                <button id="btn-verify-all-emails" class="tl-btn tl-btn-outline" style="height: 32px; font-size: 12px;" title="Auditar DNS MX + SPF + DMARC en lote ($0 Cloudflare DoH)">
+                    🛡️ Auditar DNS/DMARC
                 </button>
-                <button id="btn-export-json" class="tl-btn tl-btn-outline" style="height: 32px; font-size: 12px;">
+                <button id="btn-export-json" class="tl-btn tl-btn-outline" style="height: 32px; font-size: 12px;" title="Exportar JSON para Agentes MCP o Backups">
                     { } JSON
                 </button>
+                <button id="btn-import-json" class="tl-btn tl-btn-outline" style="height: 32px; font-size: 12px;" title="Importar archivo JSON de prospectos">
+                    📤 Importar
+                </button>
+                <input type="file" id="input-import-json-file" accept=".json" style="display: none;" />
             </div>
         </section>
 
@@ -163,15 +163,15 @@
                     </select>
                 </div>
 
-                <label class="tl-checkbox-label" title="Coincidencia estricta y exacta por rubro/categoría principal">
+                <label class="tl-checkbox-label" title="Coincidencia exacta por rubro principal">
                     <input type="checkbox" id="check-strict-niche" />
                     <span>Nicho Estricto</span>
                 </label>
 
                 <div style="display: flex; align-items: center; gap: 6px;">
-                    <label for="filter-distance" style="font-size: 12px; font-weight: 700; color: var(--text-secondary);">📍 Distancia Máx:</label>
+                    <label for="filter-distance" style="font-size: 12px; font-weight: 700; color: var(--text-secondary);">📍 Radio:</label>
                     <select id="filter-distance" class="tl-select-filter">
-                        <option value="all" selected>Cualquier distancia (Todas)</option>
+                        <option value="all" selected>Cualquier distancia</option>
                         <option value="1">&lt; 1 km (Hiper-local)</option>
                         <option value="3">&lt; 3 km (Sector)</option>
                         <option value="5">&lt; 5 km (Comuna/Zona)</option>
@@ -183,31 +183,29 @@
 
             <div class="tl-filter-group-right">
                 <button id="btn-toggle-saturation" class="tl-btn tl-btn-primary" style="height: 32px; font-size: 12px; padding: 0 12px; background: #1e293b; border-color: #334155;">
-                    🧭 Radar de Saturación & Nichos
+                    🧭 Radar de Saturación & Océanos Azules
                 </button>
-                <button id="btn-reset-filters" class="tl-btn tl-btn-ghost" style="height: 32px; font-size: 11px; color: #64748b;" title="Restablecer todos los filtros">
+                <button id="btn-reset-filters" class="tl-btn tl-btn-ghost" style="height: 32px; font-size: 11px; color: #64748b;">
                     ↺ Restablecer
                 </button>
             </div>
         </section>
 
-        <!-- MARKET SATURATION & NICHE INTELLIGENCE RADAR (COLLAPSIBLE / TOGGLEABLE) -->
+        <!-- MARKET SATURATION & NICHE INTELLIGENCE RADAR -->
         <section class="tl-saturation-section" id="market-saturation-panel">
             <div class="tl-saturation-header">
                 <div class="tl-sat-title-box">
                     <span style="font-size: 18px;">🧭</span>
-                    <div class="tl-sat-title">Radar de Saturación & Expansión de Nichos <span class="tl-badge-score tl-score-high" id="sat-target-badge" style="font-size: 10px; margin-left: 6px;">Todos los rubros</span></div>
+                    <div class="tl-sat-title">Radar Geoespacial O(N) de Saturación & Expansión <span class="tl-badge-score tl-score-high" id="sat-target-badge" style="font-size: 10px; margin-left: 6px;">Todos los rubros</span></div>
                 </div>
                 <div style="display: flex; align-items: center; gap: 8px;">
-                    <span style="font-size: 11px; color: #64748b;" id="sat-updated-label">Inteligencia geoespacial en tiempo real</span>
+                    <span style="font-size: 11px; color: var(--text-muted);">Índice espacial por celdas activo</span>
                     <button id="btn-close-saturation" class="tl-btn tl-btn-ghost" style="height: 26px; font-size: 14px; padding: 0 6px;">✕</button>
                 </div>
             </div>
 
             <div class="tl-sat-body">
-                <!-- METRIC CARDS -->
                 <div class="tl-sat-grid">
-                    <!-- Gauge Card -->
                     <div class="tl-sat-card">
                         <div class="tl-sat-card-header">
                             <span class="tl-sat-card-label">Índice de Saturación</span>
@@ -217,80 +215,70 @@
                         <div class="tl-sat-meter-bar">
                             <div class="tl-sat-meter-fill" id="sat-meter-fill" style="width: 0%; background: #2563eb;"></div>
                         </div>
-                        <div class="tl-sat-subtext" id="sat-density-sub">Calculando densidad y proximidad entre competidores...</div>
+                        <div class="tl-sat-subtext" id="sat-density-sub">Calculando densidad espacial...</div>
                     </div>
 
-                    <!-- Proximity Card ("Distancia del uno al otro") -->
                     <div class="tl-sat-card">
                         <div class="tl-sat-card-header">
-                            <span class="tl-sat-card-label">Distancia Entre Negocios</span>
-                            <span class="tl-sat-badge" style="background: #f1f5f9; color: #334155;">Proximidad Peer-to-Peer</span>
+                            <span class="tl-sat-card-label">Distancia Peer-to-Peer</span>
+                            <span class="tl-sat-badge" style="background: #f1f5f9; color: #334155;">Mismo Rubro</span>
                         </div>
                         <div class="tl-sat-val-lg" id="sat-peer-dist-val">-- m</div>
-                        <div class="tl-sat-subtext" id="sat-peer-dist-sub">Distancia promedio al competidor idéntico más cercano en la zona.</div>
+                        <div class="tl-sat-subtext" id="sat-peer-dist-sub">Separación promedio entre competidores directos.</div>
                     </div>
 
-                    <!-- Digital Vulnerability Card -->
                     <div class="tl-sat-card">
                         <div class="tl-sat-card-header">
                             <span class="tl-sat-card-label">Vulnerabilidad Digital</span>
-                            <span class="tl-sat-badge" style="background: #fef2f2; color: #b91c1c;">Oportunidad B2B</span>
+                            <span class="tl-sat-badge" style="background: #fef2f2; color: #b91c1c;">Brecha B2B</span>
                         </div>
                         <div class="tl-sat-val-lg" id="sat-vuln-val">--%</div>
-                        <div class="tl-sat-subtext" id="sat-vuln-sub">Porcentaje de negocios sin presencia web o sin pixel publicitario.</div>
+                        <div class="tl-sat-subtext" id="sat-vuln-sub">Porcentaje sin web o sin píxeles de conversión.</div>
                     </div>
 
-                    <!-- Spatial Expansion Card -->
                     <div class="tl-sat-card">
                         <div class="tl-sat-card-header">
-                            <span class="tl-sat-card-label">Cuadrante Menos Saturado</span>
+                            <span class="tl-sat-card-label">Cuadrante Recomendado</span>
                             <span class="tl-sat-badge" style="background: #f0fdf4; color: #15803d;">Expansión</span>
                         </div>
                         <div class="tl-sat-val-lg" id="sat-quadrant-val" style="font-size: 20px;">--</div>
-                        <div class="tl-sat-subtext" id="sat-quadrant-sub">Zona geográfica con menor presión de competencia directa.</div>
+                        <div class="tl-sat-subtext" id="sat-quadrant-sub">Zona geográfica con menor presión competitiva.</div>
                     </div>
                 </div>
 
-                <!-- Strategic Advisory Box -->
                 <div class="tl-sat-advice-box">
                     <span class="tl-sat-advice-icon">💡</span>
                     <div class="tl-sat-advice-text" id="sat-advice-text">
-                        Inicia una prospección o selecciona un nicho específico para evaluar la viabilidad de apertura y saturación.
+                        Selecciona un nicho o inicia extracción en Google Maps para generar diagnóstico.
                     </div>
                 </div>
 
-                <!-- Opportunity Niches Radar -->
                 <div>
-                    <div style="font-size: 12px; font-weight: 700; color: #475569; margin-bottom: 6px; display: flex; align-items: center; justify-content: space-between;">
-                        <span>🎯 Nichos Desatendidos & Sitios de Interés para Desarrollar en la Zona:</span>
-                        <span style="font-size: 11px; color: #94a3b8; font-weight: normal;">Haz clic para buscar en Google Maps</span>
+                    <div style="font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px; display: flex; align-items: center; justify-content: space-between;">
+                        <span>🎯 Océanos Azules (Nichos Desatendidos en el Cuadrante):</span>
+                        <span style="font-size: 11px; color: var(--text-muted); font-weight: normal;">Clic para prospectar en Google Maps</span>
                     </div>
-                    <div class="tl-opportunity-chips" id="sat-opportunity-chips">
-                        <!-- Injected via JS -->
-                    </div>
+                    <div class="tl-opportunity-chips" id="sat-opportunity-chips"></div>
                 </div>
 
-                <!-- DETAILED NICHE BREAKDOWN TABLE IN CRM -->
                 <div style="margin-top: 6px; border-top: 1px solid var(--border-color); padding-top: 14px;">
                     <div style="font-size: 13px; font-weight: 800; color: var(--text-primary); margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between;">
-                        <span>📊 Detalle de Nichos en el Cuadrante Escrapeado:</span>
-                        <span style="font-size: 11px; color: var(--text-muted); font-weight: normal;">Haz clic en cualquier nicho para filtrarlo al instante</span>
+                        <span>📊 Matriz de Nichos Escrapeados:</span>
+                        <span style="font-size: 11px; color: var(--text-muted); font-weight: normal;">Usa el botón Filtrar para aislar el segmento</span>
                     </div>
                     <div id="sat-niche-breakdown-container" style="overflow-x: auto;">
                         <table style="width: 100%; border-collapse: collapse; font-size: 12px; background: var(--bg-card); border-radius: 8px; overflow: hidden; border: 1px solid var(--border-color);">
                             <thead>
                                 <tr style="background: var(--bg-main); text-align: left; color: var(--text-secondary); font-weight: 700; border-bottom: 1px solid var(--border-color);">
                                     <th style="padding: 8px 12px;">Nicho / Rubro</th>
-                                    <th style="padding: 8px 12px; text-align: center;">Total Negocios</th>
-                                    <th style="padding: 8px 12px; text-align: center;">Proximidad Promedio</th>
-                                    <th style="padding: 8px 12px; text-align: center;">Saturación</th>
-                                    <th style="padding: 8px 12px; text-align: center;">Sin Web (Oportunidad)</th>
+                                    <th style="padding: 8px 12px; text-align: center;">Total</th>
+                                    <th style="padding: 8px 12px; text-align: center;">Proximidad</th>
+                                    <th style="padding: 8px 12px; text-align: center;">Estado</th>
+                                    <th style="padding: 8px 12px; text-align: center;">Sin Web</th>
                                     <th style="padding: 8px 12px; text-align: center;">Acción</th>
                                 </tr>
                             </thead>
-                            <tbody id="sat-niche-tbody">
-                                <tr><td colspan="6" style="padding: 12px; text-align: center; color: var(--text-muted);">Cargando análisis de nichos...</td></tr>
-                            </tbody>
+                            <tbody id="sat-niche-tbody"></tbody>
                         </table>
                     </div>
                 </div>
@@ -300,206 +288,214 @@
         <!-- FILTER SAFETY BANNER -->
         <div class="tl-filter-alert-banner" id="filter-reset-banner">
             <div>
-                ⚠️ <strong>Filtros activos:</strong> Mostrando <span id="banner-filtered-count">0</span> de <span id="banner-total-count">0</span> prospectos. Si no ves los prospectos deseados, restablece los filtros.
+                ⚠️ <strong>Filtros activos:</strong> Mostrando <span id="banner-filtered-count">0</span> de <span id="banner-total-count">0</span> prospectos.
             </div>
             <button id="banner-btn-reset" class="tl-btn tl-btn-outline" style="height: 26px; font-size: 11px; padding: 0 10px; border-color: #f59e0b; color: #b45309;">
-                Restablecer Filtros
+                Mostrar Todos
             </button>
         </div>
 
-        <!-- VIEW NAVIGATION TABS -->
-        <section class="tl-view-tabs" style="display: flex; gap: 8px; margin-bottom: -6px;">
+        <!-- VIEW NAVIGATION TABS (4 VIEWS INCLUDING EXECUTIVE BI) -->
+        <section class="tl-view-tabs" style="display: flex; gap: 8px; margin-bottom: -6px; flex-wrap: wrap;">
             <button class="tl-view-tab active" id="tab-view-table">
-                📋 Tabla de Prospectos
+                📋 Tabla Deep OSINT
             </button>
             <button class="tl-view-tab" id="tab-view-map">
-                🗺️ Mapa Geoespacial & Calor
+                🗺️ Radar Geoespacial & Calor
             </button>
             <button class="tl-view-tab" id="tab-view-kanban">
-                📊 Pipeline Kanban
+                📊 Pipeline Kanban CRM
+            </button>
+            <button class="tl-view-tab" id="tab-view-analytics">
+                📈 Inteligencia BI & Mercado
             </button>
         </section>
 
-        <!-- DATA TABLE VIEW -->
+        <!-- VIEW 1: DATA TABLE -->
         <section class="tl-table-card" id="view-section-table">
             <div id="example-table"></div>
         </section>
 
-        <!-- INTERACTIVE GEOMAP VIEW -->
+        <!-- VIEW 2: INTERACTIVE GEOMAP -->
         <section class="tl-map-card" id="view-section-map" style="display: none; background: var(--bg-card); border-radius: var(--radius-lg); border: 1.5px solid var(--border-color); padding: 16px; box-shadow: var(--shadow-md); position: relative;">
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
                 <div style="display: flex; align-items: center; gap: 8px;">
                     <span style="font-size: 18px;">🗺️</span>
-                    <strong style="font-size: 15px; color: var(--text-primary);">Radar Geoespacial y Concentración de Clientes</strong>
-                    <span class="tl-badge-score tl-score-high" id="map-counter-badge" style="font-size: 11px;">0 Pines en mapa</span>
+                    <strong style="font-size: 15px; color: var(--text-primary);">Radar Geoespacial y Concentración Comercial</strong>
+                    <span class="tl-badge-score tl-score-high" id="map-counter-badge" style="font-size: 11px;">0 Pines</span>
                 </div>
                 <div style="display: flex; align-items: center; gap: 12px;">
                     <label class="tl-checkbox-label">
                         <input type="checkbox" id="check-map-heatmap" checked />
-                        <span>🔥 Capa de Calor (Densidad)</span>
+                        <span>🔥 Mapa de Calor</span>
                     </label>
                     <label class="tl-checkbox-label">
                         <input type="checkbox" id="check-map-markers" checked />
-                        <span>📍 Pines de Prospectos</span>
+                        <span>📍 Pines Score</span>
                     </label>
                     <button id="btn-map-recenter" class="tl-btn tl-btn-outline" style="height: 30px; font-size: 12px; padding: 0 10px;">
-                        🎯 Centrar en Zona
+                        🎯 Centrar
                     </button>
                 </div>
             </div>
             <div id="atlasiq-map" style="height: 600px; width: 100%; border-radius: var(--radius-md); border: 1px solid var(--border-color); z-index: 10;"></div>
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 10px; font-size: 11px; color: var(--text-muted);">
-                <div>
-                    <strong>Leyenda de Oportunidad:</strong> 
-                    <span style="color: #10b981; font-weight: 700; margin-left: 6px;">🟢 Score Alto (75+)</span> · 
-                    <span style="color: #f59e0b; font-weight: 700; margin-left: 6px;">🟡 Score Medio (45-74)</span> · 
-                    <span style="color: #94a3b8; font-weight: 700; margin-left: 6px;">⚪ Score Bajo (&lt;45)</span>
-                </div>
-                <div>Haz clic en cualquier pin para ver el diagnóstico y abrir WhatsApp</div>
-            </div>
         </section>
 
-        <!-- PIPELINE KANBAN VIEW -->
+        <!-- VIEW 3: PIPELINE KANBAN -->
         <section class="tl-kanban-card" id="view-section-kanban" style="display: none; background: var(--bg-card); border-radius: var(--radius-lg); border: 1.5px solid var(--border-color); padding: 18px; box-shadow: var(--shadow-md);">
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
                 <div style="display: flex; align-items: center; gap: 8px;">
                     <span style="font-size: 18px;">📊</span>
-                    <strong style="font-size: 15px; color: var(--text-primary);">Pipeline de Ventas y Seguimiento de Leads (Kanban)</strong>
-                    <span style="font-size: 12px; color: var(--text-muted);">Arrastra los prospectos entre columnas para actualizar su estado de venta</span>
+                    <strong style="font-size: 15px; color: var(--text-primary);">Pipeline Ejecutivo de Cierres B2B</strong>
+                    <span style="font-size: 12px; color: var(--text-muted);">Arrastra cada tarjeta para actualizar su etapa comercial</span>
                 </div>
-                <div style="display: flex; gap: 8px;">
-                    <button id="btn-kanban-reset-all" class="tl-btn tl-btn-outline" style="height: 28px; font-size: 11px; color: #64748b;" title="Mover todos los prospectos de nuevo a 'Nuevo Prospecto'">
-                        ↺ Reiniciar Estados
-                    </button>
-                </div>
+                <button id="btn-kanban-reset-all" class="tl-btn tl-btn-outline" style="height: 28px; font-size: 11px; color: #64748b;">
+                    ↺ Reiniciar Pipeline
+                </button>
             </div>
 
-            <!-- KANBAN BOARD COLUMNS -->
             <div class="tl-kanban-board" id="atlasiq-kanban-board">
-                <!-- Column 1: Nuevo -->
                 <div class="tl-kanban-col" data-stage="nuevo">
                     <div class="tl-kanban-col-header" style="border-top: 3px solid #3b82f6;">
-                        <div style="display: flex; align-items: center; gap: 6px;">
-                            <span>📥</span>
-                            <span class="tl-kanban-col-title">Nuevo Prospecto</span>
-                        </div>
+                        <div style="display: flex; align-items: center; gap: 6px;"><span>📥</span><span class="tl-kanban-col-title">Nuevo Prospecto</span></div>
                         <span class="tl-kanban-count" id="kanban-count-nuevo">0</span>
                     </div>
                     <div class="tl-kanban-cards-container" id="kanban-cards-nuevo" data-stage="nuevo"></div>
                 </div>
 
-                <!-- Column 2: Contactado -->
                 <div class="tl-kanban-col" data-stage="contactado">
                     <div class="tl-kanban-col-header" style="border-top: 3px solid #f59e0b;">
-                        <div style="display: flex; align-items: center; gap: 6px;">
-                            <span>💬</span>
-                            <span class="tl-kanban-col-title">Contactado</span>
-                        </div>
+                        <div style="display: flex; align-items: center; gap: 6px;"><span>💬</span><span class="tl-kanban-col-title">Contactado</span></div>
                         <span class="tl-kanban-count" id="kanban-count-contactado">0</span>
                     </div>
                     <div class="tl-kanban-cards-container" id="kanban-cards-contactado" data-stage="contactado"></div>
                 </div>
 
-                <!-- Column 3: En Negociación -->
                 <div class="tl-kanban-col" data-stage="negociacion">
                     <div class="tl-kanban-col-header" style="border-top: 3px solid #8b5cf6;">
-                        <div style="display: flex; align-items: center; gap: 6px;">
-                            <span>🤝</span>
-                            <span class="tl-kanban-col-title">En Negociación</span>
-                        </div>
+                        <div style="display: flex; align-items: center; gap: 6px;"><span>🤝</span><span class="tl-kanban-col-title">En Negociación</span></div>
                         <span class="tl-kanban-count" id="kanban-count-negociacion">0</span>
                     </div>
                     <div class="tl-kanban-cards-container" id="kanban-cards-negociacion" data-stage="negociacion"></div>
                 </div>
 
-                <!-- Column 4: Cerrado / Ganado -->
                 <div class="tl-kanban-col" data-stage="ganado">
                     <div class="tl-kanban-col-header" style="border-top: 3px solid #10b981;">
-                        <div style="display: flex; align-items: center; gap: 6px;">
-                            <span>🎉</span>
-                            <span class="tl-kanban-col-title">Cliente Ganado</span>
-                        </div>
+                        <div style="display: flex; align-items: center; gap: 6px;"><span>🎉</span><span class="tl-kanban-col-title">Cliente Ganado</span></div>
                         <span class="tl-kanban-count" id="kanban-count-ganado">0</span>
                     </div>
                     <div class="tl-kanban-cards-container" id="kanban-cards-ganado" data-stage="ganado"></div>
                 </div>
 
-                <!-- Column 5: Descartado -->
                 <div class="tl-kanban-col" data-stage="descartado">
                     <div class="tl-kanban-col-header" style="border-top: 3px solid #ef4444;">
-                        <div style="display: flex; align-items: center; gap: 6px;">
-                            <span>❌</span>
-                            <span class="tl-kanban-col-title">Descartado</span>
-                        </div>
+                        <div style="display: flex; align-items: center; gap: 6px;"><span>❌</span><span class="tl-kanban-col-title">Descartado</span></div>
                         <span class="tl-kanban-count" id="kanban-count-descartado">0</span>
                     </div>
                     <div class="tl-kanban-cards-container" id="kanban-cards-descartado" data-stage="descartado"></div>
                 </div>
             </div>
         </section>
+
+        <!-- VIEW 4: EXECUTIVE BI ANALYTICS (ECHARTS) -->
+        <section class="tl-analytics-card" id="view-section-analytics" style="display: none;">
+            <div class="tl-bi-grid">
+                <div class="tl-bi-box">
+                    <div class="tl-bi-title">🎯 Señales de Oportunidad B2B Detectadas</div>
+                    <div id="chart-signals" class="tl-echart-canvas"></div>
+                </div>
+                <div class="tl-bi-box">
+                    <div class="tl-bi-title">💻 Penetración de Tech Stack & Píxeles Ads</div>
+                    <div id="chart-tech" class="tl-echart-canvas"></div>
+                </div>
+                <div class="tl-bi-box">
+                    <div class="tl-bi-title">🏷️ Top Nichos: Volumen vs Brecha Digital (Sin Web)</div>
+                    <div id="chart-niches" class="tl-echart-canvas"></div>
+                </div>
+                <div class="tl-bi-box">
+                    <div class="tl-bi-title">🚀 Embudo de Conversión Comercial (Pipeline)</div>
+                    <div id="chart-funnel" class="tl-echart-canvas"></div>
+                </div>
+            </div>
+        </section>
     </main>
 
-    <!-- LEAD INSPECTOR DRAWER (SLIDE-OVER) -->
+    <!-- 360° DEEP INSPECTOR DRAWER -->
     <div class="tl-drawer-overlay" id="lead-drawer-overlay">
         <aside class="tl-drawer" id="lead-drawer">
             <div class="tl-drawer-header">
                 <div>
                     <h2 class="tl-drawer-title" id="drawer-lead-name">Nombre de la Empresa</h2>
-                    <span class="tl-rating-pill" id="drawer-lead-rating">4.8★ (120 reseñas)</span>
+                    <div style="display: flex; gap: 6px; align-items: center; margin-top: 4px; flex-wrap: wrap;">
+                        <span class="tl-rating-pill" id="drawer-lead-rating">4.8★</span>
+                        <span id="drawer-claim-badge"></span>
+                        <span id="drawer-price-badge"></span>
+                    </div>
                 </div>
                 <button class="tl-drawer-close" id="drawer-close-btn">&times;</button>
             </div>
 
             <div class="tl-drawer-body">
-                <!-- AI OPPORTUNITY CARD -->
+                <!-- AI OPPORTUNITY & CORE WEB VITALS CARD -->
                 <div class="tl-detail-card" style="border-left: 4px solid #2563eb;">
-                    <div class="tl-detail-title">
-                        <span>🤖 Diagnóstico de Oportunidad IA</span>
+                    <div class="tl-detail-title" style="justify-content: space-between;">
+                        <span>🤖 Diagnóstico Deep OSINT & Velocidad Web</span>
+                        <button id="btn-audit-pagespeed" class="tl-btn tl-btn-outline" style="height: 24px; font-size: 10.5px; padding: 0 8px;">
+                            ⚡ Auditar PageSpeed Móvil
+                        </button>
                     </div>
                     <div class="tl-detail-row">
-                        <span class="tl-detail-label">Score de Prospección:</span>
+                        <span class="tl-detail-label">Score Predictivo v4.0:</span>
                         <span class="tl-badge-score tl-score-high" id="drawer-ai-score">85</span>
                     </div>
                     <div class="tl-detail-row">
-                        <span class="tl-detail-label">Prioridad de Contacto:</span>
+                        <span class="tl-detail-label">Prioridad Comercial:</span>
                         <span class="tl-detail-val" id="drawer-ai-priority">Alta</span>
                     </div>
+                    <div class="tl-detail-row">
+                        <span class="tl-detail-label">Google PageSpeed Móvil:</span>
+                        <span class="tl-detail-val" id="drawer-pagespeed-val">Sin auditar (Clic arriba)</span>
+                    </div>
                     <div class="tl-detail-row" style="flex-direction: column; align-items: flex-start; gap: 4px;">
-                        <span class="tl-detail-label">Oportunidades Detectadas:</span>
+                        <span class="tl-detail-label">Señales de Venta Detectadas:</span>
                         <div id="drawer-ai-opps" style="margin-top: 4px;"></div>
                     </div>
                 </div>
 
-                <!-- CONTACT & PROFILE -->
+                <!-- OSINT CORPORATE, FISCAL & CONTACT PROFILE -->
                 <div class="tl-detail-card">
                     <div class="tl-detail-title">
-                        <span>📞 Canales de Contacto Directo</span>
+                        <span>🕵️ Inteligencia Fiscal, Decisor & Contacto</span>
                     </div>
                     <div class="tl-detail-row">
-                        <span class="tl-detail-label">Rubro / Nicho:</span>
+                        <span class="tl-detail-label">Razón Social / Legal:</span>
+                        <span class="tl-detail-val" id="drawer-legal-name">-</span>
+                    </div>
+                    <div class="tl-detail-row">
+                        <span class="tl-detail-label">ID Fiscal (NIF/RFC/RIF):</span>
+                        <span class="tl-detail-val" id="drawer-tax-id">-</span>
+                    </div>
+                    <div class="tl-detail-row">
+                        <span class="tl-detail-label">Decisor / Ejecutivo:</span>
+                        <span class="tl-detail-val" id="drawer-decision-maker">-</span>
+                    </div>
+                    <div class="tl-detail-row">
+                        <span class="tl-detail-label">Rubro / Categorías:</span>
                         <span class="tl-detail-val" id="drawer-category">-</span>
                     </div>
                     <div class="tl-detail-row">
-                        <span class="tl-detail-label">📍 Distancia:</span>
-                        <span class="tl-detail-val" id="drawer-distance">-</span>
-                    </div>
-                    <div class="tl-detail-row">
-                        <span class="tl-detail-label">👥 Competidor más cercano:</span>
+                        <span class="tl-detail-label">📍 Distancia / Vecino:</span>
                         <span class="tl-detail-val" id="drawer-nearest-peer">-</span>
                     </div>
                     <div class="tl-detail-row">
-                        <span class="tl-detail-label">Teléfono:</span>
+                        <span class="tl-detail-label">Teléfono Directo:</span>
                         <span class="tl-detail-val" id="drawer-phone">-</span>
                     </div>
                     <div class="tl-detail-row">
-                        <span class="tl-detail-label">WhatsApp Directo:</span>
-                        <span id="drawer-whatsapp-btn">-</span>
-                    </div>
-                    <div class="tl-detail-row">
-                        <span class="tl-detail-label">Email Verificado:</span>
-                        <div style="display: flex; align-items: center;">
+                        <span class="tl-detail-label">Email & Ciberseguridad:</span>
+                        <div style="display: flex; align-items: center; gap: 4px; flex-wrap: wrap; justify-content: flex-end;">
                             <span class="tl-detail-val" id="drawer-email">-</span>
-                            <span id="drawer-email-mx" style="margin-left: 6px;"></span>
+                            <span id="drawer-email-mx"></span>
                         </div>
                     </div>
                     <div class="tl-detail-row">
@@ -507,90 +503,133 @@
                         <span class="tl-detail-val"><a href="#" id="drawer-website" target="_blank">-</a></span>
                     </div>
                     <div class="tl-detail-row">
+                        <span class="tl-detail-label">Reservas / Delivery:</span>
+                        <span class="tl-detail-val" id="drawer-booking">-</span>
+                    </div>
+                    <div class="tl-detail-row">
+                        <span class="tl-detail-label">Horario / Estado:</span>
+                        <span class="tl-detail-val" id="drawer-hours" style="max-width: 62%;">-</span>
+                    </div>
+                    <div class="tl-detail-row">
                         <span class="tl-detail-label">Dirección:</span>
-                        <span class="tl-detail-val" id="drawer-address" style="max-width: 60%;">-</span>
+                        <span class="tl-detail-val" id="drawer-address" style="max-width: 62%;">-</span>
                     </div>
                 </div>
 
                 <!-- SOCIAL & TECH STACK -->
                 <div class="tl-detail-card">
                     <div class="tl-detail-title">
-                        <span>🌐 Redes Sociales y Tecnología</span>
+                        <span>🌐 Stack Tecnológico, Píxeles Ads & RRSS</span>
                     </div>
                     <div class="tl-detail-row">
-                        <span class="tl-detail-label">Tech Stack Detectado:</span>
-                        <span class="tl-detail-val" id="drawer-tech">No detectado</span>
+                        <span class="tl-detail-label">Tecnologías & Píxeles:</span>
+                        <span class="tl-detail-val" id="drawer-tech" style="max-width: 65%;">-</span>
                     </div>
                     <div class="tl-detail-row">
                         <span class="tl-detail-label">Redes Sociales:</span>
-                        <div id="drawer-socials" style="display: flex; gap: 8px;"></div>
+                        <div id="drawer-socials" style="display: flex; gap: 6px; flex-wrap: wrap;"></div>
                     </div>
                 </div>
 
-                <!-- OUTREACH PITCH & GEMINI AI GENERATOR -->
+                <!-- OMNICHANNEL SEQUENCER & GEMINI 2.5 AI -->
                 <div class="tl-detail-card">
                     <div class="tl-detail-title">
-                        <span>⚡ Propuestas de Venta & Auditoría IA</span>
+                        <span>⚡ Secuenciador Omnicanal & Gemini 2.5 IA</span>
                     </div>
-                    <div class="tl-pitch-tabs">
-                        <button class="tl-pitch-tab active" id="tab-pitch-wa" data-channel="whatsapp">WhatsApp</button>
-                        <button class="tl-pitch-tab" id="tab-pitch-email" data-channel="email">Email Frío</button>
-                        <button class="tl-pitch-tab" id="tab-pitch-gemini" data-channel="gemini" style="background: linear-gradient(135deg, #eff6ff, #dbeafe); color: #1e40af; border: 1px solid #bfdbfe;">✨ Gemini IA en Vivo</button>
+                    <div class="tl-pitch-tabs" style="flex-wrap: wrap;">
+                        <button class="tl-pitch-tab active" data-channel="whatsapp">WA Toque 1</button>
+                        <button class="tl-pitch-tab" data-channel="followup">Toque 2 (48h)</button>
+                        <button class="tl-pitch-tab" data-channel="email">Email Frío</button>
+                        <button class="tl-pitch-tab" data-channel="call">Llamada 30s</button>
+                        <button class="tl-pitch-tab" data-channel="gemini" style="background: linear-gradient(135deg, #eff6ff, #dbeafe); color: #1e40af; border: 1px solid #bfdbfe;">✨ Gemini 2.5 IA</button>
                     </div>
-                    <div class="tl-pitch-box" id="drawer-pitch-text">Cargando propuesta...</div>
+                    <div class="tl-pitch-box" id="drawer-pitch-text">Cargando secuencia...</div>
                     <div id="gemini-controls" style="display: none; margin-top: 8px;">
                         <button class="tl-btn tl-btn-primary" id="btn-ai-generate-pitch" style="width: 100%;">
-                            ✨ Generar Auditoría y Guión con Gemini
+                            ✨ Ejecutar Estrategia Profunda con Gemini 2.5 / Nano IA
                         </button>
                     </div>
                     <div style="display: flex; gap: 8px; margin-top: 8px;" id="standard-pitch-actions">
                         <button class="tl-btn tl-btn-primary" id="btn-copy-pitch" style="flex: 1;">
-                            📋 Copiar Mensaje
+                            📋 Copiar Guión
                         </button>
                         <a href="#" target="_blank" class="tl-btn tl-btn-success" id="btn-send-wa" style="flex: 1;">
-                            💬 Abrir WhatsApp
+                            💬 Enviar WhatsApp
                         </a>
                     </div>
-                    <button id="btn-download-pdf-audit" class="tl-btn tl-btn-outline" style="width: 100%; margin-top: 10px; border-color: var(--text-primary); color: var(--text-primary); font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px;" title="Generar informe ejecutivo de auditoría en PDF de marca blanca">
-                        📄 Descargar Auditoría PDF (Marca Blanca)
-                    </button>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px;">
+                        <button id="btn-download-pdf-audit" class="tl-btn tl-btn-outline" style="font-weight: 700; font-size: 11.5px;">
+                            📄 PDF Marca Blanca
+                        </button>
+                        <button id="btn-publish-cloud-audit" class="tl-btn tl-btn-outline" style="font-weight: 700; font-size: 11.5px; border-color: #3b82f6; color: #3b82f6;" title="Publica landing personalizada en Cloudflare con tracking de lectura">
+                            🌐 Link con Tracking
+                        </button>
+                    </div>
                 </div>
             </div>
         </aside>
     </div>
 
-    <!-- SETTINGS / WEBHOOK MODAL -->
-    <div class="tl-modal" id="settings-modal">
-        <h3 style="font-size: 16px; font-weight: 800; color: var(--text-primary);">⚙️ Configuración de AtlasIQ Enterprise</h3>
-        
-        <div>
-            <label style="font-size: 12px; font-weight: 600; color: var(--text-secondary); display: block; margin-bottom: 4px;">
-                URL de Webhook (Zapier / Make / n8n / HubSpot):
-            </label>
-            <input type="url" id="setting-webhook-url" class="tl-search-input" placeholder="https://hook.eu1.make.com/..." />
-            <small style="font-size: 11px; color: var(--text-muted); margin-top: 4px; display: block;">
-                Los prospectos se enviarán en formato JSON limpio con todos sus atributos.
-            </small>
+    <!-- ENTERPRISE SETTINGS & WHITE-LABEL MODAL -->
+    <div class="tl-modal" id="settings-modal" style="width: 560px; max-width: 95vw;">
+        <h3 style="font-size: 16px; font-weight: 800; color: var(--text-primary); margin-bottom: 10px;">⚙️ Configuración Enterprise v4.0 & Marca Blanca</h3>
+
+        <div style="display: flex; flex-direction: column; gap: 10px; max-height: 70vh; overflow-y: auto; padding-right: 4px;">
+            <div>
+                <label style="font-size: 11.5px; font-weight: 700; color: var(--text-secondary); display: block; margin-bottom: 4px;">
+                    Google Gemini API Key (Modelo `gemini-2.5-flash` con cabecera segura):
+                </label>
+                <input type="password" id="setting-gemini-key" class="tl-search-input" placeholder="AIzaSy... (Opcional si usas Chrome Gemini Nano local)" />
+            </div>
+
+            <div>
+                <label style="font-size: 11.5px; font-weight: 700; color: var(--text-secondary); display: block; margin-bottom: 4px;">
+                    URL de Webhook Omnicanal (n8n / Make / Zapier / GoHighLevel / HubSpot):
+                </label>
+                <input type="url" id="setting-webhook-url" class="tl-search-input" placeholder="https://hook.eu1.make.com/..." />
+            </div>
+
+            <div>
+                <label style="font-size: 11.5px; font-weight: 700; color: var(--text-secondary); display: block; margin-bottom: 4px;">
+                    URL Cloudflare Edge Worker (Licencias en vivo + Micrositios de Auditoría con Tracking):
+                </label>
+                <input type="url" id="setting-edge-worker-url" class="tl-search-input" placeholder="https://atlasiq-edge.tu-dominio.workers.dev" />
+            </div>
+
+            <hr style="border: none; border-top: 1px solid var(--border-color); margin: 4px 0;" />
+            <strong style="font-size: 12px; color: var(--primary);">🎨 Personalización Marca Blanca (PDFs y Micrositios para Clientes):</strong>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                <div>
+                    <label style="font-size: 11px; font-weight: 600; color: var(--text-secondary);">Nombre de tu Agencia / Firma:</label>
+                    <input type="text" id="setting-agency-name" class="tl-search-input" placeholder="WINDOWSTELECOM" />
+                </div>
+                <div>
+                    <label style="font-size: 11px; font-weight: 600; color: var(--text-secondary);">Consultor / Director:</label>
+                    <input type="text" id="setting-consultant-name" class="tl-search-input" placeholder="Joseph Castillo – CEO" />
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                <div>
+                    <label style="font-size: 11px; font-weight: 600; color: var(--text-secondary);">Dominio Web en Pie de Página:</label>
+                    <input type="text" id="setting-agency-web" class="tl-search-input" placeholder="windowstelecom.com" />
+                </div>
+                <div>
+                    <label style="font-size: 11px; font-weight: 600; color: var(--text-secondary);">Link WhatsApp CTA Micrositio:</label>
+                    <input type="url" id="setting-agency-wa" class="tl-search-input" placeholder="https://wa.me/584127785780" />
+                </div>
+            </div>
         </div>
 
-        <div style="margin-top: 10px;">
-            <label style="font-size: 12px; font-weight: 600; color: var(--text-secondary); display: block; margin-bottom: 4px;">
-                Google Gemini API Key (Opcional para IA en vivo):
-            </label>
-            <input type="password" id="setting-gemini-key" class="tl-search-input" placeholder="AIzaSy..." />
-            <small style="font-size: 11px; color: var(--text-muted); margin-top: 4px; display: block;">
-                Permite redactar diagnósticos estratégicos y guiones de venta hiperpersonalizados en 1 clic.
-            </small>
-        </div>
-
-        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 14px;">
+        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 16px;">
             <button class="tl-btn tl-btn-outline" id="btn-modal-cancel">Cancelar</button>
-            <button class="tl-btn tl-btn-primary" id="btn-modal-save">Guardar Ajustes</button>
+            <button class="tl-btn tl-btn-primary" id="btn-modal-save">💾 Guardar Configuración</button>
         </div>
     </div>
 
-    <!-- SPEED OUTREACH MODAL (WHATSAPP FAST QUEUE) -->
-    <div class="tl-modal" id="speed-outreach-modal" style="width: 560px;">
+    <!-- SPEED OUTREACH MODAL -->
+    <div class="tl-modal" id="speed-outreach-modal" style="width: 560px; max-width: 95vw;">
         <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">
             <div style="display: flex; align-items: center; gap: 8px;">
                 <span style="font-size: 20px;">⚡</span>
@@ -600,7 +639,6 @@
         </div>
 
         <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 6px;">
-            <!-- Current Target Lead Info -->
             <div style="background: var(--bg-main); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px;">
                 <div style="display: flex; align-items: flex-start; justify-content: space-between;">
                     <div>
@@ -614,54 +652,46 @@
                 </div>
             </div>
 
-            <!-- Pitch Preview Box -->
             <div>
                 <label style="font-size: 12px; font-weight: 700; color: var(--text-secondary); display: block; margin-bottom: 4px;">
-                    Mensaje Personalizado de Apertura:
+                    Mensaje Hiper-Personalizado:
                 </label>
-                <div class="tl-pitch-box" id="speed-pitch-box" style="max-height: 140px; font-size: 12px;"></div>
+                <div class="tl-pitch-box" id="speed-pitch-box" style="max-height: 150px; font-size: 12px;"></div>
             </div>
 
-            <!-- Progress Bar -->
             <div class="tl-sat-meter-bar" style="height: 6px;">
                 <div class="tl-sat-meter-fill" id="speed-progress-fill" style="width: 0%; background: var(--success);"></div>
             </div>
 
-            <!-- Action Buttons -->
             <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px;">
-                <button id="btn-speed-close" class="tl-btn tl-btn-ghost" style="font-size: 12px;">
-                    Cerrar
-                </button>
+                <button id="btn-speed-close" class="tl-btn tl-btn-ghost" style="font-size: 12px;">Cerrar</button>
                 <div style="display: flex; gap: 8px;">
-                    <button id="btn-speed-skip" class="tl-btn tl-btn-outline" style="font-size: 12px;">
-                        ⏩ Saltar
-                    </button>
+                    <button id="btn-speed-skip" class="tl-btn tl-btn-outline" style="font-size: 12px;">⏩ Saltar</button>
                     <button id="btn-speed-send-next" class="tl-btn tl-btn-success" style="font-size: 12px; padding: 0 16px;">
-                        🚀 Enviar WhatsApp y Avanzar ➔
+                        🚀 Abrir WhatsApp y Avanzar ➔
                     </button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- LICENSE ACTIVATION & DEVICE ID MODAL -->
-    <div class="tl-modal" id="license-modal" style="width: 520px;">
+    <!-- ASYMMETRIC ECDSA P-256 LICENSE MODAL (CLEAN SINGLE INSTANCE) -->
+    <div class="tl-modal" id="license-modal" style="width: 520px; max-width: 95vw;">
         <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-color); padding-bottom: 12px;">
             <div style="display: flex; align-items: center; gap: 8px;">
                 <span style="font-size: 20px;">🛡️</span>
                 <div>
-                    <h3 style="font-size: 16px; font-weight: 800; color: var(--text-primary);">Activación de AtlasIQ Enterprise</h3>
-                    <small style="color: var(--text-muted); font-size: 11px;">WINDOWSTELECOM · Licenciamiento Anual Protegido por Dispositivo</small>
+                    <h3 style="font-size: 16px; font-weight: 800; color: var(--text-primary);">Activación AtlasIQ Enterprise v4.0</h3>
+                    <small style="color: var(--text-muted); font-size: 11px;">WINDOWSTELECOM · Firma Digital Asimétrica ECDSA P-256</small>
                 </div>
             </div>
             <button class="tl-btn tl-btn-ghost" id="btn-close-license-modal" style="font-size: 14px; height: 26px; padding: 0 6px;">✕</button>
         </div>
 
         <div style="display: flex; flex-direction: column; gap: 14px; margin-top: 8px;">
-            <!-- Step 1: Device ID -->
             <div style="background: var(--bg-main); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px;">
                 <label style="font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; display: block; margin-bottom: 4px;">
-                    1. Tu ID Único de Dispositivo:
+                    1. Tu ID Criptográfico de Dispositivo:
                 </label>
                 <div style="display: flex; gap: 8px; align-items: center;">
                     <div id="license-modal-device-id" style="flex: 1; font-family: monospace; font-size: 14px; font-weight: 800; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 6px; padding: 8px 12px; color: #3b82f6; user-select: all;">
@@ -672,51 +702,24 @@
                     </button>
                 </div>
                 <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 8px;">
-                    <span style="font-size: 11px; color: var(--text-muted);">Envía este ID a WINDOWSTELECOM:</span>
+                    <span style="font-size: 11px; color: var(--text-muted);">Solicita tu llave ATQ4 a WINDOWSTELECOM:</span>
                     <a href="#" target="_blank" id="link-whatsapp-license" class="tl-btn tl-btn-success" style="height: 26px; font-size: 11px; padding: 0 10px; text-decoration: none;">
-                        💬 Enviar por WhatsApp
+                        💬 Solicitar por WhatsApp
                     </a>
                 </div>
             </div>
 
-            <!-- Step 2: License Input -->
             <div>
                 <label style="font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; display: block; margin-bottom: 4px;">
-                    2. Clave de Activación Anual:
+                    2. Clave Firmada ECDSA P-256 (`ATQ4.`):
                 </label>
-                <input type="text" id="input-license-key" class="tl-search-input" placeholder="Pega aquí tu clave: ATQ-LIC-..." style="font-family: monospace; font-size: 12px; height: 38px;" />
+                <input type="text" id="input-license-key" class="tl-search-input" placeholder="Pega aquí tu llave: ATQ4.eyJ..." style="font-family: monospace; font-size: 12px; height: 38px;" />
             </div>
 
             <div id="license-alert-msg" class="tl-license-alert" style="display: none;"></div>
 
             <button class="tl-btn tl-btn-primary" id="btn-submit-license" style="height: 40px; font-size: 13px; font-weight: 800;">
-                🚀 Activar Licencia por 1 Año
-            </button>
-        </div>
-    </div>
-                        📋 Copiar ID
-                    </button>
-                </div>
-                <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 8px;">
-                    <span style="font-size: 11px; color: #64748b;">Envía este ID a WINDOWSTELECOM:</span>
-                    <a href="#" target="_blank" id="link-whatsapp-license" class="tl-btn tl-btn-success" style="height: 26px; font-size: 11px; padding: 0 10px; text-decoration: none;">
-                        💬 Enviar por WhatsApp
-                    </a>
-                </div>
-            </div>
-
-            <!-- Step 2: License Input -->
-            <div>
-                <label style="font-size: 11px; font-weight: 700; color: #475569; text-transform: uppercase; display: block; margin-bottom: 4px;">
-                    2. Clave de Activación Anual:
-                </label>
-                <input type="text" id="input-license-key" class="tl-search-input" placeholder="Pega aquí tu clave: ATQ-LIC-..." style="font-family: monospace; font-size: 12px; height: 38px;" />
-            </div>
-
-            <div id="license-alert-msg" class="tl-license-alert" style="display: none;"></div>
-
-            <button class="tl-btn tl-btn-primary" id="btn-submit-license" style="height: 40px; font-size: 13px; font-weight: 800;">
-                🚀 Activar Licencia por 1 Año
+                🚀 Activar Licencia ECDSA
             </button>
         </div>
     </div>

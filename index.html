@@ -5,13 +5,8 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover" />
     <meta name="theme-color" content="#2563eb" />
-    <title>AtlasIQ Enterprise – Guía Oficial y Manual de Prospección B2B</title>
-    <script>
-        (function() {
-            var savedTheme = localStorage.getItem("atlasiq-theme") || "light";
-            document.documentElement.setAttribute("data-theme", savedTheme);
-        })();
-    </script>
+    <title>AtlasIQ Enterprise v4.0 – Guía Oficial y Manual de Prospección B2B</title>
+    <script src="js/theme-init.js"></script>
     <style>
         :root {
             --primary: #2563eb;
@@ -966,7 +961,7 @@
             <a href="dashboard.html" class="brand-box">
                 <div class="brand-logo">🌐</div>
                 <div class="brand-name">Atlas<span>IQ</span></div>
-                <span class="topbar-badge">v2.5 Enterprise</span>
+                <span class="topbar-badge">v4.0 Extreme</span>
             </a>
             <nav class="topbar-nav">
                 <a href="#que-es">¿Qué es?</a>
@@ -1003,6 +998,9 @@
             <div class="hero-cta-box">
                 <a href="dashboard.html" class="btn-cta btn-cta-primary">
                     📊 Abrir CRM AtlasIQ
+                </a>
+                <a href="AtlasIQ-Enterprise-v4.0-Client.zip" download id="btn-download-ext-zip" class="btn-cta btn-cta-outline" style="display: none; border-color: #10b981; color: #10b981;">
+                    📦 Descargar Extensión v4.0 (.ZIP)
                 </a>
                 <a href="#instalacion" class="btn-cta btn-cta-outline">
                     ⚙️ Guía de Instalación
@@ -1333,30 +1331,7 @@
         <p style="margin-top: 6px; font-size: 12px; color: #94a3b8;">Tecnología comercial para explorar nuevas oportunidades, investigar, conectar y convertir prospectos en clientes.</p>
     </footer>
 
-    <script>
-        (function() {
-            function updateThemeBtn(theme) {
-                var btn = document.getElementById("btn-toggle-theme");
-                if (btn) {
-                    btn.innerHTML = theme === "dark" ? "☀️ Modo Claro" : "🌙 Modo Oscuro";
-                }
-            }
-            var currentTheme = localStorage.getItem("atlasiq-theme") || "light";
-            document.documentElement.setAttribute("data-theme", currentTheme);
-            updateThemeBtn(currentTheme);
-
-            var btn = document.getElementById("btn-toggle-theme");
-            if (btn) {
-                btn.addEventListener("click", function() {
-                    var active = document.documentElement.getAttribute("data-theme") || "light";
-                    var next = active === "dark" ? "light" : "dark";
-                    document.documentElement.setAttribute("data-theme", next);
-                    localStorage.setItem("atlasiq-theme", next);
-                    updateThemeBtn(next);
-                });
-            }
-        })();
-    </script>
+    <script src="js/guide-ui.js"></script>
 </body>
 
 </html>

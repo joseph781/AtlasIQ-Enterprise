@@ -1,19 +1,25 @@
 /**
- * AtlasIQ Enterprise - Cryptographic Licensing & Device Lock Engine
+ * AtlasIQ Enterprise v4.0 - Zero-Knowledge Asymmetric Licensing & Edge Seat Lock Engine
  * Author: Joseph Castillo (CEO) / WINDOWSTELECOM
- * Method: Client-Side Device Token Binding + Asymmetric/HMAC Cryptography ($0 Cost)
+ * Security Architecture: WebCrypto ECDSA P-256 (Public Key Only in Client — Zero Secret Exposure)
+ * Optional Live Edge Revocation & Seat Binding via Cloudflare Worker D1/KV.
  */
 
-const ATLASIQ_MASTER_SECRET = "WINDOWSTELECOM_ATLASIQ_ENTERPRISE_SECRET_KEY_2026_98741_SECURE";
-const ATLASIQ_SUPPORT_WA = "https://wa.me/584127785780"; // WINDOWSTELECOM Support WhatsApp
+const ATLASIQ_PUBLIC_JWK = Object.freeze({
+    kty: "EC",
+    crv: "P-256",
+    x: "jS5aBfgDiJbTLqJWHnxSYnEj7Zsyud2SeUBjHeK2neE",
+    y: "bY5bfod3-ezJlIrebupk2Yhqb3dBhpFVPyr2tj_eL18",
+    ext: true,
+    key_ops: ["verify"]
+});
 
-// In-memory cached status
+const ATLASIQ_SUPPORT_WA = "https://wa.me/584127785780";
+
 let _cachedLicenseStatus = null;
 let _cachedDeviceId = null;
+let _importedPublicKey = null;
 
-/**
- * Universal Storage Helper for Licensing
- */
 function getLicenseStorage(keys, callback) {
     if (typeof chrome !== "undefined" && chrome.storage && chrome.storage.local) {
         chrome.storage.local.get(keys, callback);
@@ -42,59 +48,43 @@ function setLicenseStorage(obj, callback) {
     }
 }
 
-/**
- * Base64 URL Safe encoding & decoding
- */
-function b64UrlEncode(str) {
-    return btoa(unescape(encodeURIComponent(str)))
-        .replace(/\+/g, "-")
-        .replace(/\//g, "_")
-        .replace(/=+$/, "");
+function b64UrlToBytes(b64url) {
+    let base64 = b64url.replace(/-/g, "+").replace(/_/g, "/");
+    while (base64.length % 4) base64 += "=";
+    const bin = atob(base64);
+    const bytes = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    return bytes;
 }
 
-function b64UrlDecode(str) {
-    let base64 = str.replace(/-/g, "+").replace(/_/g, "/");
-    while (base64.length % 4) {
-        base64 += "=";
-    }
-    return decodeURIComponent(escape(atob(base64)));
+function b64UrlDecodeUtf8(str) {
+    const bytes = b64UrlToBytes(str);
+    return new TextDecoder().decode(bytes);
 }
 
-/**
- * SHA-256 Digest using WebCrypto
- */
 async function computeSha256Hex(message) {
-    const encoder = new TextEncoder();
-    const data = encoder.encode(message);
+    const data = new TextEncoder().encode(message);
     const hashBuffer = await crypto.subtle.digest("SHA-256", data);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    return hashArray.map(b => b.toString(16).padStart(2, "0")).join("").toUpperCase();
+    return Array.from(new Uint8Array(hashBuffer))
+        .map(b => b.toString(16).padStart(2, "0"))
+        .join("")
+        .toUpperCase();
 }
 
-/**
- * HMAC-SHA256 Signature using WebCrypto
- */
-async function computeHmacHex(payloadString, secretKey) {
-    const encoder = new TextEncoder();
-    const keyData = encoder.encode(secretKey);
-    const messageData = encoder.encode(payloadString);
-
-    const cryptoKey = await crypto.subtle.importKey(
-        "raw",
-        keyData,
-        { name: "HMAC", hash: "SHA-256" },
+async function getPublicCryptoKey() {
+    if (_importedPublicKey) return _importedPublicKey;
+    _importedPublicKey = await crypto.subtle.importKey(
+        "jwk",
+        ATLASIQ_PUBLIC_JWK,
+        { name: "ECDSA", namedCurve: "P-256" },
         false,
-        ["sign"]
+        ["verify"]
     );
-
-    const signature = await crypto.subtle.sign("HMAC", cryptoKey, messageData);
-    const hashArray = Array.from(new Uint8Array(signature));
-    return hashArray.map(b => b.toString(16).padStart(2, "0")).join("").substring(0, 32).toUpperCase();
+    return _importedPublicKey;
 }
 
 /**
- * Generate or Retrieve Unique Hardware/Browser Device ID
- * Binds: Screen Geometry, Hardware Concurrency, Timezone, UserAgent Platform + Cryptographic Persistent Seed
+ * Hardware/Environment Fingerprint + Persistent Seed
  */
 async function getOrCreateDeviceId() {
     if (_cachedDeviceId) return _cachedDeviceId;
@@ -107,7 +97,6 @@ async function getOrCreateDeviceId() {
                 return;
             }
 
-            // Create persistent hardware seed if not present
             let seed = data.atlasiq_device_seed;
             if (!seed) {
                 const randomBytes = new Uint8Array(16);
@@ -115,17 +104,14 @@ async function getOrCreateDeviceId() {
                 seed = Array.from(randomBytes).map(b => b.toString(16).padStart(2, "0")).join("");
             }
 
-            // Collect device & browser environment characteristics
-            const screenInfo = `${window.screen?.width || 1920}x${window.screen?.height || 1080}x${window.screen?.colorDepth || 24}`;
+            const scr = typeof screen !== "undefined" ? `${screen.width || 1920}x${screen.height || 1080}x${screen.colorDepth || 24}` : "1920x1080x24";
             const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
-            const concurrency = navigator.hardwareConcurrency || 4;
-            const platform = navigator.platform || "Win32";
-            const lang = navigator.language || "es";
+            const concurrency = typeof navigator !== "undefined" ? (navigator.hardwareConcurrency || 4) : 4;
+            const platform = typeof navigator !== "undefined" ? (navigator.platform || "Win32") : "Win32";
+            const lang = typeof navigator !== "undefined" ? (navigator.language || "es") : "es";
 
-            const rawFingerprint = `HWID|${platform}|${screenInfo}|${tz}|${concurrency}|${lang}|SEED:${seed}`;
+            const rawFingerprint = `HWID|${platform}|${scr}|${tz}|${concurrency}|${lang}|SEED:${seed}`;
             const fullHash = await computeSha256Hex(rawFingerprint);
-
-            // Format as readable device key: ATQ-DEV-XXXX-XXXX-XXXX
             const devId = `ATQ-DEV-${fullHash.substring(0, 4)}-${fullHash.substring(4, 8)}-${fullHash.substring(8, 12)}`;
 
             setLicenseStorage({ atlasiq_device_id: devId, atlasiq_device_seed: seed }, () => {
@@ -137,166 +123,190 @@ async function getOrCreateDeviceId() {
 }
 
 /**
- * Verify a License Key against a Device ID
+ * Verify ECDSA P-256 Asymmetric License Key (`ATQ4.<payloadB64Url>.<sigB64Url>`)
+ * Optionally checks online revocation against Cloudflare Edge Licensing Authority if configured.
  */
-async function verifyLicenseKey(licenseKey, currentDevId) {
+async function verifyLicenseKey(licenseKey, currentDevId, edgeEndpoint = "") {
     try {
         if (!licenseKey || typeof licenseKey !== "string") {
-            return { valid: false, reason: "Clave de licencia no proporcionada" };
+            return { valid: false, reason: "Clave de licencia no proporcionada." };
         }
 
         const cleanKey = licenseKey.trim();
-        if (!cleanKey.startsWith("ATQ-LIC-")) {
-            return { valid: false, reason: "Formato de clave inválido (debe comenzar con ATQ-LIC-)" };
-        }
+        let encodedPayload = "";
+        let encodedSignature = "";
 
-        const parts = cleanKey.split("-");
-        // ATQ, LIC, <encodedPayload>, <signature>
-        if (parts.length < 4) {
-            return { valid: false, reason: "Estructura de clave incompleta" };
-        }
-
-        const encodedPayload = parts[2];
-        const signature = parts[3].toUpperCase();
-
-        // Verify HMAC Signature
-        const expectedSig = await computeHmacHex(encodedPayload, ATLASIQ_MASTER_SECRET);
-        if (signature !== expectedSig) {
-            return { valid: false, reason: "Firma digital no válida o clave adulterada" };
-        }
-
-        // Decode Payload
-        const payloadJson = b64UrlDecode(encodedPayload);
-        const payload = JSON.parse(payloadJson);
-
-        // Check Device Binding
-        const targetDevId = (payload.devId || "").trim().toUpperCase();
-        const thisDevId = (currentDevId || "").trim().toUpperCase();
-
-        if (targetDevId !== thisDevId) {
+        if (cleanKey.startsWith("ATQ4.")) {
+            const parts = cleanKey.split(".");
+            if (parts.length !== 3) {
+                return { valid: false, reason: "Formato de licencia asimétrica ATQ4 incompleto." };
+            }
+            encodedPayload = parts[1];
+            encodedSignature = parts[2];
+        } else if (cleanKey.startsWith("ATQ4-LIC-")) {
+            // Alternate hyphen-safe wrapper: ATQ4-LIC-<payload>.<sig>
+            const body = cleanKey.substring("ATQ4-LIC-".length);
+            const dotIdx = body.lastIndexOf(".");
+            if (dotIdx <= 0) {
+                return { valid: false, reason: "Formato de firma digital ECDSA inválido." };
+            }
+            encodedPayload = body.substring(0, dotIdx);
+            encodedSignature = body.substring(dotIdx + 1);
+        } else {
             return {
                 valid: false,
-                reason: `Esta licencia fue emitida para el equipo [${targetDevId}]. No corresponde a este dispositivo [${thisDevId}].`
+                reason: "Esta versión utiliza blindaje asimétrico ECDSA P-256 (clave ATQ4.). Solicita tu actualización gratuita de llave a WINDOWSTELECOM."
             };
         }
 
-        // Check Expiration Date
+        const pubKey = await getPublicCryptoKey();
+        const sigBytes = b64UrlToBytes(encodedSignature);
+        const msgBytes = new TextEncoder().encode(encodedPayload);
+
+        const isAuthentic = await crypto.subtle.verify(
+            { name: "ECDSA", hash: { name: "SHA-256" } },
+            pubKey,
+            sigBytes,
+            msgBytes
+        );
+
+        if (!isAuthentic) {
+            return { valid: false, reason: "Firma criptográfica ECDSA P-256 inválida o adulterada." };
+        }
+
+        const payload = JSON.parse(b64UrlDecodeUtf8(encodedPayload));
+        const targetDevId = (payload.devId || "").trim().toUpperCase();
+        const thisDevId = (currentDevId || "").trim().toUpperCase();
+
+        if (targetDevId !== "ANY-ENTERPRISE-SEAT" && targetDevId !== thisDevId) {
+            return {
+                valid: false,
+                reason: `Licencia emitida exclusivamente para [${targetDevId}]. Este equipo es [${thisDevId}].`
+            };
+        }
+
         const now = Date.now();
         if (now > payload.exp) {
             const expDate = new Date(payload.exp).toLocaleDateString("es-ES", { year: "numeric", month: "long", day: "numeric" });
-            return { valid: false, reason: `Esta licencia anual venció el ${expDate}. Contacte a WINDOWSTELECOM para renovarla.` };
+            return { valid: false, reason: `La licencia expiró el ${expDate}. Contacta a WINDOWSTELECOM para renovarla.` };
         }
 
-        const remainingMs = payload.exp - now;
-        const daysRemaining = Math.max(1, Math.ceil(remainingMs / (1000 * 60 * 60 * 24)));
+        // Optional Online Cloudflare Worker Revocation / Seat Verification
+        if (edgeEndpoint && edgeEndpoint.startsWith("http")) {
+            try {
+                const verifyUrl = `${edgeEndpoint.replace(/\/$/, "")}/api/license/verify?key=${encodeURIComponent(cleanKey)}&devId=${encodeURIComponent(thisDevId)}`;
+                const resp = await fetch(verifyUrl, { signal: AbortSignal.timeout(4500) });
+                if (resp.ok) {
+                    const edgeData = await resp.json();
+                    if (edgeData && edgeData.revoked === true) {
+                        return { valid: false, reason: edgeData.reason || "Licencia revocada por la autoridad central WINDOWSTELECOM." };
+                    }
+                }
+            } catch (netErr) {
+                // Graceful offline fallback since ECDSA cryptographic signature already passed
+            }
+        }
+
+        const daysRemaining = Math.max(1, Math.ceil((payload.exp - now) / (1000 * 60 * 60 * 24)));
 
         return {
             valid: true,
             clientName: payload.name || "Cliente Corporativo",
-            daysRemaining: daysRemaining,
-            issuedDate: new Date(payload.iat).toLocaleDateString("es-ES"),
+            daysRemaining,
+            issuedDate: new Date(payload.iat || now).toLocaleDateString("es-ES"),
             expiresDate: new Date(payload.exp).toLocaleDateString("es-ES", { year: "numeric", month: "long", day: "numeric" }),
             expiresTimestamp: payload.exp,
-            licenseType: payload.type || "ANUAL_ENTERPRISE",
-            deviceId: targetDevId
+            licenseType: payload.tier || payload.type || "ENTERPRISE_V4",
+            deviceId: thisDevId
         };
     } catch (err) {
-        return { valid: false, reason: "Error al procesar clave de licencia: " + err.message };
+        return { valid: false, reason: "No se pudo verificar la firma ECDSA: " + err.message };
     }
 }
 
-/**
- * Check Current License Status from Storage
- */
 async function checkCurrentLicense() {
     const devId = await getOrCreateDeviceId();
 
     return new Promise((resolve) => {
-        getLicenseStorage(["atlasiq_license_key"], async (data) => {
+        getLicenseStorage(["atlasiq_license_key", "tl_edge_worker_url"], async (data) => {
             const key = data.atlasiq_license_key;
+            const edgeUrl = data.tl_edge_worker_url || "";
             if (!key) {
-                const res = { active: false, deviceId: devId, reason: "Sin licencia activa. Activa tu copia de AtlasIQ Enterprise." };
+                const res = { active: false, deviceId: devId, reason: "Sin licencia activa. Activa tu copia de AtlasIQ Enterprise v4.0." };
                 _cachedLicenseStatus = res;
                 resolve(res);
                 return;
             }
 
-            const verification = await verifyLicenseKey(key, devId);
-            if (verification.valid) {
-                const res = {
-                    active: true,
-                    deviceId: devId,
-                    licenseKey: key,
-                    ...verification
-                };
-                _cachedLicenseStatus = res;
-                resolve(res);
-            } else {
-                const res = {
-                    active: false,
-                    deviceId: devId,
-                    licenseKey: key,
-                    reason: verification.reason
-                };
-                _cachedLicenseStatus = res;
-                resolve(res);
-            }
+            const verification = await verifyLicenseKey(key, devId, edgeUrl);
+            const res = verification.valid
+                ? { active: true, deviceId: devId, licenseKey: key, ...verification }
+                : { active: false, deviceId: devId, licenseKey: key, reason: verification.reason };
+
+            _cachedLicenseStatus = res;
+            resolve(res);
         });
     });
 }
 
-/**
- * Activate License by entering a key
- */
 async function activateLicenseKey(inputKey) {
     const devId = await getOrCreateDeviceId();
-    const result = await verifyLicenseKey(inputKey, devId);
-
-    if (!result.valid) {
-        return { success: false, message: result.reason };
-    }
-
     return new Promise((resolve) => {
-        setLicenseStorage({
-            atlasiq_license_key: inputKey.trim(),
-            atlasiq_license_info: result
-        }, () => {
-            _cachedLicenseStatus = { active: true, deviceId: devId, licenseKey: inputKey.trim(), ...result };
-            resolve({
-                success: true,
-                message: `¡Licencia activada con éxito para ${result.clientName}! Válida por ${result.daysRemaining} días (hasta el ${result.expiresDate}).`,
-                details: result
+        getLicenseStorage(["tl_edge_worker_url"], async (cfg) => {
+            const edgeUrl = cfg.tl_edge_worker_url || "";
+            const result = await verifyLicenseKey(inputKey, devId, edgeUrl);
+            if (!result.valid) {
+                resolve({ success: false, message: result.reason });
+                return;
+            }
+
+            // Register seat on Cloudflare Edge if configured
+            if (edgeUrl && edgeUrl.startsWith("http")) {
+                try {
+                    await fetch(`${edgeUrl.replace(/\/$/, "")}/api/license/activate`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ key: inputKey.trim(), devId }),
+                        signal: AbortSignal.timeout(4500)
+                    });
+                } catch (e) {}
+            }
+
+            setLicenseStorage({
+                atlasiq_license_key: inputKey.trim(),
+                atlasiq_license_info: result
+            }, () => {
+                _cachedLicenseStatus = { active: true, deviceId: devId, licenseKey: inputKey.trim(), ...result };
+                resolve({
+                    success: true,
+                    message: `¡Licencia ECDSA P-256 activada para ${result.clientName}! Vigencia: ${result.daysRemaining} días (hasta el ${result.expiresDate}).`,
+                    details: result
+                });
             });
         });
     });
 }
 
-/**
- * UI Controller: Initialize and Bind License Modal & Header Badge
- */
 async function initLicenseUi() {
     const status = await checkCurrentLicense();
     const devId = status.deviceId;
 
-    // 1. Update Header License Badge in Dashboard if exists
     const badgeEl = document.getElementById("header-license-badge");
     const badgeText = document.getElementById("header-license-text");
 
     if (badgeEl && badgeText) {
         if (status.active) {
             badgeEl.className = "tl-license-badge active";
-            badgeText.textContent = `🛡️ Licencia Activa (${status.daysRemaining}d)`;
-            badgeEl.title = `Licencia corporativa de ${status.clientName}. Expira: ${status.expiresDate}`;
+            badgeText.textContent = `🛡️ ECDSA Activa (${status.daysRemaining}d)`;
+            badgeEl.title = `Licencia verificada para ${status.clientName}. Expira: ${status.expiresDate}`;
         } else {
             badgeEl.className = "tl-license-badge expired";
-            badgeText.textContent = "⚠️ Licencia Requerida";
+            badgeText.textContent = "⚠️ Activar Licencia";
             badgeEl.title = status.reason || "Haz clic para activar";
         }
-
-        badgeEl.onclick = () => openLicenseModal();
+        badgeEl.onclick = () => openLicenseModal(false);
     }
 
-    // 2. Populate Device ID and WhatsApp Links in Modal
     const devIdEl = document.getElementById("license-modal-device-id");
     if (devIdEl) devIdEl.textContent = devId;
 
@@ -312,11 +322,10 @@ async function initLicenseUi() {
 
     const waLink = document.getElementById("link-whatsapp-license");
     if (waLink) {
-        const msg = encodeURIComponent(`Hola Joseph / WINDOWSTELECOM, deseo solicitar/activar mi licencia anual de AtlasIQ Enterprise.\n\nMi ID de Dispositivo es: ${devId}`);
+        const msg = encodeURIComponent(`Hola Joseph / WINDOWSTELECOM, solicito mi clave criptográfica ATQ4 para AtlasIQ Enterprise v4.0.\n\nMi ID de Dispositivo es: ${devId}`);
         waLink.href = `${ATLASIQ_SUPPORT_WA}?text=${msg}`;
     }
 
-    // 3. Activation Button Listener
     const btnActivate = document.getElementById("btn-submit-license");
     const inputKey = document.getElementById("input-license-key");
     const alertBox = document.getElementById("license-alert-msg");
@@ -328,50 +337,40 @@ async function initLicenseUi() {
                 if (alertBox) {
                     alertBox.style.display = "block";
                     alertBox.className = "tl-license-alert error";
-                    alertBox.textContent = "Por favor introduce la clave de licencia recibida.";
+                    alertBox.textContent = "Introduce tu clave asimétrica ATQ4...";
                 }
                 return;
             }
 
             btnActivate.disabled = true;
-            btnActivate.textContent = "⏳ Validando...";
+            btnActivate.textContent = "⏳ Verificando firma ECDSA...";
 
             const res = await activateLicenseKey(keyVal);
 
             btnActivate.disabled = false;
-            btnActivate.textContent = "🚀 Activar Licencia";
+            btnActivate.textContent = "🚀 Activar Licencia ECDSA";
 
             if (alertBox) {
                 alertBox.style.display = "block";
+                alertBox.className = res.success ? "tl-license-alert success" : "tl-license-alert error";
+                alertBox.textContent = res.message;
                 if (res.success) {
-                    alertBox.className = "tl-license-alert success";
-                    alertBox.textContent = res.message;
                     if (typeof playAudioNotification === "function") playAudioNotification("success");
-                    
-                    // Refresh Header Badge
                     if (badgeEl && badgeText) {
                         badgeEl.className = "tl-license-badge active";
-                        badgeText.textContent = `🛡️ Licencia Activa (${res.details.daysRemaining}d)`;
+                        badgeText.textContent = `🛡️ ECDSA Activa (${res.details.daysRemaining}d)`;
                     }
-
-                    setTimeout(() => {
-                        closeLicenseModal();
-                    }, 2500);
-                } else {
-                    alertBox.className = "tl-license-alert error";
-                    alertBox.textContent = res.message;
+                    setTimeout(() => closeLicenseModal(), 2000);
                 }
             }
         };
     }
 
-    // 4. Modal Close Listener
     const btnCloseModal = document.getElementById("btn-close-license-modal");
     if (btnCloseModal) {
         btnCloseModal.onclick = () => closeLicenseModal();
     }
 
-    // 5. If NOT active, prompt the user immediately
     if (!status.active) {
         openLicenseModal(true);
     }
@@ -395,4 +394,3 @@ function closeLicenseModal() {
     if (modal) modal.classList.remove("open");
     if (backdrop) backdrop.classList.remove("open");
 }
-
