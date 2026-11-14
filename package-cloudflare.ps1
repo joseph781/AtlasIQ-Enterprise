@@ -23,7 +23,6 @@ $WebItems = @(
     "help.html",
     "popup.html",
     "sidepanel.html",
-    "_redirects",
     "css",
     "js",
     "lib",
