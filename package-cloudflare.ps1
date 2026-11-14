@@ -1,6 +1,5 @@
-﻿# WINDOWSTELECOM - AtlasIQ Enterprise v4.0 Cloudflare Pages Production Packager
-# Genera el paquete completo listo para subir en Cloudflare Pages (Direct Upload -> https://atlasiq.windowstelecom.com/)
-# Incluye: Portal Oficial + Dashboard Cloud CRM + Descarga Limpia de Extension + Boveda Oculta CEO Cifrada (AES-256-GCM).
+# WINDOWSTELECOM - AtlasIQ Enterprise v4.0 Cloudflare Pages Production Packager
+# Genera el paquete completo listo para subir en Cloudflare Pages (https://atlasiq.windowstelecom.com/)
 
 $ErrorActionPreference = "Stop"
 Add-Type -AssemblyName System.IO.Compression
@@ -8,14 +7,14 @@ Add-Type -AssemblyName System.IO.Compression.FileSystem
 
 $RootDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 
-# 1. Primero regeneramos el ZIP limpio de la extension Chrome para que vaya actualizado dentro del portal Cloud
+# 1. Regenerar el ZIP limpio de la extension Chrome
 & (Join-Path $RootDir "package-client.ps1")
 
 $OutCloudZip = Join-Path $RootDir "AtlasIQ-Cloudflare-Production-v4.0.zip"
 $StageDir = Join-Path ([System.IO.Path]::GetTempPath()) ("atlasiq_cf_prod_" + [guid]::NewGuid().ToString("N"))
 New-Item -ItemType Directory -Path $StageDir | Out-Null
 
-# 2. Copiar aplicacion web Cloud (index.html, dashboard.html, librerias y assets)
+# 2. Copiar aplicacion web Cloud
 $WebItems = @(
     "index.html",
     "dashboard.html",
@@ -37,13 +36,13 @@ foreach ($item in $WebItems) {
     }
 }
 
-# 3. Inyectar la Boveda Privada CEO Cifrada (AES-256-GCM) leyendo la ruta secreta local desde admin-server/vault-slug.txt
+# 3. Inyectar Boveda Privada CEO Cifrada leyendo la ruta secreta local desde admin-server/vault-slug.txt
 $VaultSlug = ([System.IO.File]::ReadAllText((Join-Path $RootDir "admin-server\vault-slug.txt"))).Trim()
 $VaultDir = Join-Path $StageDir $VaultSlug
 New-Item -ItemType Directory -Path $VaultDir | Out-Null
 Copy-Item -Path (Join-Path $RootDir "admin-server\cloud-vault-keygen.html") -Destination (Join-Path $VaultDir "index.html") -Force
 
-# 4. Crear archivo nativo _headers de Cloudflare Pages (Seguridad + Anti-Indexacion en Google/Bots para la boveda)
+# 4. Crear archivo nativo _headers de Cloudflare Pages
 $HeadersContent = @"
 /*
   X-Content-Type-Options: nosniff
@@ -75,4 +74,4 @@ try {
 Remove-Item -Path $StageDir -Recurse -Force
 
 $SizeMB = [Math]::Round((Get-Item $OutCloudZip).Length / 1MB, 2)
-Write-Host "🚀 Paquete de Produccion Cloudflare generado exitosamente ($SizeMB MB): $OutCloudZip" -ForegroundColor Cyan
+Write-Host "[OK] Paquete de Produccion Cloudflare generado ($SizeMB MB): $OutCloudZip" -ForegroundColor Cyan

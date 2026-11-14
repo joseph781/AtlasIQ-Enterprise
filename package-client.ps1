@@ -53,4 +53,4 @@ try {
 Remove-Item -Path $StageDir -Recurse -Force
 
 $SizeMB = [Math]::Round((Get-Item $OutZip).Length / 1MB, 2)
-Write-Host "✅ Paquete de cliente actualizado ($SizeMB MB): $OutZip" -ForegroundColor Green
+Write-Host "[OK] Paquete de cliente actualizado ($SizeMB MB): $OutZip" -ForegroundColor Green
