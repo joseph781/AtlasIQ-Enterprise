@@ -1262,7 +1262,7 @@ async function publishLiveCloudAudit(edgeWorkerUrl, lead, branding = {}, benchma
             rank: benchmark?.rank || null,
             totalPeers: benchmark?.totalPeers || null,
             agencyName: branding.agencyName || "WINDOWSTELECOM",
-            agencyWa: branding.agencyWa || "https://wa.me/584127785780"
+            agencyWa: branding.agencyWa || "https://wa.me/584124060610"
         })
     });
 
@@ -1298,7 +1298,7 @@ function downloadStandaloneClientDemoHtml(lead, branding = {}) {
     if (!lead) return;
     const econ = estimateNicheRevenueLeak(lead);
     const agencyName = branding.agencyName || "WINDOWSTELECOM";
-    const agencyWa = branding.agencyWa || "https://wa.me/584127785780";
+    const agencyWa = branding.agencyWa || "https://wa.me/584124060610";
     const safeName = escapeHtml(lead.name || "Empresa");
     const safeCat = escapeHtml(lead.category || econ.verticalLabel);
     const safeAddr = escapeHtml(lead.address || "Atención preferencial en tu ciudad");

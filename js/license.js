@@ -14,7 +14,8 @@ const ATLASIQ_PUBLIC_JWK = Object.freeze({
     key_ops: ["verify"]
 });
 
-const ATLASIQ_SUPPORT_WA = "https://wa.me/584127785780";
+const ATLASIQ_SUPPORT_WA = "https://wa.me/584124060610";
+const ATLASIQ_SUPPORT_PHONE_DISPLAY = "+58 412-4060610";
 
 let _cachedLicenseStatus = null;
 let _cachedDeviceId = null;
@@ -322,7 +323,9 @@ async function initLicenseUi() {
 
     const waLink = document.getElementById("link-whatsapp-license");
     if (waLink) {
-        const msg = encodeURIComponent(`Hola Joseph / WINDOWSTELECOM, solicito mi clave criptográfica ATQ4 para AtlasIQ Enterprise v4.0.\n\nMi ID de Dispositivo es: ${devId}`);
+        const msg = encodeURIComponent(
+            `Hola Joseph / WINDOWSTELECOM 👋\n\nYa leí toda la información y beneficios en la página principal de AtlasIQ Enterprise (https://atlasiq.windowstelecom.com/) e instalé la extensión en mi PC.\n\nSolicito información de planes y mi código de activación ATQ4.\n\n🛡️ Mi ID de Dispositivo es: ${devId}`
+        );
         waLink.href = `${ATLASIQ_SUPPORT_WA}?text=${msg}`;
     }
 

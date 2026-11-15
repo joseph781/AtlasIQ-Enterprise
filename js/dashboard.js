@@ -19,7 +19,7 @@ let currentBranding = {
     agencyName: "WINDOWSTELECOM",
     consultantName: "Joseph Castillo – CEO",
     agencyWeb: "windowstelecom.com",
-    agencyWa: "https://wa.me/584127785780"
+    agencyWa: "https://wa.me/584124060610"
 };
 
 // Tabulator, Leaflet & ECharts Instances
@@ -2388,7 +2388,7 @@ document.addEventListener("DOMContentLoaded", () => {
             agencyName: document.getElementById("setting-agency-name")?.value.trim() || "WINDOWSTELECOM",
             consultantName: document.getElementById("setting-consultant-name")?.value.trim() || "Joseph Castillo – CEO",
             agencyWeb: document.getElementById("setting-agency-web")?.value.trim() || "windowstelecom.com",
-            agencyWa: document.getElementById("setting-agency-wa")?.value.trim() || "https://wa.me/584127785780"
+            agencyWa: document.getElementById("setting-agency-wa")?.value.trim() || "https://wa.me/584124060610"
         };
         currentBranding = branding;
         storageAdapter.set({

@@ -615,7 +615,7 @@ function createFloatingDock() {
             triggerBtn.textContent = idleLabel;
 
             if (!licStatus.active) {
-                alert(`🛡️ AtlasIQ Enterprise v4.0 - Activación Requerida\n\n${licStatus.reason || "Activa tu licencia ECDSA."}\n\nID de Dispositivo: ${licStatus.deviceId}`);
+                alert(`🛡️ AtlasIQ Enterprise - Activación Requerida\n\n${licStatus.reason || "Activa tu licencia ECDSA."}\n\nID de Dispositivo: ${licStatus.deviceId}\nWhatsApp Oficial de Activación: +58 412-4060610\n\nSe abrirá el CRM para que envíes tu ID por WhatsApp en 1 clic.`);
                 chrome.runtime.sendMessage({ action: "openPage" });
                 return false;
             }
