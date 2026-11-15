@@ -31,7 +31,7 @@
 
         const feedEl = document.getElementById("sp-feed");
         if (!filtered.length) {
-            feedEl.innerHTML = `<div style="text-align:center;color:var(--sub);font-size:12px;padding:20px 8px;">Escribe qué buscas arriba y pulsa <strong>📍 1. Escanear desde Mi Ubicación</strong> para comenzar en tu zona.</div>`;
+            feedEl.innerHTML = `<div style="text-align:center;color:var(--sub);font-size:12px;padding:20px 8px;">Escribe qué buscas arriba y pulsa <strong>1. Escanear desde Mi Ubicación</strong> para comenzar en tu zona.</div>`;
             return;
         }
 
@@ -45,21 +45,21 @@
             if (spUserLoc && l.latitude && l.longitude && typeof haversineDistance === "function") {
                 const d = haversineDistance(spUserLoc.lat, spUserLoc.lon, l.latitude, l.longitude);
                 if (d !== null) {
-                    distLabel = ` · 📍 ${d < 1 ? Math.round(d * 1000) + " m" : d.toFixed(1) + " km"}`;
+                    distLabel = ` · ${d < 1 ? Math.round(d * 1000) + " m" : d.toFixed(1) + " km"}`;
                 }
             }
 
             const badges = [];
             const ws = typeof classifyWebsiteStatus === "function" ? classifyWebsiteStatus(l) : null;
             const econ = typeof estimateNicheRevenueLeak === "function" ? estimateNicheRevenueLeak(l) : null;
-            if (!l.website) badges.push("🚨 Sin Web");
-            else if (ws && ws.status === "social_link") badges.push("⚠️ Falsa Web");
-            else if (ws && ws.status === "broken") badges.push("💀 Web Caída");
-            if (l.offer_type === "automation") badges.push("🤖 Vender Bot IA");
-            else if (l.offer_type === "combo") badges.push("🚀 Web + Bot IA");
-            if (econ && econ.monthlyLeakUsd) badges.push(`💸 -$${(econ.monthlyLeakUsd / 1000).toFixed(1)}k/m`);
-            if (l.commission_bleed) badges.push("🩸 App Comisión");
-            if (l.email) badges.push("✉️ Email");
+            if (!l.website) badges.push("Sin Web");
+            else if (ws && ws.status === "social_link") badges.push("Falsa Web");
+            else if (ws && ws.status === "broken") badges.push("Web Caída");
+            if (l.offer_type === "automation") badges.push("Vender Bot IA");
+            else if (l.offer_type === "combo") badges.push("Web + Bot IA");
+            if (econ && econ.monthlyLeakUsd) badges.push(`-$${(econ.monthlyLeakUsd / 1000).toFixed(1)}k/m`);
+            if (l.commission_bleed) badges.push("Comisión Apps");
+            if (l.email) badges.push("Email");
 
             return `
                 <div class="lead-item">
@@ -70,8 +70,8 @@
                     <div class="lead-meta">★ ${esc(l.averageRating || "-")} (${esc(l.reviewCount || 0)}) · ${esc(l.category || "Comercio")}${esc(distLabel)}</div>
                     ${badges.length ? `<div class="lead-badges">${badges.map(b => `<span class="mini-badge">${esc(b)}</span>`).join("")}</div>` : ""}
                     <div class="lead-actions">
-                        ${waHref ? `<a class="mini-btn wa" href="${esc(waHref)}" target="_blank">💬 WhatsApp</a>` : ""}
-                        ${l.website ? `<a class="mini-btn" href="${esc(l.website)}" target="_blank">🌐 Web</a>` : ""}
+                        ${waHref ? `<a class="mini-btn wa" href="${esc(waHref)}" target="_blank">${atqIcon("message", 11)} WhatsApp</a>` : ""}
+                        ${l.website ? `<a class="mini-btn" href="${esc(l.website)}" target="_blank">${atqIcon("globe", 11)} Web</a>` : ""}
                     </div>
                 </div>
             `;
@@ -81,8 +81,8 @@
     function updateGpsPill(loc) {
         const el = document.getElementById("sp-gps-label");
         if (!el || !loc || !loc.lat) return;
-        const src = loc.source === "gps" ? "GPS" : (loc.city || "IP");
-        el.textContent = `📍 Punto Cero: ${Number(loc.lat).toFixed(4)}, ${Number(loc.lon).toFixed(4)} (${src})`;
+        const src = esc(loc.source === "gps" ? "GPS" : (loc.city || "IP"));
+        el.innerHTML = `${atqIcon("mapPin", 11)} <span>Punto Cero: ${Number(loc.lat).toFixed(4)}, ${Number(loc.lon).toFixed(4)} (${src})</span>`;
     }
 
     function refreshFromStorage() {
@@ -147,14 +147,15 @@
             const zoom = gridMode === "single" ? 15 : (gridMode === "2x2" ? 14 : 13);
 
             if (!spUserLoc || !spUserLoc.lat || !spUserLoc.lon) {
-                btnGpsStart.textContent = "⏳ Obteniendo GPS...";
+                const origHtml = btnGpsStart.innerHTML;
+                btnGpsStart.innerHTML = `${atqIcon("clock", 13)} Obteniendo GPS...`;
                 await new Promise((resolve) => {
                     detectUserLocation((loc) => {
                         if (loc) spUserLoc = loc;
                         resolve();
                     }, { highAccuracy: true });
                 });
-                btnGpsStart.textContent = "📍 1. Escanear desde Mi Ubicación";
+                btnGpsStart.innerHTML = origHtml;
             }
 
             if (!spUserLoc || !spUserLoc.lat || !spUserLoc.lon) {

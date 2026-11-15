@@ -168,25 +168,25 @@ function initTable() {
                     const safeName = escapeHtml(cell.getValue() || "Sin nombre");
                     const mUrl = safeExternalUrl(row.mapsUrl);
                     const mapLink = mUrl
-                        ? `<a href="${mUrl}" target="_blank" rel="noopener noreferrer" title="Abrir ficha en Google Maps" style="margin-left: 5px; text-decoration: none;">📍</a>`
+                        ? `<a href="${mUrl}" target="_blank" rel="noopener noreferrer" title="Abrir ficha en Google Maps" style="margin-left: 5px; text-decoration: none; color: #3b82f6; display: inline-flex; vertical-align: middle;">${atqIcon("mapPin", 13)}</a>`
                         : "";
                     let badges = "";
                     if ((parseInt(row.audit_views, 10) || 0) > 0) {
-                        badges += ` <span style="background: rgba(249,115,22,0.18); color: #ea580c; border: 1px solid rgba(249,115,22,0.45); padding: 1px 5px; border-radius: 4px; font-size: 9.5px; font-weight: 800;" title="El prospecto abrió tu link de propuesta">🔥 Visto ${parseInt(row.audit_views, 10)}x</span>`;
+                        badges += ` <span style="background: rgba(249,115,22,0.18); color: #ea580c; border: 1px solid rgba(249,115,22,0.45); padding: 1px 5px; border-radius: 4px; font-size: 9.5px; font-weight: 800; display: inline-flex; align-items: center; gap: 3px;" title="El prospecto abrió tu link de propuesta">${atqIcon("activity", 10)} Visto ${parseInt(row.audit_views, 10)}x</span>`;
                     } else if (isLeadFollowupDue(row)) {
-                        badges += ` <span style="background: rgba(234,179,8,0.18); color: #ca8a04; padding: 1px 5px; border-radius: 4px; font-size: 9.5px; font-weight: 800;" title="Han pasado +48h desde el último contacto">⏰ Seguimiento</span>`;
+                        badges += ` <span style="background: rgba(234,179,8,0.18); color: #ca8a04; padding: 1px 5px; border-radius: 4px; font-size: 9.5px; font-weight: 800; display: inline-flex; align-items: center; gap: 3px;" title="Han pasado +48h desde el último contacto">${atqIcon("clock", 10)} Seguimiento</span>`;
                     }
                     if (row.unclaimed) {
-                        badges += ` <span style="background: rgba(245,158,11,0.16); color: #d97706; border: 1px solid rgba(245,158,11,0.35); padding: 1px 5px; border-radius: 4px; font-size: 9.5px; font-weight: 800;" title="Ficha Google Business No Reclamada">🏴 Sin Reclamar</span>`;
+                        badges += ` <span style="background: rgba(245,158,11,0.16); color: #d97706; border: 1px solid rgba(245,158,11,0.35); padding: 1px 5px; border-radius: 4px; font-size: 9.5px; font-weight: 800; display: inline-flex; align-items: center; gap: 3px;" title="Ficha Google Business No Reclamada">${atqIcon("flag", 10)} Sin Reclamar</span>`;
                     }
                     if (row.ad_spend_active) {
-                        badges += ` <span style="background: rgba(16,185,129,0.15); color: #059669; border: 1px solid rgba(16,185,129,0.35); padding: 1px 5px; border-radius: 4px; font-size: 9.5px; font-weight: 800;" title="Píxeles publicitarios activos detectados">💰 Ads</span>`;
+                        badges += ` <span style="background: rgba(16,185,129,0.15); color: #059669; border: 1px solid rgba(16,185,129,0.35); padding: 1px 5px; border-radius: 4px; font-size: 9.5px; font-weight: 800;" title="Píxeles publicitarios activos detectados">Ads</span>`;
                     }
                     if (row.commission_bleed) {
-                        badges += ` <span style="background: rgba(168,85,247,0.15); color: #9333ea; padding: 1px 5px; border-radius: 4px; font-size: 9.5px; font-weight: 800;" title="Paga comisiones a ${escapeHtml(row.booking_platform || 'apps')}">💸 Comisión</span>`;
+                        badges += ` <span style="background: rgba(168,85,247,0.15); color: #9333ea; padding: 1px 5px; border-radius: 4px; font-size: 9.5px; font-weight: 800;" title="Paga comisiones a ${escapeHtml(row.booking_platform || 'apps')}">Comisión</span>`;
                     }
                     if (row.decision_maker || row.tax_id) {
-                        badges += ` <span style="background: rgba(59,130,246,0.14); color: #2563eb; padding: 1px 5px; border-radius: 4px; font-size: 9.5px; font-weight: 700;" title="${escapeHtml([row.decision_maker, row.tax_id].filter(Boolean).join(' · '))}">🕵️ OSINT</span>`;
+                        badges += ` <span style="background: rgba(59,130,246,0.14); color: #2563eb; padding: 1px 5px; border-radius: 4px; font-size: 9.5px; font-weight: 700;" title="${escapeHtml([row.decision_maker, row.tax_id].filter(Boolean).join(' · '))}">OSINT</span>`;
                     }
                     return `<strong class="tl-table-name">${safeName}</strong>${mapLink}${badges}`;
                 }
@@ -220,8 +220,8 @@ function initTable() {
                     const wCls = ws >= 74 ? "color:#059669;background:rgba(16,185,129,0.15);" : "color:#64748b;background:rgba(148,163,184,0.14);";
                     const aCls = as >= 72 ? "color:#2563eb;background:rgba(59,130,246,0.16);" : "color:#64748b;background:rgba(148,163,184,0.14);";
                     return `<div style="display:inline-flex;align-items:center;gap:4px;" title="Oferta recomendada: ${escapeHtml(row.recommended_offer || '')} (${escapeHtml(row.suggested_ticket || '')})">`
-                        + `<span style="${wCls}padding:2px 5px;border-radius:5px;font-size:10px;font-weight:800;">🌐${ws}</span>`
-                        + `<span style="${aCls}padding:2px 5px;border-radius:5px;font-size:10px;font-weight:800;">🤖${as}</span>`
+                        + `<span style="${wCls}padding:2px 5px;border-radius:5px;font-size:10px;font-weight:800;display:inline-flex;align-items:center;gap:3px;">${atqIcon("globe", 10)}${ws}</span>`
+                        + `<span style="${aCls}padding:2px 5px;border-radius:5px;font-size:10px;font-weight:800;display:inline-flex;align-items:center;gap:3px;">${atqIcon("cpu", 10)}${as}</span>`
                         + (leakK ? `<span style="color:#ef4444;font-size:9.5px;font-weight:800;">${leakK}</span>` : "")
                         + `</div>`;
                 }
@@ -236,7 +236,7 @@ function initTable() {
                     if (!val) return '<span style="color: #94a3b8;">-</span>';
                     const pInfo = formatPhone(val);
                     const waBtn = pInfo.whatsappUrl
-                        ? `<a href="${pInfo.whatsappUrl}" target="_blank" rel="noopener noreferrer" style="margin-left: 6px; text-decoration: none;" title="Contactar por WhatsApp">💬</a>`
+                        ? `<a href="${pInfo.whatsappUrl}" target="_blank" rel="noopener noreferrer" style="margin-left: 6px; text-decoration: none; color: #10b981; display: inline-flex; vertical-align: middle;" title="Contactar por WhatsApp">${atqIcon("message", 13)}</a>`
                         : "";
                     return `<span>${escapeHtml(val)}</span>${waBtn}`;
                 }
@@ -254,13 +254,13 @@ function initTable() {
                     let mxBadge = "";
                     if (row.mx_status === "valid") {
                         const dmarcWarn = row.dmarc_status === "missing"
-                            ? ` <span style="background:#fef3c7;color:#b45309;font-size:9.5px;padding:1px 4px;border-radius:4px;font-weight:700;" title="Dominio sin DMARC (Vulnerable a Spoofing)">⚠ No DMARC</span>`
-                            : (row.dmarc_status === "present" ? ` <span style="background:#dcfce7;color:#15803d;font-size:9.5px;padding:1px 4px;border-radius:4px;font-weight:700;" title="SPF + DMARC Activos">🛡️ DMARC</span>` : "");
+                            ? ` <span style="background:#fef3c7;color:#b45309;font-size:9.5px;padding:1px 4px;border-radius:4px;font-weight:700;" title="Dominio sin DMARC (Vulnerable a Spoofing)">Sin DMARC</span>`
+                            : (row.dmarc_status === "present" ? ` <span style="background:#dcfce7;color:#15803d;font-size:9.5px;padding:1px 4px;border-radius:4px;font-weight:700;display:inline-flex;align-items:center;gap:2px;" title="SPF + DMARC Activos">${atqIcon("shield", 10)} DMARC</span>` : "");
                         mxBadge = `<span class="tl-mx-badge valid" title="${escapeHtml(row.mx_provider || 'Servidor MX Activo')}">✓ MX</span>${dmarcWarn}`;
                     } else if (row.mx_status === "invalid") {
                         mxBadge = `<span class="tl-mx-badge invalid" title="${escapeHtml(row.mx_provider || 'Sin servidor MX')}">✕ Rebote</span>`;
                     } else {
-                        mxBadge = `<button class="tl-btn-verify-mx" style="font-size: 10px; padding: 1px 6px; border-radius: 4px; border: 1px solid #cbd5e1; background: transparent; color: inherit; cursor: pointer; margin-left: 4px;" title="Auditar MX + SPF + DMARC con Cloudflare DoH">🛡️ DNS</button>`;
+                        mxBadge = `<button class="tl-btn-verify-mx" style="font-size: 10px; padding: 1px 6px; border-radius: 4px; border: 1px solid #cbd5e1; background: transparent; color: inherit; cursor: pointer; margin-left: 4px; display: inline-flex; align-items: center; gap: 3px;" title="Auditar MX + SPF + DMARC con Cloudflare DoH">${atqIcon("shield", 10)} DNS</button>`;
                     }
                     return `<a href="mailto:${ encodeURIComponent(val) }" style="color: #3b82f6; text-decoration: none; font-weight: 600;">${safeEmail}</a> ${mxBadge}`;
                 },
@@ -271,7 +271,7 @@ function initTable() {
                     const row = cell.getRow();
                     const rowData = row.getData();
                     if (!rowData.email) return;
-                    btn.textContent = "⏳...";
+                    btn.textContent = "Auditando...";
                     btn.disabled = true;
                     const res = await verifyDomainMx(rowData.email);
                     rowData.mx_status = res.valid ? "valid" : "invalid";
@@ -311,7 +311,7 @@ function initTable() {
                     const row = cell.getRow().getData();
                     const ws = classifyWebsiteStatus(row);
                     if (!val || ws.status === "none") {
-                        return '<span style="color: #ef4444; font-size: 11px; font-weight: 800;">⚡ Sin Web</span>';
+                        return `<span style="color: #ef4444; font-size: 11px; font-weight: 800; display: inline-flex; align-items: center; gap: 4px;">${atqIcon("globeOff", 12)} Sin Web</span>`;
                     }
                     const safeHref = safeExternalUrl(val);
                     const domain = escapeHtml(extractDomain(val) || val);
@@ -327,14 +327,14 @@ function initTable() {
                     }
 
                     if (row.has_ai_automation) {
-                        badges += ` <span style="background:rgba(16,185,129,0.16);color:#059669;padding:1px 4px;border-radius:4px;font-size:9.5px;font-weight:800;" title="Automatización activa: ${escapeHtml(row.automation_stack || 'CRM/Bot')}">🤖 IA</span>`;
+                        badges += ` <span style="background:rgba(16,185,129,0.16);color:#059669;padding:1px 4px;border-radius:4px;font-size:9.5px;font-weight:800;display:inline-flex;align-items:center;gap:2px;" title="Automatización activa: ${escapeHtml(row.automation_stack || 'CRM/Bot')}">${atqIcon("cpu", 10)} IA</span>`;
                     }
 
                     if (typeof row.pagespeed_mobile === "number") {
                         const ps = row.pagespeed_mobile;
                         const psColor = ps >= 75 ? "#15803d" : (ps >= 50 ? "#b45309" : "#b91c1c");
                         const psBg = ps >= 75 ? "#dcfce7" : (ps >= 50 ? "#fef3c7" : "#fee2e2");
-                        badges += ` <span style="background:${psBg};color:${psColor};padding:1px 4px;border-radius:4px;font-size:9.5px;font-weight:800;" title="Google PageSpeed Móvil">⚡${ps}</span>`;
+                        badges += ` <span style="background:${psBg};color:${psColor};padding:1px 4px;border-radius:4px;font-size:9.5px;font-weight:800;" title="Google PageSpeed Móvil">${ps}/100</span>`;
                     }
                     return safeHref
                         ? `<a href="${safeHref}" target="_blank" rel="noopener noreferrer" class="tl-table-link">${domain}</a>${badges}`
@@ -353,7 +353,7 @@ function initTable() {
                 }
             },
             {
-                title: "📍 Distancia",
+                title: "Distancia",
                 field: "distanceKm",
                 width: 96,
                 minWidth: 86,
@@ -363,7 +363,7 @@ function initTable() {
                     const val = cell.getValue();
                     if (val === null || val === undefined || isNaN(val)) return '<span style="color: #94a3b8; font-size: 11px;">-</span>';
                     const formatted = val < 1 ? `${Math.round(val * 1000)} m` : `${val.toFixed(1)} km`;
-                    return `<span class="tl-distance-pill">📍 ${formatted}</span>`;
+                    return `<span class="tl-distance-pill" style="display:inline-flex;align-items:center;gap:3px;">${atqIcon("mapPin", 11)} ${formatted}</span>`;
                 }
             },
             {
@@ -793,7 +793,7 @@ function renderNicheBreakdownTable() {
             <tr class="tl-niche-tr">
                 <td class="tl-niche-name" style="padding: 8px 12px;">${escapeHtml(catName)}</td>
                 <td class="tl-niche-total" style="padding: 8px 12px; text-align: center;">${total}</td>
-                <td class="tl-niche-dist" style="padding: 8px 12px; text-align: center;">📍 ${escapeHtml(avgDistText)}</td>
+                <td class="tl-niche-dist" style="padding: 8px 12px; text-align: center;"><span style="display:inline-flex;align-items:center;gap:4px;">${atqIcon("mapPin", 11)} ${escapeHtml(avgDistText)}</span></td>
                 <td style="padding: 8px 12px; text-align: center;">${satBadge}</td>
                 <td style="padding: 8px 12px; text-align: center; color: ${noWebPct > 50 ? '#ef4444' : 'var(--text-secondary)'}; font-weight: 600;">
                     ${noWebPct}% (${noWebCount}/${total})
@@ -922,14 +922,14 @@ function updateMapData(leadsToRender) {
         const uLon = parseFloat(userLocation.lon);
         const originIcon = L.divIcon({
             className: "tl-map-origin-div",
-            html: `<div style="background:#06b6d4;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;border:3px solid #ffffff;box-shadow:0 0 0 6px rgba(6,182,212,0.28),0 4px 10px rgba(0,0,0,0.5);" title="Tu Ubicación de Referencia (Punto Cero)">📍</div>`,
+            html: `<div style="background:#06b6d4;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;border:3px solid #ffffff;box-shadow:0 0 0 6px rgba(6,182,212,0.28),0 4px 10px rgba(0,0,0,0.5);" title="Tu Ubicación de Referencia (Punto Cero)">${atqIcon("compass", 15)}</div>`,
             iconSize: [30, 30],
             iconAnchor: [15, 15],
             popupAnchor: [0, -15]
         });
         const originPopup = `
             <div style="font-family:inherit;font-size:12px;line-height:1.4;min-width:200px;padding:2px;">
-                <div class="tl-map-popup-title">📍 Tu Ubicación Actual (Punto Cero)</div>
+                <div class="tl-map-popup-title" style="display:flex;align-items:center;gap:5px;">${atqIcon("compass", 13)} Tu Ubicación Actual (Punto Cero)</div>
                 <div class="tl-map-popup-sub">${escapeHtml(userLocation.label || "Referencia activa")}</div>
                 <div class="tl-map-popup-box">
                     <div>Latitud: <strong>${uLat.toFixed(5)}</strong></div>
@@ -989,9 +989,9 @@ function updateMapData(leadsToRender) {
                         ★ ${escapeHtml(lead.averageRating || "N/A")} · ${escapeHtml(lead.category || "General")}
                     </div>
                     <div class="tl-map-popup-box">
-                        <div>📍 Distancia: <strong>${escapeHtml(distStr)}</strong></div>
-                        <div>📞 Teléfono: <strong>${escapeHtml(lead.phone || "No detectado")}</strong></div>
-                        <div>🌐 Sitio Web: <strong>${webStr}</strong></div>
+                        <div style="display:flex;align-items:center;gap:5px;">${atqIcon("mapPin", 12)} Distancia: <strong>${escapeHtml(distStr)}</strong></div>
+                        <div style="display:flex;align-items:center;gap:5px;">${atqIcon("phone", 12)} Teléfono: <strong>${escapeHtml(lead.phone || "No detectado")}</strong></div>
+                        <div style="display:flex;align-items:center;gap:5px;">${atqIcon("globe", 12)} Sitio Web: <strong>${webStr}</strong></div>
                     </div>
                     <button type="button" class="tl-btn tl-btn-primary btn-map-open-drawer" data-lead-key="${leadKey}" style="width:100%;height:26px;font-size:11px;">
                         Abrir Inspector 360° ↗
@@ -1071,10 +1071,10 @@ function renderKanbanBoard(leadsToRender) {
         const openViews = parseInt(lead.audit_views, 10) || 0;
         const dueFollowup = isLeadFollowupDue(lead);
         const cadenceAlert = openViews > 0
-            ? `<div style="margin-top:4px;font-size:10px;font-weight:800;color:#ea580c;">🔥 Abrió propuesta (${openViews}x) · ¡Llamar hoy!</div>`
-            : (dueFollowup ? `<div style="margin-top:4px;font-size:10px;font-weight:800;color:#ca8a04;">⏰ Toca seguimiento (Día ${(lead.followup_step || 1) >= 2 ? "7 Cierre" : "3 Demo"})</div>` : "");
+            ? `<div style="margin-top:4px;font-size:10px;font-weight:800;color:#ea580c;display:flex;align-items:center;gap:4px;">${atqIcon("activity", 11)} Abrió propuesta (${openViews}x) · Contactar hoy</div>`
+            : (dueFollowup ? `<div style="margin-top:4px;font-size:10px;font-weight:800;color:#ca8a04;display:flex;align-items:center;gap:4px;">${atqIcon("clock", 11)} Seguimiento (Día ${(lead.followup_step || 1) >= 2 ? "7 Cierre" : "3 Demo"})</div>` : "");
         const offerLine = lead.recommended_offer
-            ? `<div style="margin-top:3px;font-size:10.5px;color:#3b82f6;font-weight:700;">🎯 ${escapeHtml(lead.recommended_offer)}${lead.revenue_leak_usd ? ` · <span style="color:#ef4444;">-$${Math.round(lead.revenue_leak_usd / 100) / 10}k/m</span>` : ""}</div>`
+            ? `<div style="margin-top:3px;font-size:10.5px;color:#3b82f6;font-weight:700;display:flex;align-items:center;gap:4px;">${atqIcon("target", 11)} <span>${escapeHtml(lead.recommended_offer)}${lead.revenue_leak_usd ? ` · <span style="color:#ef4444;">-$${Math.round(lead.revenue_leak_usd / 100) / 10}k/m</span>` : ""}</span></div>`
             : "";
 
         card.innerHTML = `
@@ -1082,18 +1082,18 @@ function renderKanbanBoard(leadsToRender) {
                 <strong class="tl-kanban-lead-title btn-kanban-open-drawer" data-lead-key="${safeKey}" style="font-size:13px;line-height:1.3;cursor:pointer;">${escapeHtml(lead.name || "Empresa")}</strong>
                 <span class="tl-badge-score ${scoreClass}" style="font-size:10px;padding:1px 5px;" title="Web: ${lead.web_score || score} · Bot IA: ${lead.automation_score || score}">${score}</span>
             </div>
-            <div class="tl-kanban-lead-meta" style="font-size:11px;display:flex;justify-content:space-between;">
+            <div class="tl-kanban-lead-meta" style="font-size:11px;display:flex;justify-content:space-between;align-items:center;">
                 <span>★ ${escapeHtml(lead.averageRating || "-")} · ${escapeHtml(lead.category || "General")}</span>
-                <span>📍 ${escapeHtml(distStr)}</span>
+                <span style="display:inline-flex;align-items:center;gap:3px;">${atqIcon("mapPin", 11)} ${escapeHtml(distStr)}</span>
             </div>
             ${offerLine}
             ${cadenceAlert}
             <div style="display:flex;align-items:center;justify-content:space-between;margin-top:4px;padding-top:6px;border-top:1px solid var(--border-color);">
-                <div class="tl-kanban-lead-phone" style="font-size:11px;">
-                    ${lead.phone ? `📞 ${escapeHtml(lead.phone)}` : '<span style="color:var(--text-muted);">Sin teléfono</span>'}
+                <div class="tl-kanban-lead-phone" style="font-size:11px;display:inline-flex;align-items:center;gap:4px;">
+                    ${lead.phone ? `${atqIcon("phone", 11)} ${escapeHtml(lead.phone)}` : '<span style="color:var(--text-muted);">Sin teléfono</span>'}
                 </div>
                 <div style="display:flex;gap:4px;">
-                    ${pInfo.whatsappUrl ? `<a href="${pInfo.whatsappUrl}" target="_blank" rel="noopener noreferrer" class="tl-btn tl-btn-outline" style="height:22px;font-size:10px;padding:0 5px;" title="WhatsApp">💬</a>` : ""}
+                    ${pInfo.whatsappUrl ? `<a href="${pInfo.whatsappUrl}" target="_blank" rel="noopener noreferrer" class="tl-btn tl-btn-outline" style="height:22px;font-size:10px;padding:0 5px;color:#10b981;" title="WhatsApp">${atqIcon("message", 12)}</a>` : ""}
                     <button type="button" class="tl-btn tl-btn-primary btn-kanban-open-drawer" data-lead-key="${safeKey}" style="height:22px;font-size:10px;padding:0 6px;">360° ↗</button>
                 </div>
             </div>
@@ -1389,7 +1389,7 @@ function openLeadDrawer(lead) {
     const claimBadge = document.getElementById("drawer-claim-badge");
     if (claimBadge) {
         claimBadge.innerHTML = lead.unclaimed
-            ? `<span style="background:#fef3c7;color:#b45309;padding:2px 8px;border-radius:999px;font-size:10.5px;font-weight:800;">🏴 Ficha No Reclamada</span>`
+            ? `<span style="background:#fef3c7;color:#b45309;padding:2px 8px;border-radius:999px;font-size:10.5px;font-weight:800;display:inline-flex;align-items:center;gap:4px;">${atqIcon("flag", 11)} Ficha No Reclamada</span>`
             : `<span style="background:#dcfce7;color:#15803d;padding:2px 8px;border-radius:999px;font-size:10.5px;font-weight:700;">✓ Ficha Verificada</span>`;
     }
 
@@ -1414,12 +1414,12 @@ function openLeadDrawer(lead) {
     }
     const webScoreEl = document.getElementById("drawer-web-score");
     if (webScoreEl) {
-        webScoreEl.textContent = `🌐 Web: ${wScore}`;
+        webScoreEl.textContent = `Web: ${wScore}`;
         webScoreEl.className = "tl-badge-score " + (wScore >= 74 ? "tl-score-high" : (wScore < 45 ? "tl-score-low" : "tl-score-med"));
     }
     const autoScoreEl = document.getElementById("drawer-auto-score");
     if (autoScoreEl) {
-        autoScoreEl.textContent = `🤖 Bot IA: ${aScore}`;
+        autoScoreEl.textContent = `Bot IA: ${aScore}`;
         autoScoreEl.className = "tl-badge-score " + (aScore >= 72 ? "tl-score-high" : (aScore < 45 ? "tl-score-low" : "tl-score-med"));
     }
 
@@ -1438,14 +1438,14 @@ function openLeadDrawer(lead) {
     const psVal = document.getElementById("drawer-pagespeed-val");
     if (psVal) {
         if (!lead.website || ws.status === "none") {
-            psVal.innerHTML = `<span style="color:#ef4444;font-weight:800;">⚡ Sin sitio web propio</span>`;
+            psVal.innerHTML = `<span style="color:#ef4444;font-weight:800;display:inline-flex;align-items:center;gap:4px;">${atqIcon("globeOff", 12)} Sin sitio web propio</span>`;
         } else if (ws.status === "social_link" || ws.status === "broken") {
             psVal.innerHTML = `<strong style="color:${ws.color};">${escapeHtml(ws.label)}</strong>`;
         } else if (typeof lead.pagespeed_mobile === "number") {
             const c = lead.pagespeed_mobile >= 75 ? "#10b981" : (lead.pagespeed_mobile >= 50 ? "#f59e0b" : "#ef4444");
             psVal.innerHTML = `<strong style="color:${c};">${lead.pagespeed_mobile}/100 Móvil</strong> <small style="color:var(--text-muted);">(SEO: ${lead.pagespeed_seo || "-"} · LCP: ${escapeHtml(lead.pagespeed_lcp || "N/A")})</small>`;
         } else {
-            psVal.innerHTML = `<span style="color:${ws.color};font-weight:700;">${escapeHtml(ws.label)}</span> <small style="color:var(--text-muted);">· Clic en ⚡ Auditar</small>`;
+            psVal.innerHTML = `<span style="color:${ws.color};font-weight:700;">${escapeHtml(ws.label)}</span> <small style="color:var(--text-muted);">· Clic en Auditar</small>`;
         }
     }
 
@@ -1459,10 +1459,10 @@ function openLeadDrawer(lead) {
                 : "";
             const safeAuditUrl = safeExternalUrl(lead.cloud_audit_url);
             telemEl.innerHTML = v > 0
-                ? `<strong style="color:#ea580c;">🔥 Abierto ${v}x${escapeHtml(ago)}</strong> · <a href="${safeAuditUrl}" target="_blank" rel="noopener noreferrer" style="color:#3b82f6;">Ver link ↗</a>`
+                ? `<strong style="color:#ea580c;display:inline-flex;align-items:center;gap:4px;">${atqIcon("activity", 12)} Abierto ${v}x${escapeHtml(ago)}</strong> · <a href="${safeAuditUrl}" target="_blank" rel="noopener noreferrer" style="color:#3b82f6;">Ver link ↗</a>`
                 : `<span style="color:#64748b;">Publicado (0 aperturas aún)</span> · <a href="${safeAuditUrl}" target="_blank" rel="noopener noreferrer" style="color:#3b82f6;">Abrir ↗</a>`;
         } else {
-            telemEl.textContent = "Sin publicar aún (Clic en 🌐 Link + Demo Cloud)";
+            telemEl.textContent = "Sin publicar aún (Clic en Link + Demo Cloud)";
         }
     }
 
@@ -1479,7 +1479,7 @@ function openLeadDrawer(lead) {
                     ? `<span style="color:#10b981;font-weight:700;">✓ Web</span>`
                     : `<span style="color:#ef4444;">Sin Web</span>`;
                 const botTag = c.hasAuto
-                    ? `<span style="color:#3b82f6;font-weight:700;">🤖 Bot/Agenda</span>`
+                    ? `<span style="color:#3b82f6;font-weight:700;display:inline-flex;align-items:center;gap:3px;">${atqIcon("cpu", 10)} Bot/Agenda</span>`
                     : `<span style="color:#94a3b8;">Manual</span>`;
                 return `<div style="display:flex;justify-content:space-between;align-items:center;gap:6px;padding:5px 8px;background:var(--bg-main);border:1px solid var(--border-color);border-radius:6px;">`
                     + `<div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><strong>#${c.pos} ${escapeHtml(c.name)}</strong> <small style="color:var(--text-muted);">(${escapeHtml(c.distStr)})</small></div>`
@@ -1548,8 +1548,8 @@ function openLeadDrawer(lead) {
         if (lead.email) {
             if (lead.mx_status === "valid") {
                 const dmarcHtml = lead.dmarc_status === "present"
-                    ? ` <span class="tl-mx-badge valid" title="SPF: ${escapeHtml(lead.spf_status)} · DMARC Activo">🛡️ DMARC</span>`
-                    : (lead.dmarc_status === "missing" ? ` <span class="tl-mx-badge invalid" title="Sin política DMARC anti-spoofing">⚠ Sin DMARC</span>` : "");
+                    ? ` <span class="tl-mx-badge valid" title="SPF: ${escapeHtml(lead.spf_status)} · DMARC Activo">DMARC</span>`
+                    : (lead.dmarc_status === "missing" ? ` <span class="tl-mx-badge invalid" title="Sin política DMARC anti-spoofing">Sin DMARC</span>` : "");
                 mxSpan.innerHTML = `<span class="tl-mx-badge valid">${escapeHtml(lead.mx_provider || "MX Activo")}</span>${dmarcHtml}`;
             } else if (lead.mx_status === "invalid") {
                 mxSpan.innerHTML = `<span class="tl-mx-badge invalid">${escapeHtml(lead.mx_provider || "Sin MX")}</span>`;
@@ -1557,9 +1557,9 @@ function openLeadDrawer(lead) {
                 const checkBtn = document.createElement("button");
                 checkBtn.type = "button";
                 checkBtn.style.cssText = "font-size:10px;padding:2px 6px;border-radius:4px;border:1px solid #cbd5e1;background:transparent;color:inherit;cursor:pointer;";
-                checkBtn.textContent = "🛡️ Auditar MX/DMARC";
+                checkBtn.textContent = "Auditar MX/DMARC";
                 checkBtn.addEventListener("click", async () => {
-                    checkBtn.textContent = "⏳...";
+                    checkBtn.textContent = "Auditando...";
                     checkBtn.disabled = true;
                     const res = await verifyDomainMx(lead.email);
                     lead.mx_status = res.valid ? "valid" : "invalid";
@@ -1626,7 +1626,7 @@ function openLeadDrawer(lead) {
         updatePitchPreview();
     } else {
         document.getElementById("drawer-pitch-text").textContent =
-            "Haz clic en '✨ Ejecutar Estrategia Profunda con Gemini 2.5 / Nano IA' para generar un análisis B2B a medida.";
+            "Haz clic en 'Ejecutar Estrategia Profunda con Gemini 2.5 / Nano IA' para generar un análisis B2B a medida.";
     }
 
     if (overlay) overlay.classList.add("open");
@@ -1710,7 +1710,7 @@ function startSpeedOutreach() {
 
 function renderSpeedLead() {
     if (speedIndex >= speedQueue.length) {
-        alert("🎉 ¡Sesión completada! Todos los prospectos de la cola fueron procesados.");
+        alert("Sesión completada: todos los prospectos de la cola fueron procesados.");
         closeSpeedOutreach();
         applyFilters();
         return;
@@ -1726,8 +1726,8 @@ function renderSpeedLead() {
     document.getElementById("speed-progress-fill").style.width = `${Math.round((speedIndex / total) * 100)}%`;
     document.getElementById("speed-lead-name").textContent = `${lead.name || "Empresa"} · ${stepLabel}`;
 
-    const distStr = lead.distanceKm ? ` · 📍 ${lead.distanceKm < 1 ? Math.round(lead.distanceKm * 1000) + "m" : lead.distanceKm + "km"}` : "";
-    const offerStr = lead.recommended_offer ? ` · 🎯 ${lead.recommended_offer}` : "";
+    const distStr = lead.distanceKm ? ` · ${lead.distanceKm < 1 ? Math.round(lead.distanceKm * 1000) + "m" : lead.distanceKm + "km"}` : "";
+    const offerStr = lead.recommended_offer ? ` · ${lead.recommended_offer}` : "";
     document.getElementById("speed-lead-meta").textContent = `${lead.category || "General"}${distStr}${offerStr}`;
 
     const score = parseInt(lead.lead_score, 10) || 50;
@@ -1770,22 +1770,22 @@ async function refreshAllAuditOpens(silent = false) {
         const publishedLeads = allLeads.filter(l => Boolean(l.cloud_audit_url));
         if (!edgeUrl) {
             if (!silent) {
-                alert("Configura la URL de tu Cloudflare Edge Worker en ⚙️ Ajustes para rastrear en tiempo real quién abre tus propuestas.");
+                alert("Configura la URL de tu Cloudflare Edge Worker en Ajustes para rastrear en tiempo real quién abre tus propuestas.");
             }
             return;
         }
         if (publishedLeads.length === 0) {
             if (!silent) {
-                alert("Aún no has generado links de propuesta con tracking (botón '🌐 Link + Demo Cloud' en el inspector 360° de un prospecto).");
+                alert("Aún no has generado links de propuesta con tracking (botón 'Link + Demo Cloud' en el inspector 360° de un prospecto).");
             }
             return;
         }
 
         const btn = document.getElementById("btn-refresh-audit-opens");
-        const origText = btn ? btn.textContent : "🔥 Radar Aperturas";
+        const origHtml = btn ? btn.innerHTML : `${atqIcon("activity", 13)} Radar Aperturas`;
         if (btn && !silent) {
             btn.disabled = true;
-            btn.textContent = "⏳ Consultando...";
+            btn.innerHTML = `${atqIcon("clock", 13)} Consultando...`;
         }
 
         let hotCount = 0;
@@ -1811,10 +1811,10 @@ async function refreshAllAuditOpens(silent = false) {
         if (activeLeadForDrawer) openLeadDrawer(activeLeadForDrawer);
 
         if (btn && !silent) {
-            btn.textContent = `🔥 ${hotCount} Abiertos`;
+            btn.innerHTML = `${atqIcon("activity", 13)} ${hotCount} Abiertos`;
             playAudioNotification("success");
             setTimeout(() => {
-                btn.textContent = origText;
+                btn.innerHTML = origHtml;
                 btn.disabled = false;
             }, 2600);
         }
@@ -1848,14 +1848,14 @@ function openClientDemoModal(lead) {
         if (el) el.textContent = val;
     };
 
-    setTxt("demo-modal-title", `✨ Prototipo Comercial: ${name}`);
+    setTxt("demo-modal-title", `Prototipo Comercial: ${name}`);
     setTxt("demo-modal-subtitle", `Oferta recomendada: ${lead.recommended_offer || "Web + Agente IA 24/7"} (${lead.suggested_ticket || ""})`);
     setTxt("demo-site-pill", `★ ${lead.averageRating || "4.9"} en Google · ${lead.category || econ.verticalLabel}`);
     setTxt("demo-leak-pill", `Recupera ~$${econ.monthlyLeakUsd.toLocaleString("en-US")}/mes`);
     setTxt("demo-site-headline", `${name}: ${econ.heroHeadline}`);
-    setTxt("demo-site-desc", `📍 ${lead.address || "Tu ciudad"} · ${lead.phone || "WhatsApp 24/7"}. Embudo móvil de alta conversión conectado a recepción inteligente.`);
-    setTxt("demo-bot-role-box", `🤖 ${econ.botRole}`);
-    setTxt("demo-bot-header-name", `🤖 Asistente IA · ${name}`);
+    setTxt("demo-site-desc", `${lead.address || "Tu ciudad"} · ${lead.phone || "WhatsApp 24/7"}. Embudo móvil de alta conversión conectado a recepción inteligente.`);
+    setTxt("demo-bot-role-box", `${econ.botRole}`);
+    setTxt("demo-bot-header-name", `Asistente IA · ${name}`);
 
     const chatBox = document.getElementById("demo-chat-messages");
     if (chatBox) chatBox.innerHTML = "";
@@ -1891,10 +1891,10 @@ async function verifyAllLeadsMx() {
     }
 
     const btn = document.getElementById("btn-verify-all-emails");
-    const originalText = btn ? btn.textContent : "🛡️ Auditar DNS/DMARC";
+    const originalHtml = btn ? btn.innerHTML : `${atqIcon("shield", 13)} Auditar DNS/DMARC`;
     if (btn) {
         btn.disabled = true;
-        btn.textContent = `⏳ Auditando 0/${emailLeads.length}...`;
+        btn.innerHTML = `${atqIcon("clock", 13)} Auditando 0/${emailLeads.length}...`;
     }
 
     // Concurrent batches of 5 domains (Cloudflare DoH caches domain hits automatically)
@@ -1910,7 +1910,7 @@ async function verifyAllLeadsMx() {
             lead.dmarc_status = res.dmarc;
             normalizeLeadRecord(lead);
             completed++;
-            if (btn) btn.textContent = `⏳ Auditando ${completed}/${emailLeads.length}...`;
+            if (btn) btn.innerHTML = `${atqIcon("clock", 13)} Auditando ${completed}/${emailLeads.length}...`;
         }));
     }
 
@@ -1919,9 +1919,9 @@ async function verifyAllLeadsMx() {
     if (activeViewId === "analytics") renderAnalyticsBiCharts(currentFilteredLeads);
 
     if (btn) {
-        btn.textContent = "✅ DNS/DMARC Auditados";
+        btn.innerHTML = `${atqIcon("check", 13)} DNS/DMARC Auditados`;
         setTimeout(() => {
-            btn.textContent = originalText;
+            btn.innerHTML = originalHtml;
             btn.disabled = false;
         }, 2500);
     }
@@ -1950,7 +1950,9 @@ function setTheme(theme) {
 
     const toggleBtn = document.getElementById("btn-toggle-theme");
     if (toggleBtn) {
-        toggleBtn.textContent = theme === "dark" ? "☀️ Modo Claro" : "🌙 Modo Oscuro";
+        toggleBtn.innerHTML = theme === "dark"
+            ? `${atqIcon("sun", 14)} <span>Modo Claro</span>`
+            : `${atqIcon("moon", 14)} <span>Modo Oscuro</span>`;
     }
 
     if (leafletMap) setMapTileLayer(theme);
@@ -2088,9 +2090,9 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
         const btn = document.getElementById("btn-audit-pagespeed");
-        const orig = btn.textContent;
+        const origHtml = btn.innerHTML;
         btn.disabled = true;
-        btn.textContent = "⏳ Midiendo Core Web Vitals...";
+        btn.innerHTML = `${atqIcon("clock", 12)} Midiendo Core Web Vitals...`;
         try {
             const report = await auditWebsitePageSpeed(activeLeadForDrawer.website);
             activeLeadForDrawer.pagespeed_mobile = report.performance;
@@ -2104,7 +2106,7 @@ document.addEventListener("DOMContentLoaded", () => {
         } catch (err) {
             alert("No se pudo completar PageSpeed Insights: " + err.message);
         } finally {
-            btn.textContent = orig;
+            btn.innerHTML = origHtml;
             btn.disabled = false;
         }
     });
@@ -2122,7 +2124,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (geminiControls) geminiControls.style.display = "block";
                 if (standardActions) standardActions.style.display = "flex";
                 document.getElementById("drawer-pitch-text").textContent =
-                    "Haz clic en '✨ Ejecutar Estrategia Profunda con Gemini 2.5 / Nano IA' para sintetizar vulnerabilidades, pérdida mensual estimada y secuencia de cierre.";
+                    "Haz clic en 'Ejecutar Estrategia Profunda con Gemini 2.5 / Nano IA' para sintetizar vulnerabilidades, pérdida mensual estimada y secuencia de cierre.";
             } else {
                 if (geminiControls) geminiControls.style.display = "none";
                 if (standardActions) standardActions.style.display = "flex";
@@ -2136,8 +2138,8 @@ document.addEventListener("DOMContentLoaded", () => {
         storageAdapter.get(["tl_gemini_key"], async (data) => {
             const apiKey = data.tl_gemini_key || "";
             const btn = document.getElementById("btn-ai-generate-pitch");
-            const originalText = btn.textContent;
-            btn.textContent = "⏳ Analizando huella OSINT con Gemini 2.5...";
+            const originalHtml = btn.innerHTML;
+            btn.innerHTML = `${atqIcon("clock", 13)} Analizando huella OSINT con Gemini 2.5...`;
             btn.disabled = true;
 
             try {
@@ -2156,7 +2158,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 document.getElementById("settings-modal")?.classList.add("open");
                 document.getElementById("tl-modal-backdrop")?.classList.add("open");
             } finally {
-                btn.textContent = originalText;
+                btn.innerHTML = originalHtml;
                 btn.disabled = false;
             }
         });
@@ -2167,8 +2169,9 @@ document.addEventListener("DOMContentLoaded", () => {
         navigator.clipboard.writeText(text).then(() => {
             const btn = document.getElementById("btn-copy-pitch");
             if (btn) {
-                btn.textContent = "✅ ¡Guión Copiado!";
-                setTimeout(() => { btn.textContent = "📋 Copiar Guión"; }, 2000);
+                const origHtml = btn.innerHTML;
+                btn.innerHTML = `${atqIcon("check", 13)} Guión Copiado`;
+                setTimeout(() => { btn.innerHTML = origHtml; }, 2000);
             }
         });
     });
@@ -2199,15 +2202,15 @@ document.addEventListener("DOMContentLoaded", () => {
         storageAdapter.get(["tl_edge_worker_url"], async (cfg) => {
             const edgeUrl = (cfg.tl_edge_worker_url || "").trim();
             if (!edgeUrl) {
-                alert("Configura primero la URL de tu Cloudflare Edge Worker en ⚙️ Ajustes para publicar micrositios con Demo IA + tracking de apertura en tiempo real.");
+                alert("Configura primero la URL de tu Cloudflare Edge Worker en Ajustes para publicar micrositios con Demo IA + tracking de apertura en tiempo real.");
                 document.getElementById("settings-modal")?.classList.add("open");
                 document.getElementById("tl-modal-backdrop")?.classList.add("open");
                 return;
             }
-            const orig = triggerBtn ? triggerBtn.textContent : "";
+            const origHtml = triggerBtn ? triggerBtn.innerHTML : "";
             if (triggerBtn) {
                 triggerBtn.disabled = true;
-                triggerBtn.textContent = "⏳ Publicando...";
+                triggerBtn.innerHTML = `${atqIcon("clock", 13)} Publicando...`;
             }
             try {
                 const bench = computeQuadrantTop3Benchmark(targetLead, allLeads);
@@ -2220,12 +2223,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (activeLeadForDrawer === targetLead) openLeadDrawer(targetLead);
                 await navigator.clipboard.writeText(pub.auditUrl).catch(() => {});
                 playAudioNotification("success");
-                alert(`✅ Propuesta + Demo IA publicada y copiada al portapapeles:\n\n${pub.auditUrl}\n\nEnvíala por WhatsApp o Email: el botón '🔥 Radar Aperturas' te avisará apenas el dueño la abra.`);
+                alert(`Propuesta + Demo IA publicada y copiada al portapapeles:\n\n${pub.auditUrl}\n\nEnvíala por WhatsApp o Email: el botón 'Radar Aperturas' te avisará apenas el dueño la abra.`);
             } catch (err) {
                 alert("Error al publicar auditoría: " + err.message);
             } finally {
                 if (triggerBtn) {
-                    triggerBtn.textContent = orig;
+                    triggerBtn.innerHTML = origHtml;
                     triggerBtn.disabled = false;
                 }
             }
@@ -2256,19 +2259,19 @@ document.addEventListener("DOMContentLoaded", () => {
         const econ = estimateNicheRevenueLeak(lead);
         const simType = chip.getAttribute("data-sim");
         if (simType === "book") {
-            appendDemoChatBubble("user", "📅 Quiero agendar un turno para mañana");
+            appendDemoChatBubble("user", "Quiero agendar un turno para mañana");
             setTimeout(() => {
-                appendDemoChatBubble("bot", `¡Excelente! ✅ En ${lead.name || "nuestro centro"} tengo cupo disponible mañana a las 10:30 AM o 4:00 PM. ¿Cuál prefieres para bloquearte en agenda y enviarte recordatorio automático por WhatsApp?`);
+                appendDemoChatBubble("bot", `Excelente. En ${lead.name || "nuestro centro"} tengo cupo disponible mañana a las 10:30 AM o 4:00 PM. ¿Cuál prefieres para bloquearte en agenda y enviarte recordatorio automático por WhatsApp?`);
             }, 260);
         } else if (simType === "price") {
-            appendDemoChatBubble("user", "💰 ¿Cuáles son sus precios y promociones?");
+            appendDemoChatBubble("user", "¿Cuáles son sus precios y promociones?");
             setTimeout(() => {
-                appendDemoChatBubble("bot", `¡Con gusto! 📋 Nuestro servicio promedio parte desde referencias competitivas en ${econ.verticalLabel} con beneficio exclusivo por reserva directa web (0% comisiones de apps). ¿Te envío el catálogo interactivo aquí mismo?`);
+                appendDemoChatBubble("bot", `Con gusto. Nuestro servicio promedio parte desde referencias competitivas en ${econ.verticalLabel} con beneficio exclusivo por reserva directa web (0% comisiones de apps). ¿Te envío el catálogo interactivo aquí mismo?`);
             }, 260);
         } else {
-            appendDemoChatBubble("user", "🌙 Hola, escribo a las 11:15 PM, ¿siguen atendiendo?");
+            appendDemoChatBubble("user", "Hola, escribo a las 11:15 PM, ¿siguen atendiendo?");
             setTimeout(() => {
-                appendDemoChatBubble("bot", `¡Hola! 👋 Nuestro local físico descansa a esta hora, pero soy la Recepcionista IA 24/7 de ${lead.name || "la empresa"}. Puedo responder tus dudas y dejarte confirmado ahora mismo en 30 segundos sin esperar a mañana.`);
+                appendDemoChatBubble("bot", `Hola. Nuestro local físico descansa a esta hora, pero soy la Recepcionista IA 24/7 de ${lead.name || "la empresa"}. Puedo responder tus dudas y dejarte confirmado ahora mismo en 30 segundos sin esperar a mañana.`);
             }, 260);
         }
     });
@@ -2329,7 +2332,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 populateNicheDropdown();
                 applyFilters();
                 playAudioNotification("success");
-                alert(`✅ Importación completada: ${added} prospectos nuevos añadidos (${allLeads.length} totales en AtlasDB).`);
+                alert(`Importación completada: ${added} prospectos nuevos añadidos (${allLeads.length} totales en AtlasDB).`);
             } catch (err) {
                 alert("Error al importar JSON: " + err.message);
             } finally {
@@ -2344,7 +2347,7 @@ document.addEventListener("DOMContentLoaded", () => {
         storageAdapter.get(["tl_webhook_url"], async (data) => {
             const webhookUrl = data.tl_webhook_url;
             if (!webhookUrl) {
-                alert("Configura primero la URL de tu Webhook (n8n, Make, Zapier, GoHighLevel, HubSpot) en ⚙️ Ajustes.");
+                alert("Configura primero la URL de tu Webhook (n8n, Make, Zapier, GoHighLevel, HubSpot) en Ajustes.");
                 document.getElementById("settings-modal")?.classList.add("open");
                 document.getElementById("tl-modal-backdrop")?.classList.add("open");
                 return;
@@ -2355,17 +2358,17 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
             const btn = document.getElementById("btn-sync-webhook");
-            const orig = btn.textContent;
-            btn.textContent = "⏳ Sincronizando...";
+            const origHtml = btn.innerHTML;
+            btn.innerHTML = `${atqIcon("clock", 13)} Sincronizando...`;
             btn.disabled = true;
             try {
                 await sendLeadsToWebhook(webhookUrl, leadsToSync);
-                btn.textContent = "✅ ¡Sincronizado!";
+                btn.innerHTML = `${atqIcon("check", 13)} Sincronizado`;
                 playAudioNotification("success");
-                setTimeout(() => { btn.textContent = orig; btn.disabled = false; }, 2500);
+                setTimeout(() => { btn.innerHTML = origHtml; btn.disabled = false; }, 2500);
             } catch (err) {
                 alert("Error al sincronizar con Webhook: " + err.message);
-                btn.textContent = orig;
+                btn.innerHTML = origHtml;
                 btn.disabled = false;
             }
         });

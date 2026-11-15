@@ -85,6 +85,10 @@
             background: transparent;
             color: var(--text-sub);
             transition: all 0.15s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
         }
         .mode-tab.active {
             background: var(--primary);
@@ -170,7 +174,10 @@
 </head>
 <body>
     <div class="header">
-        <div class="brand">🌐 Atlas<span>IQ</span></div>
+        <div class="brand">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
+            Atlas<span>IQ</span>
+        </div>
         <span class="badge">v4.0 EXTREME</span>
     </div>
 
@@ -182,10 +189,12 @@
             </div>
             <div style="display:flex;gap:6px;">
                 <button id="open-sidepanel-btn" class="btn btn-outline" style="width:auto;height:31px;padding:0 9px;font-size:11px;" title="Abrir Copilot lateral">
-                    🧭 Copilot
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+                    Copilot
                 </button>
                 <button id="open-crm-btn" class="btn btn-primary" style="width:auto;height:31px;padding:0 11px;font-size:11.5px;">
-                    📊 CRM
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                    CRM
                 </button>
             </div>
         </div>
@@ -193,43 +202,52 @@
         <div class="card">
             <div class="card-title">1. Punto de Referencia para Scrapeo</div>
             <div class="mode-tabs">
-                <button type="button" class="mode-tab active" id="mode-gps-btn">📍 1. Mi Ubicación</button>
-                <button type="button" class="mode-tab" id="mode-city-btn">🌍 2. Otra Ciudad</button>
+                <button type="button" class="mode-tab active" id="mode-gps-btn">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                    1. Mi Ubicación
+                </button>
+                <button type="button" class="mode-tab" id="mode-city-btn">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
+                    2. Otra Ciudad
+                </button>
             </div>
 
             <div class="gps-strip" id="gps-status-strip">
-                <span id="gps-status-text">📍 Detectando tu ubicación actual...</span>
+                <span id="gps-status-text" style="display:inline-flex;align-items:center;gap:5px;">Detectando tu ubicación actual...</span>
                 <button type="button" class="gps-refresh" id="btn-refresh-gps" title="Actualizar GPS exacto">↻ GPS</button>
             </div>
 
             <input type="text" id="query-input" class="input" placeholder="¿Qué buscas cerca de ti? Ej: Clínicas dentales" value="Clínicas dentales" />
 
             <div class="chips">
-                <span class="chip" data-niche="Clínicas dentales">🦷 Clínicas</span>
-                <span class="chip" data-niche="Restaurantes">🍽 Restaurantes</span>
-                <span class="chip" data-niche="Inmobiliarias">🏢 Inmobiliarias</span>
-                <span class="chip" data-niche="Gimnasios">🏋️ Gimnasios</span>
+                <span class="chip" data-niche="Clínicas dentales">Clínicas</span>
+                <span class="chip" data-niche="Restaurantes">Restaurantes</span>
+                <span class="chip" data-niche="Inmobiliarias">Inmobiliarias</span>
+                <span class="chip" data-niche="Gimnasios">Gimnasios</span>
             </div>
 
             <select id="popup-grid-select" class="select">
-                <option value="single" data-zoom="15" selected>📍 Zona Inmediata (~2 km · Estándar)</option>
-                <option value="2x2" data-zoom="14">🧭 Radio Urbano (~5 km · Malla 2×2)</option>
-                <option value="3x3" data-zoom="13">🌐 Radio Ciudad (~10 km · Malla H3 3×3)</option>
-                <option value="4x4" data-zoom="13">🚀 Radio Metropolitano (~16 km · Malla 4×4)</option>
+                <option value="single" data-zoom="15" selected>Zona Inmediata (~2 km · Estándar)</option>
+                <option value="2x2" data-zoom="14">Radio Urbano (~5 km · Malla 2×2)</option>
+                <option value="3x3" data-zoom="13">Radio Ciudad (~10 km · Malla H3 3×3)</option>
+                <option value="4x4" data-zoom="13">Radio Metropolitano (~16 km · Malla 4×4)</option>
             </select>
 
             <label class="auto-row">
                 <input type="checkbox" id="popup-autostart" checked />
-                <span>⚡ Iniciar scrapeo automático al abrir el mapa</span>
+                <span>Iniciar scrapeo automático al abrir el mapa</span>
             </label>
 
-            <button id="search-btn" class="btn btn-success">📍 Escanear desde Mi Ubicación Actual</button>
+            <button id="search-btn" class="btn btn-success">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                Escanear desde Mi Ubicación Actual
+            </button>
         </div>
 
         <div class="stats-card" id="popup-license-card">
             <div>
                 <div class="stats-label">Seguridad ECDSA P-256</div>
-                <div id="popup-license-status" style="font-size: 12px; font-weight: 800; color: var(--text-sub);">Verificando...</div>
+                <div id="popup-license-status" style="font-size: 12px; font-weight: 800; color: var(--text-sub); display: inline-flex; align-items: center; gap: 5px;">Verificando...</div>
             </div>
             <button id="btn-popup-license-open" class="btn btn-outline" style="width: auto; height: 28px; padding: 0 10px; font-size: 11px;">
                 Gestionar
@@ -238,7 +256,7 @@
     </div>
 
     <div class="footer">
-        <a href="index.html" target="_blank" style="color: var(--primary); text-decoration: none; font-weight: 700;">📖 Manual Oficial</a> ·
+        <a href="index.html" target="_blank" style="color: var(--primary); text-decoration: none; font-weight: 700;">Manual Oficial</a> ·
         <strong>Joseph Castillo (CEO)</strong> · <strong>WINDOWSTELECOM</strong>
     </div>
 

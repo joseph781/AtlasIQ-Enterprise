@@ -26,15 +26,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function renderGpsStatus(loc) {
         if (!loc || !loc.lat || !loc.lon) {
-            gpsText.textContent = "⚠️ Ubicación pendiente — pulsa ↻ GPS";
+            gpsText.innerHTML = `${atqIcon("alert", 12)} <span>Ubicación pendiente — pulsa ↻ GPS</span>`;
             return;
         }
-        const tag = loc.source === "gps" ? "GPS Exacto" : (loc.city || "Ubicación IP");
-        gpsText.textContent = `📍 Punto Cero: ${Number(loc.lat).toFixed(4)}, ${Number(loc.lon).toFixed(4)} (${tag})`;
+        const tag = escapeHtml(loc.source === "gps" ? "GPS Exacto" : (loc.city || "Ubicación IP"));
+        gpsText.innerHTML = `${atqIcon("mapPin", 12)} <span>Punto Cero: ${Number(loc.lat).toFixed(4)}, ${Number(loc.lon).toFixed(4)} (${tag})</span>`;
     }
 
     function acquireLocation(highAccuracy = true) {
-        gpsText.textContent = "⏳ Obteniendo coordenadas de referencia...";
+        gpsText.innerHTML = `${atqIcon("clock", 12)} <span>Obteniendo coordenadas de referencia...</span>`;
         if (typeof detectUserLocation === "function") {
             detectUserLocation((loc) => {
                 if (loc && loc.lat && loc.lon) {
@@ -64,7 +64,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if (/^.+ en $/i.test(searchInput.value) || searchInput.value === "Clínicas dentales en Madrid") {
                 searchInput.value = searchInput.value.replace(/\s+en(\s+Madrid)?$/i, "").trim() || "Clínicas dentales";
             }
-            searchBtn.textContent = "📍 Escanear desde Mi Ubicación Actual";
+            searchBtn.innerHTML = `${atqIcon("mapPin", 14)} Escanear desde Mi Ubicación Actual`;
             searchBtn.className = "btn btn-success";
         } else {
             modeCityBtn.classList.add("active");
@@ -74,7 +74,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if (searchInput.value === "Clínicas dentales") {
                 searchInput.value = "Clínicas dentales en Madrid";
             }
-            searchBtn.textContent = "🌍 Lanzar Scrapeo en Ciudad Indicada";
+            searchBtn.innerHTML = `${atqIcon("globe", 14)} Lanzar Scrapeo en Ciudad Indicada`;
             searchBtn.className = "btn btn-primary";
         }
     }
@@ -113,7 +113,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (referenceMode === "gps") {
             searchBtn.disabled = true;
-            searchBtn.textContent = "⏳ Fijando tu ubicación...";
+            searchBtn.innerHTML = `${atqIcon("clock", 14)} Fijando tu ubicación...`;
 
             if (!currentCoords || !currentCoords.lat || !currentCoords.lon) {
                 await new Promise((resolve) => {
@@ -189,11 +189,11 @@ document.addEventListener("DOMContentLoaded", () => {
             const btnEl = document.getElementById("btn-popup-license-open");
             if (statusEl) {
                 if (lic.active) {
-                    statusEl.textContent = `🛡️ ECDSA Activa (${lic.daysRemaining}d)`;
+                    statusEl.innerHTML = `${atqIcon("shield", 13)} <span>ECDSA Activa (${lic.daysRemaining}d)</span>`;
                     statusEl.style.color = "#10b981";
                     if (btnEl) btnEl.textContent = "Ver";
                 } else {
-                    statusEl.textContent = "⚠️ Activación Requerida";
+                    statusEl.innerHTML = `${atqIcon("alert", 13)} <span>Activación Requerida</span>`;
                     statusEl.style.color = "#ef4444";
                     if (btnEl) {
                         btnEl.textContent = "Activar";

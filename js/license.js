@@ -294,15 +294,17 @@ async function initLicenseUi() {
 
     const badgeEl = document.getElementById("header-license-badge");
     const badgeText = document.getElementById("header-license-text");
+    const shieldSvg = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>';
+    const alertSvg = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em;"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg>';
 
     if (badgeEl && badgeText) {
         if (status.active) {
             badgeEl.className = "tl-license-badge active";
-            badgeText.textContent = `🛡️ ECDSA Activa (${status.daysRemaining}d)`;
+            badgeText.innerHTML = `${shieldSvg} <span>ECDSA Activa (${Number(status.daysRemaining) || 1}d)</span>`;
             badgeEl.title = `Licencia verificada para ${status.clientName}. Expira: ${status.expiresDate}`;
         } else {
             badgeEl.className = "tl-license-badge expired";
-            badgeText.textContent = "⚠️ Activar Licencia";
+            badgeText.innerHTML = `${alertSvg} <span>Activar Licencia</span>`;
             badgeEl.title = status.reason || "Haz clic para activar";
         }
         badgeEl.onclick = () => openLicenseModal(false);
@@ -313,10 +315,11 @@ async function initLicenseUi() {
 
     const btnCopyDevId = document.getElementById("btn-copy-device-id");
     if (btnCopyDevId) {
+        const origCopyHtml = btnCopyDevId.innerHTML;
         btnCopyDevId.onclick = () => {
             navigator.clipboard.writeText(devId).then(() => {
-                btnCopyDevId.textContent = "✅ ¡Copiado!";
-                setTimeout(() => { btnCopyDevId.textContent = "📋 Copiar ID"; }, 2000);
+                btnCopyDevId.textContent = "✓ ID Copiado";
+                setTimeout(() => { btnCopyDevId.innerHTML = origCopyHtml; }, 2000);
             });
         };
     }
@@ -324,7 +327,7 @@ async function initLicenseUi() {
     const waLink = document.getElementById("link-whatsapp-license");
     if (waLink) {
         const msg = encodeURIComponent(
-            `Hola Joseph / WINDOWSTELECOM 👋\n\nYa leí toda la información y beneficios en la página principal de AtlasIQ Enterprise (https://atlasiq.windowstelecom.com/) e instalé la extensión en mi PC.\n\nSolicito información de planes y mi código de activación ATQ4.\n\n🛡️ Mi ID de Dispositivo es: ${devId}`
+            `Hola Joseph / WINDOWSTELECOM.\n\nYa revisé toda la información y beneficios en la página principal de AtlasIQ Enterprise (https://atlasiq.windowstelecom.com/) e instalé la extensión en mi equipo.\n\nSolicito información de planes y mi código de activación ATQ4.\n\n• ID de Dispositivo: ${devId}`
         );
         waLink.href = `${ATLASIQ_SUPPORT_WA}?text=${msg}`;
     }
@@ -334,6 +337,7 @@ async function initLicenseUi() {
     const alertBox = document.getElementById("license-alert-msg");
 
     if (btnActivate && inputKey) {
+        const origActivateHtml = btnActivate.innerHTML;
         btnActivate.onclick = async () => {
             const keyVal = inputKey.value.trim();
             if (!keyVal) {
@@ -346,12 +350,12 @@ async function initLicenseUi() {
             }
 
             btnActivate.disabled = true;
-            btnActivate.textContent = "⏳ Verificando firma ECDSA...";
+            btnActivate.textContent = "Verificando firma ECDSA P-256...";
 
             const res = await activateLicenseKey(keyVal);
 
             btnActivate.disabled = false;
-            btnActivate.textContent = "🚀 Activar Licencia ECDSA";
+            btnActivate.innerHTML = origActivateHtml;
 
             if (alertBox) {
                 alertBox.style.display = "block";
@@ -361,7 +365,7 @@ async function initLicenseUi() {
                     if (typeof playAudioNotification === "function") playAudioNotification("success");
                     if (badgeEl && badgeText) {
                         badgeEl.className = "tl-license-badge active";
-                        badgeText.textContent = `🛡️ ECDSA Activa (${res.details.daysRemaining}d)`;
+                        badgeText.innerHTML = `${shieldSvg} <span>ECDSA Activa (${Number(res.details.daysRemaining) || 1}d)</span>`;
                     }
                     setTimeout(() => closeLicenseModal(), 2000);
                 }

@@ -231,8 +231,25 @@ body {
 }
 
 .tl-kpi-icon {
-    font-size: 16px;
-    color: var(--text-muted);
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: var(--primary-light);
+    color: var(--primary);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.tl-kpi-icon.emerald {
+    background: var(--success-light);
+    color: var(--success);
+}
+
+.tl-kpi-icon.amber {
+    background: var(--warning-light);
+    color: var(--warning);
 }
 
 .tl-kpi-value {
@@ -298,7 +315,9 @@ body {
     top: 50%;
     transform: translateY(-50%);
     color: var(--text-muted);
-    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    pointer-events: none;
 }
 
 .tl-filter-chips {
@@ -318,6 +337,9 @@ body {
     border: 1px solid var(--border-color);
     cursor: pointer;
     transition: all 0.15s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
 }
 
 .tl-chip:hover {

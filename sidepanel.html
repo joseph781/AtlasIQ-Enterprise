@@ -47,7 +47,7 @@
         .btn-outline { background: transparent; color: var(--text); border: 1px solid var(--border); width: 100%; }
         .btn-red { background: #ef4444; width: 100%; display: none; }
         .chips { display: flex; gap: 5px; flex-wrap: wrap; }
-        .chip { font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 99px; border: 1px solid var(--border); background: var(--card); color: var(--sub); cursor: pointer; }
+        .chip { font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 99px; border: 1px solid var(--border); background: var(--card); color: var(--sub); cursor: pointer; display: inline-flex; align-items: center; gap: 4px; }
         .chip.active { background: var(--primary); color: #fff; border-color: var(--primary); }
         .feed { display: flex; flex-direction: column; gap: 7px; overflow-y: auto; flex: 1; }
         .lead-item { background: var(--card); border: 1px solid var(--border); border-radius: 9px; padding: 9px 10px; display: flex; flex-direction: column; gap: 4px; }
@@ -58,13 +58,16 @@
         .lead-badges { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 2px; }
         .mini-badge { font-size: 9.5px; font-weight: 700; padding: 1px 5px; border-radius: 4px; background: rgba(245,158,11,0.15); color: var(--warn); }
         .lead-actions { display: flex; gap: 6px; margin-top: 4px; }
-        .mini-btn { flex: 1; height: 25px; border-radius: 5px; border: 1px solid var(--border); background: var(--bg); color: var(--text); font-size: 10.5px; font-weight: 700; cursor: pointer; text-decoration: none; display: flex; align-items: center; justify-content: center; }
+        .mini-btn { flex: 1; height: 25px; border-radius: 5px; border: 1px solid var(--border); background: var(--bg); color: var(--text); font-size: 10.5px; font-weight: 700; cursor: pointer; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 4px; }
         .mini-btn.wa { background: rgba(16,185,129,0.15); color: var(--success); border-color: rgba(16,185,129,0.35); }
     </style>
 </head>
 <body>
     <div class="top">
-        <div class="brand">🌐 Atlas<span>IQ</span> Copilot</div>
+        <div class="brand">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" style="color: var(--primary);"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
+            Atlas<span>IQ</span> Copilot
+        </div>
         <span class="tag">SidePanel v4.0</span>
     </div>
 
@@ -84,9 +87,12 @@
     </div>
 
     <div class="panel">
-        <div class="panel-lbl">📍 Opción 1: Desde Mi Ubicación Actual</div>
+        <div class="panel-lbl" style="display:flex;align-items:center;gap:4px;">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+            Opción 1: Desde Mi Ubicación Actual
+        </div>
         <div class="gps-pill">
-            <span id="sp-gps-label">📍 Detectando tu ubicación...</span>
+            <span id="sp-gps-label" style="display:inline-flex;align-items:center;gap:4px;">Detectando tu ubicación...</span>
         </div>
         <div class="row">
             <input type="text" id="sp-niche" placeholder="¿Qué negocio buscas? Ej: Clínicas" value="Restaurantes" />
@@ -99,17 +105,29 @@
                 <option value="4x4">Barrido: Malla 4×4 (~16 km)</option>
             </select>
         </div>
-        <button class="btn btn-green" id="sp-btn-gps-start">📍 1. Escanear desde Mi Ubicación</button>
-        <button class="btn btn-blue" id="sp-btn-start">▶ 2. Extraer Vista Actual del Mapa</button>
-        <button class="btn btn-red" id="sp-btn-stop">⏹ Detener Extracción</button>
-        <button class="btn btn-outline" id="sp-btn-crm">📊 Abrir CRM Ejecutivo Completo</button>
+        <button class="btn btn-green" id="sp-btn-gps-start">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+            1. Escanear desde Mi Ubicación
+        </button>
+        <button class="btn btn-blue" id="sp-btn-start">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+            2. Extraer Vista Actual del Mapa
+        </button>
+        <button class="btn btn-red" id="sp-btn-stop">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect width="16" height="16" x="4" y="4" rx="2"/></svg>
+            Detener Extracción
+        </button>
+        <button class="btn btn-outline" id="sp-btn-crm">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+            Abrir CRM Ejecutivo Completo
+        </button>
     </div>
 
     <div class="chips">
         <span class="chip active" data-flt="all">Todos</span>
-        <span class="chip" data-flt="hot">🔥 Score 75+</span>
-        <span class="chip" data-flt="noweb">⚡ Sin Web</span>
-        <span class="chip" data-flt="unclaimed">🏴 Sin Reclamar</span>
+        <span class="chip" data-flt="hot">Score 75+</span>
+        <span class="chip" data-flt="noweb">Sin Web</span>
+        <span class="chip" data-flt="unclaimed">Sin Reclamar</span>
     </div>
 
     <div class="feed" id="sp-feed"></div>

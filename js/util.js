@@ -1,8 +1,59 @@
 /**
- * AtlasIQ Enterprise v4.0 - Core Geo-Intelligence, Hybrid AI, OSINT & Cyber-Deliverability Engine
+ * AtlasIQ Enterprise v4.5 - Core Geo-Intelligence, Hybrid AI, OSINT & Cyber-Deliverability Engine
  * Author: Joseph Castillo (CEO) / WINDOWSTELECOM
  * Grade: Silicon Valley Principal Architecture
  */
+
+const ATQ_SVG_PATHS = Object.freeze({
+    logo: '<polygon points="12 2 21 7 21 17 12 22 3 17 3 7"/><circle cx="12" cy="12" r="3"/><path d="M12 2v7M21 7l-6.4 3.5M21 17l-6.4-3.5M12 22v-7M3 17l6.4-3.5M3 7l6.4 3.5"/>',
+    globe: '<circle cx="12" cy="12" r="9.5"/><path d="M2.5 12h19"/><path d="M12 2.5a14.5 14.5 0 0 1 0 19 14.5 14.5 0 0 1 0-19"/>',
+    globeOff: '<path d="M2 2l20 20"/><path d="M8.5 3.2A9.5 9.5 0 0 1 21.5 12a9.4 9.4 0 0 1-1.7 5.4"/><path d="M15.5 20.8A9.5 9.5 0 0 1 2.5 12a9.4 9.4 0 0 1 1.7-5.4"/><path d="M2.5 12h5.5M16 12h5.5"/>',
+    link: '<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>',
+    cpu: '<rect x="5" y="5" width="14" height="14" rx="2"/><rect x="9" y="9" width="6" height="6" rx="1"/><path d="M9 2v3M15 2v3M9 19v3M15 19v3M2 9h3M2 15h3M19 9h3M19 15h3"/>',
+    shield: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/>',
+    zap: '<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>',
+    mapPin: '<path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/>',
+    compass: '<circle cx="12" cy="12" r="9.5"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/>',
+    map: '<polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/>',
+    barChart: '<line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>',
+    trendingUp: '<polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/>',
+    dollar: '<line x1="12" y1="2" x2="12" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>',
+    percent: '<line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/>',
+    award: '<circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/>',
+    layers: '<polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/>',
+    activity: '<polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>',
+    target: '<circle cx="12" cy="12" r="9.5"/><circle cx="12" cy="12" r="5.5"/><circle cx="12" cy="12" r="1.8"/>',
+    clock: '<circle cx="12" cy="12" r="9.5"/><polyline points="12 6 12 12 16 14"/>',
+    users: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+    mail: '<rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>',
+    phone: '<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>',
+    message: '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
+    search: '<circle cx="11" cy="11" r="7.5"/><path d="m21 21-4.3-4.3"/>',
+    sliders: '<line x1="4" x2="4" y1="21" y2="14"/><line x1="4" x2="4" y1="10" y2="3"/><line x1="12" x2="12" y1="21" y2="12"/><line x1="12" x2="12" y1="8" y2="3"/><line x1="20" x2="20" y1="21" y2="16"/><line x1="20" x2="20" y1="12" y2="3"/><line x1="2" x2="6" y1="14" y2="14"/><line x1="10" x2="14" y1="8" y2="8"/><line x1="18" x2="22" y1="16" y2="16"/>',
+    trash: '<path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>',
+    download: '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/>',
+    upload: '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/>',
+    fileText: '<path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/>',
+    copy: '<rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>',
+    sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>',
+    moon: '<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>',
+    flag: '<path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" x2="4" y1="22" y2="15"/>',
+    alert: '<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/>',
+    check: '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>',
+    star: '<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>',
+    table: '<rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18M3 15h18M9 9v12"/>',
+    kanban: '<rect width="18" height="18" x="3" y="3" rx="2"/><path d="M8 7v7M12 7v4M16 7v10"/>',
+    send: '<line x1="22" x2="11" y1="2" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>',
+    play: '<polygon points="6 4 20 12 6 20 6 4"/>',
+    stop: '<rect width="14" height="14" x="5" y="5" rx="2"/>',
+    lock: '<rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>'
+});
+
+function atqIcon(name, size = 14) {
+    const inner = ATQ_SVG_PATHS[name] || ATQ_SVG_PATHS.layers;
+    const s = Number(size) || 14;
+    return `<svg class="atq-ico" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.95" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:inline-block;vertical-align:-0.18em;flex-shrink:0;">${inner}</svg>`;
+}
 
 function escapeHtml(str) {
     if (str === null || str === undefined) return "";
@@ -64,7 +115,7 @@ const FAKE_WEB_HOSTS_UTIL = /(?:^|\.)(?:linktr\.ee|beacons\.ai|bio\.site|lnk\.bi
 function classifyWebsiteStatus(lead) {
     const raw = (lead && lead.website) ? String(lead.website).trim() : "";
     if (!raw) {
-        return { status: "none", label: "⚡ Sin Web", shortBadge: "⚡ Sin Web", color: "#ef4444", bg: "rgba(239,68,68,0.14)", needsWeb: true };
+        return { status: "none", label: "Sin Sitio Web", shortBadge: "Sin Web", color: "#ef4444", bg: "rgba(239,68,68,0.14)", needsWeb: true };
     }
     let host = "";
     try {
@@ -72,32 +123,32 @@ function classifyWebsiteStatus(lead) {
     } catch (_) {}
 
     if (lead.web_status === "social_link" || (host && FAKE_WEB_HOSTS_UTIL.test(host))) {
-        return { status: "social_link", label: "🔗 Falsa Web (Linktree/RRSS)", shortBadge: "🔗 Solo Link/RRSS", color: "#f97316", bg: "rgba(249,115,22,0.16)", needsWeb: true };
+        return { status: "social_link", label: "Falsa Web (Linktree/RRSS)", shortBadge: "Solo Link/RRSS", color: "#f97316", bg: "rgba(249,115,22,0.16)", needsWeb: true };
     }
     if (lead.web_status === "broken") {
-        return { status: "broken", label: "💀 Web Caída / Hosting Roto", shortBadge: "💀 Caída", color: "#dc2626", bg: "rgba(220,38,38,0.16)", needsWeb: true };
+        return { status: "broken", label: "Web Caída / Hosting Roto", shortBadge: "Web Caída", color: "#dc2626", bg: "rgba(220,38,38,0.16)", needsWeb: true };
     }
     if (typeof lead.pagespeed_mobile === "number" && lead.pagespeed_mobile < 55) {
-        return { status: "slow", label: `🐢 Móvil Lenta (${lead.pagespeed_mobile}/100)`, shortBadge: `🐢 ${lead.pagespeed_mobile}/100`, color: "#d97706", bg: "rgba(245,158,11,0.16)", needsWeb: true };
+        return { status: "slow", label: `Móvil Lenta (${lead.pagespeed_mobile}/100)`, shortBadge: `Lenta ${lead.pagespeed_mobile}/100`, color: "#d97706", bg: "rgba(245,158,11,0.16)", needsWeb: true };
     }
     if (lead.web_status === "outdated" || (lead.copyright_year && lead.copyright_year <= 2022) || lead.has_viewport === false) {
         const yr = lead.copyright_year ? ` ©${lead.copyright_year}` : "";
-        return { status: "outdated", label: `🦖 Web Obsoleta${yr}`, shortBadge: `🦖 Obsoleta${yr}`, color: "#d97706", bg: "rgba(245,158,11,0.15)", needsWeb: true };
+        return { status: "outdated", label: `Web Obsoleta${yr}`, shortBadge: `Obsoleta${yr}`, color: "#d97706", bg: "rgba(245,158,11,0.15)", needsWeb: true };
     }
     if (lead.ssl_insecure) {
-        return { status: "insecure", label: "🔓 Sin SSL (HTTP)", shortBadge: "🔓 Sin SSL", color: "#ea580c", bg: "rgba(234,88,12,0.15)", needsWeb: true };
+        return { status: "insecure", label: "Sin SSL (HTTP)", shortBadge: "Sin SSL", color: "#ea580c", bg: "rgba(234,88,12,0.15)", needsWeb: true };
     }
     return { status: "active", label: "✓ Web Propia Activa", shortBadge: "✓ Activa", color: "#10b981", bg: "rgba(16,185,129,0.14)", needsWeb: false };
 }
 
 const NICHE_REVENUE_PROFILES = [
-    { key: "clinic", label: "Salud, Clínica & Odontología", rx: /cl[ií]nica|odont|dent|m[eé]dic|salud|hospital|pedia|dermat|oftalm|fisiot|psicol|veterin/i, avgTicket: 115, setupUsd: 890, retainerUsd: 197, botRole: "Recepcionista Médica IA 24/7 (Citas + Recordatorios Anti-Inasistencia)", heroHeadline: "Agenda tu valoración en menos de 60 segundos sin esperas telefónicas", sampleQ: "Hola, ¿tienen disponibilidad para consulta esta semana y qué costo tiene?", sampleA: "¡Hola! 👋 Sí, tenemos cupos disponibles mañana a las 10:30 AM y el jueves a las 4:00 PM. La valoración inicial incluye diagnóstico completo. ¿Cuál horario prefieres que te reserve ahora mismo?" },
-    { key: "realestate", label: "Inmobiliaria & Bienes Raíces", rx: /inmobil|bienes\s*ra[ií]ces|propiedad|arquitect|construct|urbaniz|broker/i, avgTicket: 1850, setupUsd: 1200, retainerUsd: 297, botRole: "Calificador Inmobiliario IA 24/7 (Filtro de Presupuesto + Agendamiento Visitas)", heroHeadline: "Encuentra tu propiedad ideal con asesoría inmediata y recorrido agendado hoy", sampleQ: "Hola, vi una propiedad en su perfil, ¿sigue disponible y aceptan financiamiento?", sampleA: "¡Un gusto saludarte! 🏡 Sí, sigue disponible para entrega inmediata y aceptamos crédito bancario o financiamiento directo. ¿Buscas para inversión o vivienda familiar para enviarte la ficha PDF y agendar visita?" },
-    { key: "legal", label: "Legal, Contable & Consultoría B2B", rx: /abogad|jur[ií]dic|notar|contab|contador|fiscal|consultor|auditor|seguros|agencia/i, avgTicket: 380, setupUsd: 950, retainerUsd: 247, botRole: "Asistente Ejecutivo IA (Pre-Calificación de Casos + Agenda Directa)", heroHeadline: "Protección legal y estrategia corporativa con respuesta ejecutiva inmediata", sampleQ: "Buenas noches, necesito asesoría urgente para mi empresa, ¿cómo agendamos?", sampleA: "¡Buenas noches! ⚖️ Tomamos tus datos de inmediato para priorizar tu caso a primera hora. Cuéntame en una línea el tema principal y elige si prefieres videollamada o reunión presencial mañana." },
-    { key: "beauty", label: "Estética, Spa & Barbería", rx: /est[eé]tic|spa|belleza|peluquer|barber|u[ñn]as|salon|sal[oó]n|masaje|laser|cosm[eé]t/i, avgTicket: 65, setupUsd: 650, retainerUsd: 147, botRole: "Concierge IA de Reservas 24/7 (Cero Comisiones Booksy + Reconfirmación WA)", heroHeadline: "Reserva tu experiencia de bienestar en 1 clic con confirmación instantánea", sampleQ: "Hola! Quiero agendar corte y tratamiento para el sábado, ¿tienen turno?", sampleA: "¡Hola! ✨ Qué alegría atenderte. Para este sábado nos quedan 2 espacios: 11:00 AM y 3:30 PM, con 10% de beneficio reservando directo por aquí. ¿A qué nombre te bloqueo el turno?" },
-    { key: "food", label: "Restaurante, Café & Gastronomía", rx: /restauran|caf[eé]|pizz|sushi|hamburg|panader|pasteler|gastron|bar|parrill|comida|bodeg/i, avgTicket: 32, setupUsd: 690, retainerUsd: 147, botRole: "Motor Propio de Pedidos & Reservas WA (Ahorra 28% de Comisión Delivery)", heroHeadline: "Pide directo sin recargos de apps o reserva tu mesa VIP en segundos", sampleQ: "Hola, ¿tienen delivery hasta mi zona y me pasan el menú actualizado?", sampleA: "¡Hola! 🍽️ Sí, llegamos en 25 min con envío bonificado pidiendo directo aquí (sin recargos de apps). Aquí tienes nuestro menú interactivo: ¿deseas ordenar a domicilio o reservar mesa para hoy?" },
-    { key: "auto", label: "Automotriz, Taller & Repuestos", rx: /taller|mec[aá]nic|auto|veh[ií]cul|repuest|concesionar|caucho|llanta|lubric|lavado/i, avgTicket: 145, setupUsd: 750, retainerUsd: 167, botRole: "Cotizador Automotriz IA + Recordatorio Automático de Mantenimiento", heroHeadline: "Diagnóstico certificado y cotización de repuestos/servicio al instante", sampleQ: "Buenas, ¿cuánto sale el mantenimiento general y tienen turno hoy?", sampleA: "¡Hola! 🔧 Sí tenemos bahía disponible hoy. Indícame marca, modelo y año de tu vehículo y en 30 segundos te confirmo precio exacto y hora de recepción." },
-    { key: "fitness", label: "Gimnasio, Fitness & Academia", rx: /gimnasio|fitness|crossfit|pilates|yoga|deport|academia|escuela|colegio|curso|idiom/i, avgTicket: 75, setupUsd: 690, retainerUsd: 167, botRole: "Closer IA de Inscripciones y Clases de Prueba 24/7", heroHeadline: "Activa tu pase de prueba gratuito hoy y transforma tus resultados", sampleQ: "Hola, ¿qué planes mensuales manejan y qué horarios tienen?", sampleA: "¡Hola! 💪 Tenemos horarios desde las 6:00 AM hasta las 9:30 PM y puedes venir mañana mismo a una sesión de prueba sin costo. ¿En qué turno te queda más cómodo entrenar?" }
+    { key: "clinic", label: "Salud, Clínica & Odontología", rx: /cl[ií]nica|odont|dent|m[eé]dic|salud|hospital|pedia|dermat|oftalm|fisiot|psicol|veterin/i, avgTicket: 115, setupUsd: 890, retainerUsd: 197, botRole: "Recepcionista Médica IA 24/7 (Citas + Recordatorios Anti-Inasistencia)", heroHeadline: "Agenda tu valoración en menos de 60 segundos sin esperas telefónicas", sampleQ: "Hola, ¿tienen disponibilidad para consulta esta semana y qué costo tiene?", sampleA: "Buen día. Sí, contamos con disponibilidad mañana a las 10:30 AM y el jueves a las 4:00 PM. La valoración inicial incluye diagnóstico integral. ¿En cuál horario deseas que reservemos tu cita ahora mismo?" },
+    { key: "realestate", label: "Inmobiliaria & Bienes Raíces", rx: /inmobil|bienes\s*ra[ií]ces|propiedad|arquitect|construct|urbaniz|broker/i, avgTicket: 1850, setupUsd: 1200, retainerUsd: 297, botRole: "Calificador Inmobiliario IA 24/7 (Filtro de Presupuesto + Agendamiento Visitas)", heroHeadline: "Encuentra tu propiedad ideal con asesoría inmediata y recorrido agendado hoy", sampleQ: "Hola, vi una propiedad en su perfil, ¿sigue disponible y aceptan financiamiento?", sampleA: "Un gusto saludarte. Sí, la propiedad continúa disponible para entrega inmediata y gestionamos crédito bancario o financiamiento directo. ¿Buscas inversión o vivienda familiar para enviarte el dossier técnico y agendar visita?" },
+    { key: "legal", label: "Legal, Contable & Consultoría B2B", rx: /abogad|jur[ií]dic|notar|contab|contador|fiscal|consultor|auditor|seguros|agencia/i, avgTicket: 380, setupUsd: 950, retainerUsd: 247, botRole: "Asistente Ejecutivo IA (Pre-Calificación de Casos + Agenda Directa)", heroHeadline: "Protección legal y estrategia corporativa con respuesta ejecutiva inmediata", sampleQ: "Buenas noches, necesito asesoría urgente para mi empresa, ¿cómo agendamos?", sampleA: "Buenas noches. Registramos tus datos de inmediato para priorizar tu caso a primera hora. Indícanos brevemente el asunto principal y confirma si prefieres videollamada ejecutiva o sesión presencial mañana." },
+    { key: "beauty", label: "Estética, Spa & Barbería", rx: /est[eé]tic|spa|belleza|peluquer|barber|u[ñn]as|salon|sal[oó]n|masaje|laser|cosm[eé]t/i, avgTicket: 65, setupUsd: 650, retainerUsd: 147, botRole: "Concierge IA de Reservas 24/7 (Cero Comisiones Booksy + Reconfirmación WA)", heroHeadline: "Reserva tu experiencia de bienestar en 1 clic con confirmación instantánea", sampleQ: "Hola, quiero agendar corte y tratamiento para el sábado, ¿tienen turno?", sampleA: "Bienvenido. Para este sábado disponemos de dos espacios: 11:00 AM y 3:30 PM, con 10% de beneficio exclusivo reservando por nuestro canal directo. ¿A qué nombre confirmamos tu turno?" },
+    { key: "food", label: "Restaurante, Café & Gastronomía", rx: /restauran|caf[eé]|pizz|sushi|hamburg|panader|pasteler|gastron|bar|parrill|comida|bodeg/i, avgTicket: 32, setupUsd: 690, retainerUsd: 147, botRole: "Motor Propio de Pedidos & Reservas WA (Ahorra 28% de Comisión Delivery)", heroHeadline: "Pide directo sin recargos de apps o reserva tu mesa VIP en segundos", sampleQ: "Hola, ¿tienen delivery hasta mi zona y me pasan el menú actualizado?", sampleA: "Hola, bienvenido. Llegamos en 25 minutos con envío preferencial pidiendo por nuestro canal directo sin sobrecargos de aplicaciones externas. ¿Deseas ordenar a domicilio o reservar mesa para hoy?" },
+    { key: "auto", label: "Automotriz, Taller & Repuestos", rx: /taller|mec[aá]nic|auto|veh[ií]cul|repuest|concesionar|caucho|llanta|lubric|lavado/i, avgTicket: 145, setupUsd: 750, retainerUsd: 167, botRole: "Cotizador Automotriz IA + Recordatorio Automático de Mantenimiento", heroHeadline: "Diagnóstico certificado y cotización de repuestos/servicio al instante", sampleQ: "Buenas, ¿cuánto sale el mantenimiento general y tienen turno hoy?", sampleA: "Buen día. Contamos con bahía de servicio disponible hoy. Indícanos marca, modelo y año de tu vehículo para confirmarte cotización exacta y hora de recepción en 30 segundos." },
+    { key: "fitness", label: "Gimnasio, Fitness & Academia", rx: /gimnasio|fitness|crossfit|pilates|yoga|deport|academia|escuela|colegio|curso|idiom/i, avgTicket: 75, setupUsd: 690, retainerUsd: 167, botRole: "Closer IA de Inscripciones y Clases de Prueba 24/7", heroHeadline: "Activa tu pase de prueba gratuito hoy y transforma tus resultados", sampleQ: "Hola, ¿qué planes mensuales manejan y qué horarios tienen?", sampleA: "Hola. Operamos en horario corrido desde las 6:00 AM hasta las 9:30 PM y puedes asistir mañana a una sesión de evaluación sin costo. ¿En qué horario prefieres reservar tu acceso?" }
 ];
 
 const DEFAULT_NICHE_PROFILE = {
@@ -109,7 +160,7 @@ const DEFAULT_NICHE_PROFILE = {
     botRole: "Agente Comercial IA 24/7 en WhatsApp + Embudo Web de Alta Conversión",
     heroHeadline: "Atención inmediata 24/7 y cotización personalizada en menos de 1 minuto",
     sampleQ: "Hola, quisiera cotizar un servicio y confirmar si atienden hoy.",
-    sampleA: "¡Hola! 👋 Gracias por escribirnos. Estamos activos para ayudarte ahora mismo: indícanos qué solución buscas y te enviamos disponibilidad y presupuesto al instante."
+    sampleA: "Buen día, gracias por contactarnos. Nuestro sistema de atención está activo: indícanos qué requerimiento tienes y te enviamos disponibilidad y presupuesto al instante."
 };
 
 function getNicheEconomicsProfile(categoryStr) {
@@ -487,24 +538,24 @@ function generateOutreachPitch(lead, channel = "whatsapp", benchmark = null) {
     }
 
     if (channel === "whatsapp") {
-        const auditSuffix = lead.cloud_audit_url ? `\n\n🔗 Diagnóstico + Demo aquí: ${lead.cloud_audit_url}` : "";
-        return `${execGreeting} 👋\n\nEstuve auditando los negocios referentes de *${category}* en ${city} y destacó su perfil (${rating}).\n\nSin embargo, ${diagnosticHook}\n\n${solutionPromise} ¿Me autorizan enviársela por aquí en 1 minuto sin ningún compromiso?${auditSuffix}`;
+        const auditSuffix = lead.cloud_audit_url ? `\n\nDiagnóstico interactivo y Demo: ${lead.cloud_audit_url}` : "";
+        return `${execGreeting}.\n\nEstuve auditando los negocios referentes de *${category}* en ${city} y destacó su perfil (${rating}).\n\nSin embargo, ${diagnosticHook}\n\n${solutionPromise} ¿Me autorizan enviársela por esta vía en 1 minuto sin compromiso?${auditSuffix}`;
     }
 
     if (channel === "followup") {
-        return `Hola equipo de *${name}*, ¿cómo va la semana? 👋\n\nLes escribí hace un par de días porque dejamos armada la demostración personalizada de *${lead.recommended_offer || "Web + Automatización IA"}* para su sede en ${city}.\n\nEn negocios de *${category}*, implementar esto suele recuperar entre *${leakStr}* desde el primer mes al atender en segundos incluso de noche y domingos.\n\n¿Les comparto el enlace interactivo por aquí para que lo prueben desde su celular en 60 segundos?`;
+        return `Buen día equipo de *${name}*.\n\nLes escribí hace un par de días porque dejamos preparada la demostración ejecutiva de *${lead.recommended_offer || "Web + Automatización IA"}* para su sede en ${city}.\n\nEn empresas de *${category}*, activar este sistema permite recuperar alrededor de *${leakStr}* desde el primer mes al atender consultas en segundos incluso fuera de horario.\n\n¿Les comparto el enlace interactivo por aquí para que lo evalúen desde su teléfono en 60 segundos?`;
     }
 
     if (channel === "closing") {
-        return `Hola *${name}* 👋 Te escribo por última vez para no incomodar.\n\nEsta semana estamos activando el sistema exclusivo de captación y *${econ.botRole}* para *un solo negocio de ${category}* en este cuadrante de ${city} (para no generar conflicto de interés con ${leaderPeer || "sus competidores directos"}).\n\nComo ustedes ya tienen ${rating}, los priorizamos primero. Si les interesa ver el prototipo antes de que pasemos al siguiente en la lista, respóndeme *"DEMO"* hoy y se los activo. ¡Éxitos!`;
+        return `Estimado equipo de *${name}*, les escribo brevemente para cerrar este seguimiento.\n\nEsta semana estamos habilitando la arquitectura exclusiva de captación y *${econ.botRole}* para *una sola empresa de ${category}* en este cuadrante de ${city} (por política de no competencia frente a ${leaderPeer || "sus competidores directos"}).\n\nDado su respaldo actual (${rating}), les dimos prioridad en la zona. Si desean revisar el prototipo funcional antes de asignarlo al siguiente candidato, respondan *"DEMO"* hoy y se los habilito.`;
     }
 
     if (channel === "call") {
-        return `📞 GUIÓN DE LLAMADA FRÍA (30 SEGUNDOS · ${(lead.recommended_offer || "WEB + IA").toUpperCase()}):\n\n"Hola, buenos días. Busco a ${lead.decision_maker || "la persona encargada de crecimiento comercial"} en ${name}.\n\nTe llamo muy puntual: hicimos un barrido de ${category} en ${city}; ustedes tienen ${rating}, pero ${diagnosticHook.replace(/\*/g, "")}\n\nNo te llamo para venderte a ciegas: ya montamos un prototipo funcionando con el nombre de ${name}. ¿Te lo paso ahora mismo a este WhatsApp para que lo veas en 1 minuto?"`;
+        return `GUIÓN DE LLAMADA EJECUTIVA (30 SEGUNDOS · ${(lead.recommended_offer || "WEB + IA").toUpperCase()}):\n\n"Buenos días. Me comunico con ${lead.decision_maker || "la dirección comercial"} de ${name}.\n\nSoy muy puntual: realizamos una auditoría técnica de ${category} en ${city}; ustedes destacan con ${rating}, pero ${diagnosticHook.replace(/\*/g, "")}\n\nYa preparamos un prototipo funcional con la identidad de ${name}. ¿Me autorizas enviártelo a este WhatsApp para que lo revises en 60 segundos?"`;
     }
 
     // Cold Email
-    return `Asunto: Prototipo listo para ${name} (Fuga detectada: ~${leakStr})\n\nHola ${lead.decision_maker || `equipo directivo de ${name}`},\n\nAnalizando el cuadrante comercial de ${category} en ${city}, su reputación (${rating}) destaca claramente${benchmark?.rank ? ` (posición actual #${benchmark.rank} de ${benchmark.totalPeers} en huella digital)` : ""}.\n\nNo obstante, en nuestra auditoría técnica detectamos que ${diagnosticHook.replace(/\*/g, "")}\n\n${solutionPromise.replace(/\*/g, "")}\n\n¿Tienen 7 minutos este jueves para mostrársela en vivo o prefieren que les responda este correo con el enlace de prueba?\n\nSaludos cordiales,\nConsultoría de Crecimiento Web & Automatización IA`;
+    return `Asunto: Prototipo ejecutivo para ${name} (Fuga estimada: ~${leakStr})\n\nHola ${lead.decision_maker || `equipo directivo de ${name}`},\n\nAnalizando el cuadrante comercial de ${category} en ${city}, su reputación (${rating}) destaca claramente${benchmark?.rank ? ` (posición actual #${benchmark.rank} de ${benchmark.totalPeers} en huella digital)` : ""}.\n\nNo obstante, en nuestra auditoría técnica detectamos que ${diagnosticHook.replace(/\*/g, "")}\n\n${solutionPromise.replace(/\*/g, "")}\n\n¿Disponen de 7 minutos este jueves para revisarla en vivo o prefieren recibir el enlace interactivo respondiendo este correo?\n\nSaludos cordiales,\nConsultoría de Crecimiento Web & Automatización IA`;
 }
 
 /**
@@ -517,8 +568,8 @@ async function callGeminiAnalysis(apiKey, lead, customChannel = "whatsapp") {
     const econ = estimateNicheRevenueLeak(cleanLead);
     const ws = classifyWebsiteStatus(cleanLead);
 
-    const prompt = `Actúa como el Principal Revenue Strategist de una agencia élite de Desarrollo Web y Automatizaciones IA.
-Analiza este prospecto real extraído con AtlasIQ y entrega un plan quirúrgico para cerrarle "${cleanLead.recommended_offer || "Web + Agente IA 24/7"}":
+    const prompt = `Actúa como el Principal Revenue Strategist de una firma corporativa de Desarrollo Web y Automatizaciones IA.
+Analiza este prospecto real extraído con AtlasIQ y entrega un plan quirúrgico, sobrio y sin emojis infantiles para cerrarle "${cleanLead.recommended_offer || "Web + Agente IA 24/7"}":
 
 DATOS PROFUNDOS DEL PROSPECTO:
 - Empresa: ${cleanLead.name || "N/A"} ${cleanLead.legal_name ? `(Razón Social: ${cleanLead.legal_name})` : ""}
@@ -534,12 +585,12 @@ DATOS PROFUNDOS DEL PROSPECTO:
 - Reservas / Comisiones: ${cleanLead.booking_platform ? `${cleanLead.booking_platform}${cleanLead.commission_bleed ? " (PAGA COMISIÓN EXTERNA)" : ""}` : "Sin agenda online"}
 - Competidor Cercano: ${cleanLead.nearestPeerName ? `${cleanLead.nearestPeerName} (${cleanLead.nearestPeerDistanceKm ? Math.round(cleanLead.nearestPeerDistanceKm * 1000) + "m" : "cercano"})` : "Zona activa"}
 
-RESPONDE EN ESPAÑOL EJECUTIVO, DIRECTO Y ACCIONABLE CON ESTAS 5 SECCIONES:
-1. 💰 DIAGNÓSTICO DE FUGA DE DINERO (por qué pierden ~$${econ.monthlyLeakUsd}/mes hoy y qué paquete exacto venderles: Web, Automatización o Combo).
-2. 🤖 ARQUITECTURA DE AUTOMATIZACIÓN + WEB IDEAL PARA ESTE NEGOCIO (flujo exacto WhatsApp/IA/CRM que les ahorrará horas y multiplicará citas).
-3. 🎣 ROMPEHIELOS DE 5 SEGUNDOS POR WHATSAPP (natural, humano, imposible de ignorar).
-4. 💬 CADENCIA DE 3 TOQUES (Día 1 Diagnóstico + Día 3 Demo en Vivo + Día 7 Escasez de Zona).
-5. 🛡️ MANEJO DE LAS 2 OBJECIONES MÁS PROBABLES ("Ya tengo Instagram/conocido" o "Está caro").`;
+RESPONDE EN ESPAÑOL EJECUTIVO, SOBRIO Y ACCIONABLE (SIN EMOJIS INFANTILES) CON ESTAS 5 SECCIONES:
+1. DIAGNÓSTICO DE FUGA DE INGRESOS (por qué pierden ~$${econ.monthlyLeakUsd}/mes hoy y qué paquete exacto ofrecerles: Web, Automatización o Combo).
+2. ARQUITECTURA DE AUTOMATIZACIÓN + WEB IDEAL (flujo exacto WhatsApp/IA/CRM que reducirá carga operativa y multiplicará citas).
+3. APERTURA EJECUTIVA DE 5 SEGUNDOS POR WHATSAPP (sobria, directa y de alta autoridad).
+4. CADENCIA COMERCIAL DE 3 TOQUES (Día 1 Diagnóstico + Día 3 Demo en Vivo + Día 7 Exclusividad de Cuadrante).
+5. RESPUESTA EJECUTIVA A LAS 2 OBJECIONES MÁS PROBABLES ("Ya usamos redes sociales" o "Presupuesto").`;
 
     // 1. Try Cloud Gemini 2.5 Flash if API Key is provided
     if (apiKey && apiKey.trim().length > 10) {
@@ -585,11 +636,11 @@ RESPONDE EN ESPAÑOL EJECUTIVO, DIRECTO Y ACCIONABLE CON ESTAS 5 SECCIONES:
             const session = await lmFactory.create();
             const localResult = await session.prompt(prompt);
             if (session.destroy) session.destroy();
-            if (localResult) return `⚡ [Generado con Chrome Gemini Nano Local · $0 API]\n\n${localResult}`;
+            if (localResult) return `[Generado con Chrome Gemini Nano Local · $0 API]\n\n${localResult}`;
         }
     } catch (nanoErr) {}
 
-    throw new Error("Configura tu Google Gemini API Key gratuita en ⚙️ Ajustes (o habilita Chrome Built-in AI Gemini Nano).");
+    throw new Error("Configura tu Google Gemini API Key gratuita en Ajustes (o habilita Chrome Built-in AI Gemini Nano).");
 }
 
 // Backward-compatible alias so legacy callers never fail
@@ -1228,7 +1279,7 @@ async function auditWebsitePageSpeed(websiteUrl) {
  */
 async function publishLiveCloudAudit(edgeWorkerUrl, lead, branding = {}, benchmark = null) {
     if (!edgeWorkerUrl || !edgeWorkerUrl.startsWith("http")) {
-        throw new Error("Configura primero la URL de tu Cloudflare Edge Worker en ⚙️ Ajustes.");
+        throw new Error("Configura primero la URL de tu Cloudflare Edge Worker en Ajustes.");
     }
     const econ = estimateNicheRevenueLeak(lead);
     const ws = classifyWebsiteStatus(lead);
@@ -1343,17 +1394,17 @@ h1{font-size:clamp(28px,4vw,44px);line-height:1.12;margin:14px 0;font-weight:900
 </head>
 <body>
 <div class="topbar">
-  <div>🚀 Prototipo Exclusivo preparado por <b>${escapeHtml(agencyName)}</b> · Recuperación estimada: <b>~$${econ.monthlyLeakUsd.toLocaleString("en-US")} USD/mes</b></div>
-  <a href="${escapeHtml(agencyWa)}?text=${ctaText}" target="_blank">Activar en mi negocio ➔</a>
+  <div>Prototipo Corporativo preparado por <b>${escapeHtml(agencyName)}</b> · Recuperación estimada: <b>~$${econ.monthlyLeakUsd.toLocaleString("en-US")} USD/mes</b></div>
+  <a href="${escapeHtml(agencyWa)}?text=${ctaText}" target="_blank">Implementar en mi empresa ➔</a>
 </div>
 <section class="hero">
   <div>
     <span class="pill">★ ${safeRating} en Google · ${safeCat}</span>
     <h1>${safeName}: ${escapeHtml(econ.heroHeadline)}</h1>
-    <p class="sub">📍 ${safeAddr} · ${safePhone}. Sistema web ultra-rápido (&lt;1.2s) integrado con ${escapeHtml(econ.botRole)}.</p>
+    <p class="sub">${safeAddr} · ${safePhone}. Arquitectura web ultra-rápida (&lt;1.2s) integrada con ${escapeHtml(econ.botRole)}.</p>
     <div class="cta-row">
-      <a class="btn-p" href="#bot" data-q="Quiero agendar ahora mismo">⚡ Probar Agendamiento IA</a>
-      <span class="btn-s">🛡️ Atención Automática 24/7</span>
+      <a class="btn-p" href="#bot" data-q="Quiero agendar ahora mismo">Probar Agendamiento IA</a>
+      <span class="btn-s">Atención Automática 24/7</span>
     </div>
     <div class="trust">
       <div class="tcard"><strong>&lt; 15 seg</strong><span>Tiempo respuesta IA</span></div>
@@ -1363,26 +1414,26 @@ h1{font-size:clamp(28px,4vw,44px);line-height:1.12;margin:14px 0;font-weight:900
   </div>
   <div class="botbox" id="bot">
     <div class="bothead">
-      <div><strong style="font-size:14px">🤖 Asistente IA · ${safeName}</strong><div style="font-size:11px;color:#a7f3d0">● En línea 24/7 en WhatsApp y Web</div></div>
-      <span style="font-size:11px;background:rgba(0,0,0,.25);padding:3px 8px;border-radius:99px">DEMO VIVO</span>
+      <div><strong style="font-size:14px">Asistente Ejecutivo IA · ${safeName}</strong><div style="font-size:11px;color:#a7f3d0">● Activo 24/7 en WhatsApp y Web</div></div>
+      <span style="font-size:11px;background:rgba(0,0,0,.25);padding:3px 8px;border-radius:99px;font-weight:700">SIMULACIÓN EN VIVO</span>
     </div>
     <div class="botmsgs" id="chat">
       <div class="msg u">${escapeHtml(econ.sampleQ)}</div>
       <div class="msg b">${escapeHtml(econ.sampleA)}</div>
     </div>
     <div class="chips">
-      <button type="button" class="chip" data-q="📅 Quiero reservar turno mañana">📅 Reservar turno</button>
-      <button type="button" class="chip" data-q="💰 ¿Cuáles son sus precios y promos?">💰 Consultar precios</button>
-      <button type="button" class="chip" data-q="📍 ¿Dónde están ubicados y horarios?">📍 Ubicación</button>
+      <button type="button" class="chip" data-q="Quiero reservar turno mañana">Reservar turno</button>
+      <button type="button" class="chip" data-q="¿Cuáles son sus precios y planes?">Consultar tarifas</button>
+      <button type="button" class="chip" data-q="¿Dónde están ubicados y horarios?">Ubicación y horario</button>
     </div>
   </div>
 </section>
 <script>
 const replies = {
-  "📅 Quiero reservar turno mañana": "¡Perfecto! ✅ Ya bloqueé prioridad para ti mañana. Solo confírmame tu nombre completo y si prefieres en la mañana (10:00 AM) o tarde (4:00 PM) para enviarte el recordatorio automático a tu WhatsApp.",
-  "💰 ¿Cuáles son sus precios y promos?": "¡Con gusto! 📋 Manejamos opciones adaptadas a lo que necesitas y beneficio exclusivo por reserva directa web sin intermediarios. ¿Deseas que te envíe el catálogo PDF interactivo ahora mismo?",
-  "📍 ¿Dónde están ubicados y horarios?": "📍 Nos encontramos en ${safeAddr}. Aunque nuestro local cierre en la noche, yo estoy activo 24/7 aquí para dejarte agendado en 30 segundos.",
-  "Quiero agendar ahora mismo": "¡Excelente elección! 🚀 Dime qué día te queda mejor y te confirmo disponibilidad en tiempo real."
+  "Quiero reservar turno mañana": "Confirmado. Hemos pre-reservado prioridad para mañana. Indícanos tu nombre completo y si prefieres turno matutino (10:00 AM) o vespertino (4:00 PM) para enviarte confirmación automática por WhatsApp.",
+  "¿Cuáles son sus precios y planes?": "Con gusto. Contamos con opciones adaptadas a tu requerimiento y beneficio preferencial por reserva directa web sin intermediarios. ¿Deseas recibir el catálogo ejecutivo ahora mismo?",
+  "¿Dónde están ubicados y horarios?": "Nuestra sede está ubicada en ${safeAddr}. Incluso fuera de horario de oficina, este asistente permanece activo 24/7 para confirmar tu solicitud en 30 segundos.",
+  "Quiero agendar ahora mismo": "Excelente. Indícanos qué día prefieres y confirmamos tu espacio en tiempo real."
 };
 function sendQuick(q){
   const c=document.getElementById('chat');

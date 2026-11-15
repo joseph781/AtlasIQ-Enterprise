@@ -147,6 +147,8 @@ chrome.storage.onChanged.addListener((changes, area) => {
     }
 });
 
+const dockIcon = (name, size = 13) => (typeof atqIcon === "function" ? atqIcon(name, size) : "");
+
 function updateUiCounters() {
     const totalLeads = leads.length;
     const emailsCount = leads.filter(l => l.email && l.email.includes("@")).length;
@@ -155,7 +157,7 @@ function updateUiCounters() {
     if (uiLeadsCountEl) uiLeadsCountEl.textContent = totalLeads.toLocaleString();
     if (uiEmailsCountEl) uiEmailsCountEl.textContent = emailsCount.toLocaleString();
     if (uiOppsCountEl) uiOppsCountEl.textContent = highOppCount.toLocaleString();
-    if (uiExportBtnEl) uiExportBtnEl.textContent = `📊 Abrir CRM v4.0 (${totalLeads})`;
+    if (uiExportBtnEl) uiExportBtnEl.innerHTML = `${dockIcon("barChart", 13)} Abrir CRM v4.0 (${totalLeads})`;
 }
 
 let syncTimeout = null;
@@ -432,12 +434,12 @@ function createFloatingDock() {
     header.className = "atlasiq-header";
     header.title = "Arrastra para mover el panel";
     header.innerHTML = `
-        <div class="atlasiq-brand">
-            🌐 Atlas<span>IQ</span>
+        <div class="atlasiq-brand" style="display:inline-flex;align-items:center;gap:6px;">
+            ${dockIcon("globe", 15)} Atlas<span>IQ</span>
             <span class="atlasiq-badge-pro">v4.0 EXTREME</span>
         </div>
         <div class="atlasiq-header-controls">
-            <button class="atlasiq-icon-btn" id="tl_btn_sidepanel" title="Abrir Copilot en Side Panel lateral de Chrome">🧭</button>
+            <button class="atlasiq-icon-btn" id="tl_btn_sidepanel" title="Abrir Copilot en Side Panel lateral de Chrome" style="display:inline-flex;align-items:center;justify-content:center;">${dockIcon("compass", 14)}</button>
             <button class="atlasiq-icon-btn" id="tl_btn_minimize" title="Minimizar / Expandir">—</button>
         </div>
     `;
@@ -480,11 +482,11 @@ function createFloatingDock() {
         .trim();
     gpsBox.innerHTML = `
         <div class="atlasiq-gps-head">
-            <span>📍 1. Desde Mi Ubicación</span>
+            <span style="display:inline-flex;align-items:center;gap:4px;">${dockIcon("mapPin", 12)} 1. Desde Mi Ubicación</span>
             <span class="atlasiq-gps-coord" id="tl_gps_coord">GPS Listo</span>
         </div>
         <input type="text" class="atlasiq-input" id="tl_inp_gps_niche" placeholder="¿Qué buscas cerca de ti? Ej: Clínicas" style="width:100%;" />
-        <button type="button" class="atlasiq-btn atlasiq-btn-gps" id="tl_btn_gps_start">📍 Ubicarme e Iniciar Scrapeo</button>
+        <button type="button" class="atlasiq-btn atlasiq-btn-gps" id="tl_btn_gps_start" style="display:inline-flex;align-items:center;justify-content:center;gap:5px;">${dockIcon("mapPin", 13)} Ubicarme e Iniciar Scrapeo</button>
     `;
 
     const gridRow = document.createElement("div");
@@ -523,24 +525,24 @@ function createFloatingDock() {
     const btnStart = document.createElement("button");
     btnStart.className = "atlasiq-btn atlasiq-btn-start";
     btnStart.id = "tl_btn_start";
-    btnStart.textContent = "▶ 2. Extraer Vista Actual del Mapa";
+    btnStart.innerHTML = `${dockIcon("play", 12)} 2. Extraer Vista Actual del Mapa`;
 
     const btnStop = document.createElement("button");
     btnStop.className = "atlasiq-btn atlasiq-btn-stop";
     btnStop.id = "tl_btn_stop";
-    btnStop.textContent = "⏹ Detener Motor";
+    btnStop.innerHTML = `${dockIcon("stop", 12)} Detener Motor`;
     btnStop.style.display = "none";
 
     const btnExport = document.createElement("button");
     btnExport.className = "atlasiq-btn atlasiq-btn-crm-dark";
     btnExport.id = "tl_btn_export";
-    btnExport.textContent = "📊 Abrir CRM v4.0 (0)";
+    btnExport.innerHTML = `${dockIcon("barChart", 13)} Abrir CRM v4.0 (0)`;
 
     const secondaryRow = document.createElement("div");
     secondaryRow.className = "atlasiq-row";
     const btnClear = document.createElement("button");
     btnClear.className = "atlasiq-btn atlasiq-btn-secondary";
-    btnClear.textContent = "🗑 Reiniciar Lista";
+    btnClear.innerHTML = `${dockIcon("trash", 12)} Reiniciar Lista`;
     btnClear.style.flex = "1";
     secondaryRow.appendChild(btnClear);
 
@@ -606,16 +608,17 @@ function createFloatingDock() {
         max_limit = parseInt(e.target.value) || 0;
     });
 
-    async function ensureLicenseBeforeStart(triggerBtn, idleLabel) {
+    async function ensureLicenseBeforeStart(triggerBtn) {
         if (typeof checkCurrentLicense === "function") {
+            const origHtml = triggerBtn.innerHTML;
             triggerBtn.disabled = true;
-            triggerBtn.textContent = "⏳ Verificando ECDSA...";
+            triggerBtn.innerHTML = `${dockIcon("clock", 12)} Verificando ECDSA...`;
             const licStatus = await checkCurrentLicense();
             triggerBtn.disabled = false;
-            triggerBtn.textContent = idleLabel;
+            triggerBtn.innerHTML = origHtml;
 
             if (!licStatus.active) {
-                alert(`🛡️ AtlasIQ Enterprise - Activación Requerida\n\n${licStatus.reason || "Activa tu licencia ECDSA."}\n\nID de Dispositivo: ${licStatus.deviceId}\nWhatsApp Oficial de Activación: +58 412-4060610\n\nSe abrirá el CRM para que envíes tu ID por WhatsApp en 1 clic.`);
+                alert(`AtlasIQ Enterprise — Activación Requerida\n\n${licStatus.reason || "Activa tu licencia ECDSA."}\n\nID de Dispositivo: ${licStatus.deviceId}\nWhatsApp Oficial de Activación: +58 412-4060610\n\nSe abrirá el CRM para que envíes tu ID por WhatsApp en 1 clic.`);
                 chrome.runtime.sendMessage({ action: "openPage" });
                 return false;
             }
@@ -625,7 +628,7 @@ function createFloatingDock() {
 
     const btnGpsStart = document.getElementById("tl_btn_gps_start");
     btnGpsStart.addEventListener("click", async () => {
-        const okLic = await ensureLicenseBeforeStart(btnGpsStart, "📍 Ubicarme e Iniciar Scrapeo");
+        const okLic = await ensureLicenseBeforeStart(btnGpsStart);
         if (!okLic) return;
 
         const mapBoxVal = (document.querySelector("#searchboxinput, input[name='q']")?.value || "").trim();
@@ -638,13 +641,14 @@ function createFloatingDock() {
             return;
         }
 
+        const origGpsHtml = btnGpsStart.innerHTML;
         btnGpsStart.disabled = true;
-        btnGpsStart.textContent = "⏳ Obteniendo tu GPS...";
+        btnGpsStart.innerHTML = `${dockIcon("clock", 13)} Obteniendo tu GPS...`;
         setDockStatus("Fijando tu ubicación actual...", true);
 
         const loc = await resolveMyCoordinates(true);
         btnGpsStart.disabled = false;
-        btnGpsStart.textContent = "📍 Ubicarme e Iniciar Scrapeo";
+        btnGpsStart.innerHTML = origGpsHtml;
 
         if (!loc || !loc.lat || !loc.lon) {
             alert("No se pudo detectar tu ubicación actual. Verifica la conexión o permisos de ubicación.");
@@ -691,7 +695,7 @@ function createFloatingDock() {
     }
 
     btnStart.addEventListener("click", async () => {
-        const okLic = await ensureLicenseBeforeStart(btnStart, "▶ 2. Extraer Vista Actual del Mapa");
+        const okLic = await ensureLicenseBeforeStart(btnStart);
         if (!okLic) return;
         anchor_coords = null;
         startExtraction();
@@ -1453,18 +1457,18 @@ chrome.storage.local.get(["atlasiq_pending_mission"], async (res) => {
     if (m.useMyLocation && m.lat && m.lon) {
         anchor_coords = { lat: Number(m.lat), lng: Number(m.lon), label: "Mi Ubicación" };
         updateGpsCoordBadge({ lat: m.lat, lon: m.lon });
-        setDockStatus(`📍 Punto Cero fijado (${Number(m.lat).toFixed(3)}, ${Number(m.lon).toFixed(3)})`, true);
+        setDockStatus(`Punto Cero fijado (${Number(m.lat).toFixed(3)}, ${Number(m.lon).toFixed(3)})`, true);
     }
 
     if (m.autoStart) {
         if (typeof checkCurrentLicense === "function") {
             const lic = await checkCurrentLicense();
             if (!lic.active) {
-                setDockStatus("⚠️ Activa tu licencia ECDSA para iniciar");
+                setDockStatus("Activa tu licencia ECDSA para iniciar");
                 return;
             }
         }
-        setDockStatus("📍 Cargando resultados en tu ubicación...", true);
+        setDockStatus("Cargando resultados en tu ubicación...", true);
         await new Promise(r => setTimeout(r, 2600));
         startExtraction();
     }

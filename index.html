@@ -159,6 +159,15 @@
             border-radius: 8px;
             font-weight: 700 !important;
             box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .atq-ico {
+            display: inline-block;
+            vertical-align: -0.18em;
+            flex-shrink: 0;
         }
 
         /* === HERO SECTION === */
@@ -570,7 +579,28 @@
         }
 
         .feature-icon {
-            font-size: 25px;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: rgba(37, 99, 235, 0.12);
+            border: 1px solid rgba(59, 130, 246, 0.28);
+            color: var(--primary);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 2px;
+        }
+
+        .feature-icon.emerald {
+            background: rgba(16, 185, 129, 0.12);
+            border-color: rgba(16, 185, 129, 0.28);
+            color: var(--accent);
+        }
+
+        .feature-icon.amber {
+            background: rgba(245, 158, 11, 0.12);
+            border-color: rgba(245, 158, 11, 0.3);
+            color: var(--warn);
         }
 
         .feature-box-title {
@@ -654,6 +684,18 @@
             font-size: 13.5px;
             font-weight: 700;
             color: var(--text-main);
+        }
+
+        .sector-pill-head {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-main);
+        }
+
+        .sector-pill-head svg {
+            color: var(--primary);
+            flex-shrink: 0;
         }
 
         .sector-pill small {
@@ -832,7 +874,9 @@
         <div class="topbar-content">
             <a href="dashboard.html" class="brand-box">
                 <div style="display: flex; align-items: center; gap: 10px;">
-                    <div class="brand-logo">🌐</div>
+                    <div class="brand-logo">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="12 2 21 7 21 17 12 22 3 17 3 7"/><circle cx="12" cy="12" r="3"/><path d="M12 2v7M21 7l-6.4 3.5M21 17l-6.4-3.5M12 22v-7M3 17l6.4-3.5M3 7l6.4 3.5"/></svg>
+                    </div>
                     <div class="brand-name">Atlas<span>IQ</span></div>
                 </div>
                 <span class="topbar-badge">v4.5 Revenue Engine</span>
@@ -844,9 +888,13 @@
                 <a href="#casos-uso">Nichos &amp; Tickets</a>
                 <a href="#instalacion">Instalación</a>
                 <button id="btn-toggle-theme" class="btn-cta btn-cta-outline" style="height: 34px; padding: 0 12px; font-size: 12px; border-radius: 8px;" title="Alternar Modo Oscuro / Claro">
-                    ☀️ Modo Claro
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+                    <span>Modo Claro</span>
                 </button>
-                <a href="dashboard.html" class="btn-crm-nav">📊 Abrir CRM Dashboard</a>
+                <a href="dashboard.html" class="btn-crm-nav">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                    <span>Abrir CRM Dashboard</span>
+                </a>
             </nav>
         </div>
     </header>
@@ -855,7 +903,8 @@
     <section class="hero">
         <div class="hero-inner">
             <div class="hero-pill">
-                🚀 Inteligencia Geoespacial · Auditoría Web · Automatización IA 24/7
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9.5"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+                <span>Inteligencia Geoespacial · Auditoría Web · Automatización IA 24/7</span>
             </div>
             <h1 class="hero-title">
                 No extraigas simples listas: <span>encuentra empresas perdiendo dinero hoy</span> y ciérralas con una Demo IA lista
@@ -864,6 +913,7 @@
                 <strong>AtlasIQ Enterprise</strong> transforma Google Maps en tu motor privado de ventas B2B. Escanea desde tu ubicación GPS, detecta quién no tiene web o atiende 100% manual, calcula cuántos dólares pierde cada mes, genera su <strong>Prototipo Web + Recepcionista IA 24/7</strong> en 1 clic y te alerta en vivo apenas abre tu propuesta.
             </p>
             <div class="hero-author-badge">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--primary);" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
                 <span>Arquitectura Oficial:</span>
                 <strong>Joseph Castillo (CEO)</strong>
                 <span>·</span>
@@ -871,13 +921,16 @@
             </div>
             <div class="hero-cta-box">
                 <a href="dashboard.html" class="btn-cta btn-cta-primary">
-                    📊 Entrar al CRM AtlasIQ
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                    <span>Entrar al CRM AtlasIQ</span>
                 </a>
                 <a href="AtlasIQ-Enterprise-v4.0-Client.zip" download id="btn-download-ext-zip" class="btn-cta btn-cta-emerald" style="display: none;">
-                    📦 Descargar Extensión Chrome (.ZIP)
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+                    <span>Descargar Extensión Chrome (.ZIP)</span>
                 </a>
-                <a href="https://wa.me/584124060610?text=Hola%20Joseph%20%2F%20WINDOWSTELECOM%20%F0%9F%91%8B%2C%20acabo%20de%20revisar%20la%20p%C3%A1gina%20principal%20de%20AtlasIQ%20Enterprise%20(https%3A%2F%2Fatlasiq.windowstelecom.com%2F).%20Quiero%20solicitar%20informaci%C3%B3n%2C%20los%20pasos%20de%20instalaci%C3%B3n%20y%20activar%20mi%20c%C3%B3digo%20de%20licencia%20ATQ4." target="_blank" rel="noopener noreferrer" class="btn-cta btn-cta-outline" style="border-color: #10b981; color: var(--accent);">
-                    💬 Solicitar Licencia (+58 412-4060610)
+                <a href="https://wa.me/584124060610?text=Hola%20Joseph%20%2F%20WINDOWSTELECOM.%20Acabo%20de%20revisar%20la%20p%C3%A1gina%20principal%20de%20AtlasIQ%20Enterprise%20(https%3A%2F%2Fatlasiq.windowstelecom.com%2F).%20Solicito%20informaci%C3%B3n%2C%20los%20pasos%20de%20instalaci%C3%B3n%20y%20mi%20c%C3%B3digo%20de%20activaci%C3%B3n%20ATQ4." target="_blank" rel="noopener noreferrer" class="btn-cta btn-cta-outline" style="border-color: #10b981; color: var(--accent);">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                    <span>Solicitar Licencia (+58 412-4060610)</span>
                 </a>
             </div>
 
@@ -957,7 +1010,7 @@
                         <span class="benefit-tag">Beneficio #4 · Timing Perfecto</span>
                         <div class="benefit-title">Sabes exactamente quién abrió tu propuesta y cuándo</div>
                         <div class="benefit-desc">
-                            Con el <strong>Radar de Aperturas Cloud</strong> ves la insignia <strong>🔥 Visto 3x</strong> apenas el dueño abre tu diagnóstico interactivo. Llamar o escribir por WhatsApp en ese preciso minuto multiplica por 5 la probabilidad de agendar y cobrar.
+                            Con el <strong>Radar de Aperturas Cloud</strong> ves la insignia ejecutiva <strong>Visto 3x</strong> apenas el dueño abre tu diagnóstico interactivo. Llamar o escribir por WhatsApp en ese preciso minuto multiplica por 5 la probabilidad de agendar y cobrar.
                         </div>
                         <div class="benefit-result">✓ Priorizas siempre a los prospectos más calientes</div>
                     </div>
@@ -1003,37 +1056,37 @@
                             <tr>
                                 <td><strong>Punto de partida geográfico</strong></td>
                                 <td><span class="badge-bad">Búsqueda manual limitada</span></td>
-                                <td><span class="badge-good">📍 Punto Cero GPS (Tu Ubicación) + Malla GeoGrid 2×2 y 3×3</span></td>
+                                <td><span class="badge-good">✓ Punto Cero GPS (Tu Ubicación) + Malla GeoGrid 2×2 y 3×3</span></td>
                             </tr>
                             <tr>
                                 <td><strong>Detección de "Falsas Webs"</strong></td>
-                                <td><span class="badge-bad">Cree que Linktree o Instagram es web</span></td>
-                                <td><span class="badge-good">🔗 Detecta Linktree, wa.me, Canva, webs caídas o sin SSL</span></td>
+                                <td><span class="badge-bad">Confunde Linktree o Instagram con web</span></td>
+                                <td><span class="badge-good">✓ Detecta Linktree, wa.me, Canva, webs caídas o sin SSL</span></td>
                             </tr>
                             <tr>
                                 <td><strong>Calificación de qué vender</strong></td>
                                 <td><span class="badge-bad">No existe (revisión 1 por 1)</span></td>
-                                <td><span class="badge-good">🎯 Doble Score separado: 🌐 Venta Web vs. 🤖 Bot IA + Ticket</span></td>
+                                <td><span class="badge-good">✓ Doble Score independiente: Venta Web vs. Bot IA + Ticket</span></td>
                             </tr>
                             <tr>
                                 <td><strong>Argumento económico en dólares</strong></td>
                                 <td><span class="badge-bad">Discurso subjetivo sin números</span></td>
-                                <td><span class="badge-good">💸 Calcula fuga mensual en USD según rubro y comisiones</span></td>
+                                <td><span class="badge-good">✓ Calcula fuga mensual en USD según rubro y comisiones</span></td>
                             </tr>
                             <tr>
                                 <td><strong>Demostración al cliente</strong></td>
                                 <td><span class="badge-bad">Texto plano ignorado en WhatsApp</span></td>
-                                <td><span class="badge-good">✨ Demo Web + Simulador Recepcionista IA 24/7 + PDF Marca Blanca</span></td>
+                                <td><span class="badge-good">✓ Demo Web + Simulador Recepcionista IA 24/7 + PDF Marca Blanca</span></td>
                             </tr>
                             <tr>
                                 <td><strong>Rastreo de lectura y seguimiento</strong></td>
                                 <td><span class="badge-bad">A ciegas, olvidando prospectos</span></td>
-                                <td><span class="badge-good">🔥 Radar de Aperturas en vivo + Cadencia Día 1 → Día 3 → Día 7</span></td>
+                                <td><span class="badge-good">✓ Radar de Aperturas en vivo + Cadencia Día 1 → Día 3 → Día 7</span></td>
                             </tr>
                             <tr>
                                 <td><strong>Costo mensual en créditos / APIs</strong></td>
                                 <td><span class="badge-bad">$79 a $299 USD/mes con límites</span></td>
-                                <td><span class="badge-good">$0 en APIs externas · Extracción local ilimitada</span></td>
+                                <td><span class="badge-good">✓ $0 en APIs externas · Extracción local ilimitada</span></td>
                             </tr>
                         </tbody>
                     </table>
@@ -1050,73 +1103,97 @@
 
                 <div class="feature-grid">
                     <div class="feature-box">
-                        <div class="feature-icon">📍</div>
+                        <div class="feature-icon emerald">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                        </div>
                         <div class="feature-box-title">1. Escaneo "Punto Cero" GPS + GeoGrid</div>
                         <div class="feature-box-desc">Toma tu ubicación actual exacta como primera referencia para barrer los negocios que te rodean, o despliega mallas automáticas 2×2 y 3×3 para superar el límite de 120 resultados de Google Maps.</div>
                     </div>
 
                     <div class="feature-box">
-                        <div class="feature-icon">🔗</div>
+                        <div class="feature-icon amber">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                        </div>
                         <div class="feature-box-title">2. Detector de Falsas Webs y Caídas</div>
                         <div class="feature-box-desc">Descubre al instante quién puso un Linktree, Instagram, Facebook, link de WhatsApp o Canva en lugar de una web real, además de detectar hostings vencidos, falta de SSL HTTPS o webs obsoletas.</div>
                     </div>
 
                     <div class="feature-box">
-                        <div class="feature-icon">🎯</div>
+                        <div class="feature-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><circle cx="12" cy="12" r="5.5"/><circle cx="12" cy="12" r="1.8"/></svg>
+                        </div>
                         <div class="feature-box-title">3. Doble Scoring (Web vs. Bot IA)</div>
                         <div class="feature-box-desc">Evalúa con algoritmos independientes la urgencia de Diseño Web (0–99) frente a la urgencia de Automatización IA (0–99), asignando la oferta ideal y el ticket recomendado de instalación + mensualidad.</div>
                     </div>
 
                     <div class="feature-box">
-                        <div class="feature-icon">🩸</div>
+                        <div class="feature-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="5" width="14" height="14" rx="2"/><rect x="9" y="9" width="6" height="6" rx="1"/><path d="M9 2v3M15 2v3M9 19v3M15 19v3M2 9h3M2 15h3M19 9h3M19 15h3"/></svg>
+                        </div>
                         <div class="feature-box-title">4. Escáner de Stack IA y Comisiones</div>
-                        <div class="feature-box-desc">Identifica +40 firmas técnicas (WordPress, Shopify, Wix, Meta/Google/TikTok Pixel, ManyChat, GoHighLevel, Kommo, Botpress) y detecta negocios desangrándose en comisiones de Rappi, UberEats, Doctoralia o Booksy.</div>
+                        <div class="feature-box-desc">Identifica +40 firmas técnicas (WordPress, Shopify, Wix, Meta/Google/TikTok Pixel, ManyChat, GoHighLevel, Kommo, Botpress) y detecta negocios cediendo margen en comisiones de Rappi, UberEats, Doctoralia o Booksy.</div>
                     </div>
 
                     <div class="feature-box">
-                        <div class="feature-icon">💸</div>
+                        <div class="feature-icon emerald">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="2" x2="12" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                        </div>
                         <div class="feature-box-title">5. Calculadora de Fuga en USD</div>
                         <div class="feature-box-desc">Cruza volumen de reseñas, ticket promedio de 8 verticales comerciales, fricción móvil y desatención fuera de horario para estimar cuántos dólares mensuales pierde cada empresa hoy mismo.</div>
                     </div>
 
                     <div class="feature-box">
-                        <div class="feature-icon">🏆</div>
+                        <div class="feature-icon amber">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>
+                        </div>
                         <div class="feature-box-title">6. Benchmark Top 3 del Cuadrante</div>
                         <div class="feature-box-desc">Calcula en milisegundos el ranking del prospecto frente a los 3 competidores mejor posicionados de su misma zona y rubro (distancia en metros, estrellas, reseñas, web propia y anuncios).</div>
                     </div>
 
                     <div class="feature-box">
-                        <div class="feature-icon">✨</div>
+                        <div class="feature-icon emerald">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+                        </div>
                         <div class="feature-box-title">7. Prototipo en Vivo (Web + Bot IA 24/7)</div>
                         <div class="feature-box-desc">Genera sin escribir código una vista previa de página web de alta conversión + simulador interactivo de Recepcionista IA adaptado al nicho del cliente, descargable en 1 archivo <code>.html</code> para WhatsApp.</div>
                     </div>
 
                     <div class="feature-box">
-                        <div class="feature-icon">🔥</div>
+                        <div class="feature-icon amber">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                        </div>
                         <div class="feature-box-title">8. Micrositios Cloud + Radar de Aperturas</div>
                         <div class="feature-box-desc">Publica diagnósticos con Demo IA en un enlace único de Cloudflare y rastrea en tiempo real cuántas veces el prospecto abrió tu propuesta para atacar en el momento exacto.</div>
                     </div>
 
                     <div class="feature-box">
-                        <div class="feature-icon">⚡</div>
+                        <div class="feature-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                        </div>
                         <div class="feature-box-title">9. Cadencia Día 1→3→7 + Modo Ráfaga</div>
                         <div class="feature-box-desc">Genera guiones hiper-personalizados para WhatsApp Día 1, Seguimiento Día 3, Cierre Día 7, Email ROI, Llamada de 30s y estrategia profunda con Gemini 2.5 Flash o Gemini Nano local.</div>
                     </div>
 
                     <div class="feature-box">
-                        <div class="feature-icon">🕵️</div>
+                        <div class="feature-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+                        </div>
                         <div class="feature-box-title">10. OSINT Fiscal, DNS/DMARC y Ad Spy</div>
                         <div class="feature-box-desc">Extrae emails ocultos, Razón Social, NIF/RFC/RIF y nombre del decisor; verifica registros MX, SPF y DMARC vía Cloudflare DoH y abre Meta Ad Library y Google Ads Transparency en 1 clic.</div>
                     </div>
 
                     <div class="feature-box">
-                        <div class="feature-icon">🗺️</div>
+                        <div class="feature-icon emerald">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/></svg>
+                        </div>
                         <div class="feature-box-title">11. Mapa de Calor, Kanban CRM y BI</div>
                         <div class="feature-box-desc">Visualiza océanos azules y saturación comercial O(N) sobre mapas interactivos, mueve negocios por tu embudo Kanban arrastrando tarjetas y analiza métricas ejecutivas en tiempo real.</div>
                     </div>
 
                     <div class="feature-box">
-                        <div class="feature-icon">📄</div>
+                        <div class="feature-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/></svg>
+                        </div>
                         <div class="feature-box-title">12. PDF Marca Blanca y Webhooks</div>
                         <div class="feature-box-desc">Descarga auditorías ejecutivas en PDF firmadas con el nombre y WhatsApp de tu agencia, exporta en CSV, Excel XLSX, JSON o vCard para tu celular y sincroniza con n8n, Make, HubSpot o GoHighLevel.</div>
                     </div>
@@ -1133,35 +1210,59 @@
 
                 <div class="sector-grid">
                     <div class="sector-pill">
-                        🦷 Clínicas, Médicos y Odontología
+                        <div class="sector-pill-head">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                            <span>Clínicas, Médicos y Odontología</span>
+                        </div>
                         <small>Web + Recepcionista IA de citas y recordatorios ($890 + $197/mes)</small>
                     </div>
                     <div class="sector-pill">
-                        🏢 Inmobiliarias y Constructoras
+                        <div class="sector-pill-head">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="16" height="20" x="4" y="2" rx="2"/><path d="M9 22v-4h6v4M8 6h.01M16 6h.01M12 6h.01M12 10h.01M12 14h.01M16 10h.01M16 14h.01M8 10h.01M8 14h.01"/></svg>
+                            <span>Inmobiliarias y Constructoras</span>
+                        </div>
                         <small>Embudo de propiedades + Calificador IA de presupuesto ($1,200 + $297/mes)</small>
                     </div>
                     <div class="sector-pill">
-                        🍽️ Restaurantes y Gastronomía
+                        <div class="sector-pill-head">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></svg>
+                            <span>Restaurantes y Gastronomía</span>
+                        </div>
                         <small>Menú y pedidos directos sin pagar 28% a apps ($690 + $147/mes)</small>
                     </div>
                     <div class="sector-pill">
-                        ⚖️ Abogados, Contadores y B2B
+                        <div class="sector-pill-head">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10M12 3v18M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/></svg>
+                            <span>Abogados, Contadores y B2B</span>
+                        </div>
                         <small>Web corporativa + Pre-calificador ejecutivo de casos ($950 + $247/mes)</small>
                     </div>
                     <div class="sector-pill">
-                        ✨ Estética, MedSpa y Barberías
+                        <div class="sector-pill-head">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><polyline points="12 6 12 12 16 14"/></svg>
+                            <span>Estética, MedSpa y Barberías</span>
+                        </div>
                         <small>Agenda 24/7 por WhatsApp cero inasistencias ($650 + $147/mes)</small>
                     </div>
                     <div class="sector-pill">
-                        🔧 Talleres, Concesionarios y Repuestos
+                        <div class="sector-pill-head">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+                            <span>Talleres, Concesionarios y Repuestos</span>
+                        </div>
                         <small>Cotizador IA rápido + recordatorios de servicio ($750 + $167/mes)</small>
                     </div>
                     <div class="sector-pill">
-                        🏋️ Gimnasios, Academias y Escuelas
+                        <div class="sector-pill-head">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 6.5h11M6.5 17.5h11M4 10v4M20 10v4M7 4v16M17 4v16"/></svg>
+                            <span>Gimnasios, Academias y Escuelas</span>
+                        </div>
                         <small>Closer IA de pases de prueba e inscripciones ($690 + $167/mes)</small>
                     </div>
                     <div class="sector-pill">
-                        📈 SEO Local y Tráfico Pago (Ads)
+                        <div class="sector-pill-head">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+                            <span>SEO Local y Tráfico Pago (Ads)</span>
+                        </div>
                         <small>Reclamación de ficha Maps + Píxeles + Campañas Meta/Google</small>
                     </div>
                 </div>
@@ -1180,21 +1281,21 @@
                         <div class="step-number">1</div>
                         <div>
                             <div class="step-title">Escanea desde tu Ubicación ("Punto Cero") o ciudad objetivo</div>
-                            <div class="step-desc">Abre la extensión, escribe un rubro rentable (ej. <em>«Clínicas dentales»</em> o <em>«Inmobiliarias»</em>) y pulsa <strong>📍 1. Escanear desde Mi Ubicación</strong>. AtlasIQ recolectará negocios y auditará sus webs y redes automáticamente.</div>
+                            <div class="step-desc">Abre la extensión, escribe un rubro rentable (ej. <em>«Clínicas dentales»</em> o <em>«Inmobiliarias»</em>) y pulsa <strong>1. Escanear desde Mi Ubicación</strong>. AtlasIQ recolectará negocios y auditará sus webs y redes automáticamente.</div>
                         </div>
                     </div>
                     <div class="process-step-item">
                         <div class="step-number">2</div>
                         <div>
-                            <div class="step-title">Filtra las joyas ocultas en 1 clic dentro del CRM</div>
-                            <div class="step-desc">Usa los chips superiores <strong>🌐 Vender Web</strong>, <strong>🤖 Vender Bot IA</strong> o <strong>🔗 Falsa Web / Caída</strong> para quedarte únicamente con empresas activas que tienen una urgencia evidente hoy mismo.</div>
+                            <div class="step-title">Filtra las oportunidades en 1 clic dentro del CRM</div>
+                            <div class="step-desc">Usa los selectores superiores <strong>Venta Web</strong>, <strong>Venta Automatización</strong> o <strong>Falsa Web (IG/Linktree)</strong> para quedarte únicamente con empresas activas que tienen una urgencia comercial evidente hoy mismo.</div>
                         </div>
                     </div>
                     <div class="process-step-item">
                         <div class="step-number">3</div>
                         <div>
                             <div class="step-title">Genera su Demo Pre-Construida o PDF Marca Blanca</div>
-                            <div class="step-desc">Abre el Inspector 360° del prospecto, revisa su fuga mensual en USD y su puesto frente al Top 3 del cuadrante, y pulsa <strong>✨ Ver Demo Pre-Construida</strong> o <strong>🌐 Link + Demo Cloud</strong>.</div>
+                            <div class="step-desc">Abre el Inspector 360° del prospecto, revisa su fuga mensual en USD y su puesto frente al Top 3 del cuadrante, y pulsa <strong>Ver Demo Pre-Construida</strong> o <strong>Link + Demo Cloud</strong>.</div>
                         </div>
                     </div>
                     <div class="process-step-item">
@@ -1207,8 +1308,8 @@
                     <div class="process-step-item">
                         <div class="step-number">5</div>
                         <div>
-                            <div class="step-title">Remata a quienes abren tu propuesta en vivo</div>
-                            <div class="step-desc">Pulsa <strong>🔥 Radar Aperturas</strong>: verás al instante quién acaba de abrir tu link y probar su simulador de Recepcionista IA. Llámalo o escríbele en caliente para cerrar el acuerdo.</div>
+                            <div class="step-title">Contacta al instante a quienes abren tu propuesta</div>
+                            <div class="step-desc">Pulsa <strong>Radar Aperturas</strong>: verás de inmediato quién acaba de abrir tu enlace y probar su simulador de Recepcionista IA. Llámalo o escríbele en ese momento para concretar el acuerdo.</div>
                         </div>
                     </div>
                 </div>
@@ -1217,13 +1318,18 @@
             <!-- SECTION 6: CHROME INSTALLATION & WHATSAPP LICENSE ACTIVATION -->
             <article class="install-box" id="instalacion">
                 <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;">
-                    <div class="install-heading">⚙️ Cómo instalar AtlasIQ paso a paso y activar tu licencia (+58 412-4060610)</div>
+                    <div class="install-heading" style="display: flex; align-items: center; gap: 10px;">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+                        <span>Cómo instalar AtlasIQ paso a paso y activar tu licencia (+58 412-4060610)</span>
+                    </div>
                     <div style="display: flex; gap: 8px; flex-wrap: wrap;">
                         <a href="AtlasIQ-Enterprise-v4.0-Client.zip" download class="btn-cta btn-cta-emerald js-ext-download-btn" style="display: none; height: 40px; font-size: 13px;">
-                            📥 1. Descargar Extensión (.ZIP)
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+                            <span>1. Descargar Extensión (.ZIP)</span>
                         </a>
-                        <a href="https://wa.me/584124060610?text=Hola%20Joseph%20%2F%20WINDOWSTELECOM%20%F0%9F%91%8B%2C%20ya%20le%C3%AD%20toda%20la%20informaci%C3%B3n%20y%20beneficios%20en%20la%20p%C3%A1gina%20principal%20de%20AtlasIQ%20Enterprise%20(https%3A%2F%2Fatlasiq.windowstelecom.com%2F).%20Quiero%20solicitar%20informaci%C3%B3n%20para%20instalarla%20y%20pedir%20mi%20c%C3%B3digo%20de%20activaci%C3%B3n%20ATQ4." target="_blank" rel="noopener noreferrer" class="btn-cta btn-cta-primary" style="height: 40px; font-size: 13px;">
-                            💬 2. Pedir Código al +58 412-4060610
+                        <a href="https://wa.me/584124060610?text=Hola%20Joseph%20%2F%20WINDOWSTELECOM.%20Ya%20revis%C3%A9%20toda%20la%20informaci%C3%B3n%20y%20beneficios%20en%20la%20p%C3%A1gina%20principal%20de%20AtlasIQ%20Enterprise%20(https%3A%2F%2Fatlasiq.windowstelecom.com%2F).%20Solicito%20informaci%C3%B3n%20para%20instalarla%20y%20activar%20mi%20c%C3%B3digo%20ATQ4." target="_blank" rel="noopener noreferrer" class="btn-cta btn-cta-primary" style="height: 40px; font-size: 13px;">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                            <span>2. Pedir Código al +58 412-4060610</span>
                         </a>
                     </div>
                 </div>
@@ -1249,7 +1355,7 @@
                     </div>
                     <div class="install-step-card">
                         <div class="num">5</div>
-                        <div class="text"><strong>Solicita tu Código de Activación al WhatsApp <code>+58 412-4060610</code>:</strong> Abre el CRM desde el icono de AtlasIQ, copia tu <strong>ID Criptográfico de Dispositivo</strong> (<code>ATQ-DEV-...</code>) y envíalo al WhatsApp oficial <a href="https://wa.me/584124060610?text=Hola%20Joseph%20%2F%20WINDOWSTELECOM%20%F0%9F%91%8B%2C%20ya%20le%C3%AD%20toda%20la%20p%C3%A1gina%20principal%20e%20instal%C3%A9%20AtlasIQ%20Enterprise.%20Quiero%20solicitar%20mi%20c%C3%B3digo%20de%20activaci%C3%B3n%20ATQ4.%20Mi%20ID%20de%20Dispositivo%20es%3A%20" target="_blank" rel="noopener noreferrer" style="color: #34d399; font-weight: 800; text-decoration: underline;">+58 412-4060610</a> para recibir tu llave firmada <code>ATQ4.</code> y pegarla en el activador.</div>
+                        <div class="text"><strong>Solicita tu Código de Activación al WhatsApp <code>+58 412-4060610</code>:</strong> Abre el CRM desde el icono de AtlasIQ, copia tu <strong>ID Criptográfico de Dispositivo</strong> (<code>ATQ-DEV-...</code>) y envíalo al WhatsApp oficial <a href="https://wa.me/584124060610?text=Hola%20Joseph%20%2F%20WINDOWSTELECOM.%20Ya%20revis%C3%A9%20toda%20la%20p%C3%A1gina%20principal%20e%20instal%C3%A9%20AtlasIQ%20Enterprise.%20Solicito%20mi%20c%C3%B3digo%20de%20activaci%C3%B3n%20ATQ4.%20Mi%20ID%20de%20Dispositivo%20es%3A%20" target="_blank" rel="noopener noreferrer" style="color: #34d399; font-weight: 800; text-decoration: underline;">+58 412-4060610</a> para recibir tu llave firmada <code>ATQ4.</code> y pegarla en el activador.</div>
                     </div>
                 </div>
             </article>
@@ -1264,11 +1370,13 @@
                     </div>
                 </div>
                 <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                    <a href="https://wa.me/584124060610?text=Hola%20Joseph%20%2F%20WINDOWSTELECOM%20%F0%9F%91%8B%2C%20le%C3%AD%20toda%20la%20informaci%C3%B3n%20en%20la%20p%C3%A1gina%20principal%20de%20AtlasIQ%20Enterprise%20y%20quiero%20activar%20mi%20licencia%20ATQ4." target="_blank" rel="noopener noreferrer" class="btn-cta btn-cta-emerald" style="height: 42px; font-size: 13.5px;">
-                        💬 WhatsApp Activación (+58 412-4060610)
+                    <a href="https://wa.me/584124060610?text=Hola%20Joseph%20%2F%20WINDOWSTELECOM.%20Revis%C3%A9%20toda%20la%20informaci%C3%B3n%20en%20la%20p%C3%A1gina%20principal%20de%20AtlasIQ%20Enterprise%20y%20deseo%20activar%20mi%20licencia%20ATQ4." target="_blank" rel="noopener noreferrer" class="btn-cta btn-cta-emerald" style="height: 42px; font-size: 13.5px;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                        <span>WhatsApp Activación (+58 412-4060610)</span>
                     </a>
                     <a href="dashboard.html" class="btn-cta btn-cta-primary" style="height: 42px; font-size: 13.5px;">
-                        📊 Abrir CRM AtlasIQ
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                        <span>Abrir CRM AtlasIQ</span>
                     </a>
                 </div>
             </article>
