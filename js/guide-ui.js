@@ -1,5 +1,5 @@
 /**
- * AtlasIQ Enterprise v4.0 - CSP-Safe Standalone Guide UI Controller
+ * AtlasIQ Enterprise v4.5 - CSP-Safe Standalone Landing & Guide UI Controller
  */
 (function () {
     function updateThemeBtn(theme) {
@@ -30,10 +30,14 @@
             });
         }
 
-        // Show direct extension ZIP download button when hosted on web (https://atlasiq.windowstelecom.com)
-        var dlBtn = document.getElementById("btn-download-ext-zip");
-        if (dlBtn && (window.location.protocol === "https:" || window.location.protocol === "http:")) {
-            dlBtn.style.display = "inline-flex";
+        // Show direct extension ZIP download buttons when hosted on web (https://atlasiq.windowstelecom.com)
+        if (window.location.protocol === "https:" || window.location.protocol === "http:") {
+            var dlBtn = document.getElementById("btn-download-ext-zip");
+            if (dlBtn) dlBtn.style.display = "inline-flex";
+            var extraBtns = document.querySelectorAll(".js-ext-download-btn");
+            for (var i = 0; i < extraBtns.length; i++) {
+                extraBtns[i].style.display = "inline-flex";
+            }
         }
     });
 })();

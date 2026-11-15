@@ -5,7 +5,8 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover" />
     <meta name="theme-color" content="#2563eb" />
-    <title>AtlasIQ Enterprise v4.0 – Guía Oficial y Manual de Prospección B2B</title>
+    <meta name="description" content="AtlasIQ Enterprise por WINDOWSTELECOM: Plataforma de inteligencia comercial geoespacial, auditoría OSINT, cálculo de fuga en USD, demos de Recepcionista IA 24/7 y CRM B2B sobre Google Maps." />
+    <title>AtlasIQ Enterprise – Inteligencia Comercial B2B, Venta Web y Automatización IA</title>
     <script src="js/theme-init.js"></script>
     <style>
         :root {
@@ -13,241 +14,41 @@
             --primary-dark: #1d4ed8;
             --primary-light: #eff6ff;
             --accent: #10b981;
+            --accent-dark: #059669;
             --accent-light: #ecfdf5;
+            --warn: #f59e0b;
+            --danger: #ef4444;
             --bg: #f8fafc;
             --card-bg: #ffffff;
+            --subtle-bg: #f1f5f9;
             --text-main: #0f172a;
             --text-muted: #475569;
             --text-light: #64748b;
             --border: #e2e8f0;
-            --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
-            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.08), 0 2px 4px -2px rgba(0,0,0,0.05);
-            --shadow-xl: 0 20px 25px -5px rgba(0,0,0,0.08), 0 8px 10px -6px rgba(0,0,0,0.04);
-            --radius-lg: 16px;
-            --radius-md: 10px;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 8px 20px -4px rgba(15, 23, 42, 0.08);
+            --shadow-xl: 0 20px 30px -8px rgba(15, 23, 42, 0.12);
+            --radius-lg: 18px;
+            --radius-md: 12px;
         }
 
-        /* === LUXURY OBSIDIAN DARK THEME === */
         [data-theme="dark"] {
             --primary: #3b82f6;
             --primary-dark: #60a5fa;
             --primary-light: #172554;
             --accent: #10b981;
+            --accent-dark: #34d399;
             --accent-light: #064e3b;
-            --bg: #0b0f19;
-            --card-bg: #111827;
+            --bg: #070b14;
+            --card-bg: #0f172a;
+            --subtle-bg: #111c33;
             --text-main: #f8fafc;
             --text-muted: #cbd5e1;
             --text-light: #94a3b8;
             --border: #1e293b;
-            --shadow-sm: 0 1px 3px rgba(0,0,0,0.4);
-            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.5);
-            --shadow-xl: 0 20px 25px -5px rgba(0,0,0,0.7);
-        }
-
-        [data-theme="dark"] body {
-            background-color: var(--bg);
-            color: var(--text-main);
-        }
-
-        [data-theme="dark"] .topbar {
-            background: rgba(17, 24, 39, 0.94);
-            border-bottom-color: #1e293b;
-        }
-
-        [data-theme="dark"] .brand-name {
-            color: #f8fafc;
-        }
-
-        [data-theme="dark"] .topbar-badge {
-            background: rgba(59, 130, 246, 0.18);
-            border-color: rgba(59, 130, 246, 0.4);
-            color: #93c5fd;
-        }
-
-        [data-theme="dark"] .topbar-nav a {
-            color: #cbd5e1;
-            background: #1e293b;
-        }
-
-        [data-theme="dark"] .hero {
-            background: linear-gradient(180deg, #111827 0%, #0b0f19 100%);
-            border-bottom-color: #1e293b;
-        }
-
-        [data-theme="dark"] .hero-title {
-            color: #f8fafc;
-        }
-
-        [data-theme="dark"] .hero-subtitle {
-            color: #cbd5e1;
-        }
-
-        [data-theme="dark"] .hero-pill {
-            background: rgba(59, 130, 246, 0.15);
-            border-color: rgba(59, 130, 246, 0.35);
-            color: #93c5fd;
-        }
-
-        [data-theme="dark"] .hero-author-badge {
-            background: #111827;
-            border-color: #1e293b;
-            color: #f8fafc;
-        }
-
-        [data-theme="dark"] .hero-author-badge span.company {
-            color: #60a5fa;
-        }
-
-        [data-theme="dark"] .btn-cta-outline {
-            background: #1e293b;
-            color: #f8fafc;
-            border-color: #334155;
-        }
-
-        [data-theme="dark"] .btn-cta-outline:hover {
-            background: #334155;
-            border-color: #475569;
-            color: #ffffff;
-        }
-
-        [data-theme="dark"] .sidebar-nav {
-            background: #111827;
-            border-color: #1e293b;
-        }
-
-        [data-theme="dark"] .sidebar-title {
-            color: #94a3b8;
-        }
-
-        [data-theme="dark"] .sidebar-link {
-            color: #cbd5e1;
-        }
-
-        [data-theme="dark"] .sidebar-link:hover {
-            background: #1e293b;
-            color: #60a5fa;
-        }
-
-        [data-theme="dark"] .guide-card {
-            background: #111827;
-            border-color: #1e293b;
-        }
-
-        [data-theme="dark"] .guide-section-badge {
-            color: #60a5fa;
-        }
-
-        [data-theme="dark"] .guide-heading {
-            color: #f8fafc;
-        }
-
-        [data-theme="dark"] .guide-text {
-            color: #cbd5e1;
-        }
-
-        [data-theme="dark"] .guide-text strong {
-            color: #f8fafc;
-        }
-
-        /* Callout Box Dark Mode */
-        [data-theme="dark"] .callout-box {
-            background: rgba(30, 58, 138, 0.25);
-            border-left: 4px solid #3b82f6;
-            border-top: 1px solid rgba(59, 130, 246, 0.2);
-            border-right: 1px solid rgba(59, 130, 246, 0.2);
-            border-bottom: 1px solid rgba(59, 130, 246, 0.2);
-            color: #e2e8f0;
-        }
-
-        [data-theme="dark"] .callout-box strong {
-            color: #93c5fd;
-        }
-
-        /* Process Steps Dark Mode */
-        [data-theme="dark"] .process-step-item {
-            background: #0b0f19;
-            border-color: #1e293b;
-        }
-
-        [data-theme="dark"] .step-number {
-            background: #2563eb;
-            color: #ffffff;
-        }
-
-        [data-theme="dark"] .step-title {
-            color: #f8fafc;
-        }
-
-        [data-theme="dark"] .step-desc {
-            color: #cbd5e1;
-        }
-
-        /* Sector Pills Dark Mode */
-        [data-theme="dark"] .sector-pill {
-            background: #0b0f19;
-            border-color: #1e293b;
-            color: #f8fafc;
-        }
-
-        /* Feature Boxes Dark Mode */
-        [data-theme="dark"] .feature-box {
-            background: #0b0f19;
-            border-color: #1e293b;
-        }
-
-        [data-theme="dark"] .feature-box-title {
-            color: #f8fafc;
-        }
-
-        [data-theme="dark"] .feature-box-desc {
-            color: #94a3b8;
-        }
-
-        /* Install Box Dark Mode */
-        [data-theme="dark"] .install-box {
-            background: linear-gradient(135deg, #070b14 0%, #0f172a 100%);
-            border: 1px solid #1e293b;
-        }
-
-        [data-theme="dark"] .install-step-card {
-            background: rgba(255, 255, 255, 0.05);
-            border-color: #1e293b;
-        }
-
-        [data-theme="dark"] .install-step-card .text {
-            color: #f1f5f9;
-        }
-
-        [data-theme="dark"] .install-step-card code {
-            background: #030712;
-            color: #93c5fd;
-            border: 1px solid #1e293b;
-        }
-
-        /* Author Card Dark Mode */
-        [data-theme="dark"] .author-card {
-            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-            border-color: #334155;
-        }
-
-        [data-theme="dark"] .author-title {
-            color: #f8fafc;
-        }
-
-        [data-theme="dark"] .author-meta {
-            color: #60a5fa;
-        }
-
-        [data-theme="dark"] .author-desc {
-            color: #cbd5e1;
-        }
-
-        /* Footer Dark Mode */
-        [data-theme="dark"] .main-footer {
-            background: #0b0f19;
-            border-top-color: #1e293b;
-            color: #94a3b8;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.45);
+            --shadow-md: 0 10px 25px -5px rgba(0, 0, 0, 0.55);
+            --shadow-xl: 0 22px 35px -8px rgba(0, 0, 0, 0.75);
         }
 
         * {
@@ -260,7 +61,7 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             background-color: var(--bg);
             color: var(--text-main);
-            line-height: 1.6;
+            line-height: 1.62;
             scroll-behavior: smooth;
         }
 
@@ -269,19 +70,24 @@
             position: sticky;
             top: 0;
             background: rgba(255, 255, 255, 0.92);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
             border-bottom: 1px solid var(--border);
             z-index: 100;
             padding: 12px 24px;
         }
 
+        [data-theme="dark"] .topbar {
+            background: rgba(11, 17, 32, 0.92);
+        }
+
         .topbar-content {
-            max-width: 1200px;
+            max-width: 1240px;
             margin: 0 auto;
             display: flex;
             align-items: center;
             justify-content: space-between;
+            gap: 16px;
         }
 
         .brand-box {
@@ -292,21 +98,22 @@
         }
 
         .brand-logo {
-            width: 36px;
-            height: 36px;
-            background: linear-gradient(135deg, #1d4ed8, #2563eb);
-            border-radius: 8px;
+            width: 38px;
+            height: 38px;
+            background: linear-gradient(135deg, #1d4ed8, #06b6d4);
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
             color: #fff;
             font-size: 20px;
             font-weight: 900;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
         }
 
         .brand-name {
-            font-size: 18px;
-            font-weight: 800;
+            font-size: 19px;
+            font-weight: 900;
             color: var(--text-main);
             letter-spacing: -0.5px;
         }
@@ -316,20 +123,21 @@
         }
 
         .topbar-badge {
-            font-size: 11px;
-            font-weight: 700;
-            background: var(--primary-light);
-            color: var(--primary);
-            padding: 3px 8px;
-            border-radius: 20px;
-            border: 1px solid #bfdbfe;
+            font-size: 10.5px;
+            font-weight: 800;
+            background: rgba(16, 185, 129, 0.14);
+            color: var(--accent);
+            padding: 3px 9px;
+            border-radius: 99px;
+            border: 1px solid rgba(16, 185, 129, 0.35);
             text-transform: uppercase;
+            letter-spacing: 0.4px;
         }
 
         .topbar-nav {
             display: flex;
             align-items: center;
-            gap: 20px;
+            gap: 16px;
         }
 
         .topbar-nav a {
@@ -345,86 +153,80 @@
         }
 
         .btn-crm-nav {
-            background: var(--primary);
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
             color: #fff !important;
-            padding: 6px 14px;
+            padding: 7px 15px;
             border-radius: 8px;
             font-weight: 700 !important;
-            box-shadow: 0 2px 4px rgba(37, 99, 235, 0.25);
-            transition: transform 0.15s !important;
-        }
-
-        .btn-crm-nav:hover {
-            transform: translateY(-1px);
-            background: var(--primary-dark);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
         }
 
         /* === HERO SECTION === */
         .hero {
-            background: linear-gradient(180deg, #ffffff 0%, #f1f5f9 100%);
+            background: radial-gradient(circle at 50% 0%, rgba(37, 99, 235, 0.14) 0%, transparent 65%),
+                        linear-gradient(180deg, var(--card-bg) 0%, var(--bg) 100%);
             border-bottom: 1px solid var(--border);
-            padding: 64px 24px 50px;
+            padding: 68px 24px 56px;
             text-align: center;
         }
 
         .hero-inner {
-            max-width: 860px;
+            max-width: 980px;
             margin: 0 auto;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 18px;
+            gap: 20px;
         }
 
         .hero-pill {
             display: inline-flex;
             align-items: center;
-            gap: 6px;
-            background: #eff6ff;
-            color: #2563eb;
-            border: 1px solid #bfdbfe;
-            padding: 4px 12px;
-            border-radius: 20px;
+            gap: 8px;
+            background: rgba(59, 130, 246, 0.14);
+            color: var(--primary);
+            border: 1px solid rgba(59, 130, 246, 0.35);
+            padding: 6px 16px;
+            border-radius: 99px;
             font-size: 12px;
-            font-weight: 700;
+            font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.6px;
         }
 
         .hero-title {
-            font-size: 42px;
+            font-size: clamp(30px, 4.6vw, 50px);
             font-weight: 900;
-            line-height: 1.18;
-            letter-spacing: -1px;
-            color: #0f172a;
+            line-height: 1.13;
+            letter-spacing: -1.2px;
+            color: var(--text-main);
         }
 
         .hero-title span {
-            background: linear-gradient(135deg, #1d4ed8, #2563eb);
+            background: linear-gradient(135deg, #3b82f6, #10b981);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
         .hero-subtitle {
-            font-size: 18px;
+            font-size: clamp(16px, 2vw, 19px);
             color: var(--text-muted);
-            max-width: 720px;
-            line-height: 1.5;
+            max-width: 820px;
+            line-height: 1.58;
         }
 
         .hero-author-badge {
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            background: #ffffff;
+            background: var(--card-bg);
             border: 1px solid var(--border);
-            border-radius: 30px;
-            padding: 6px 16px;
+            border-radius: 99px;
+            padding: 7px 18px;
             box-shadow: var(--shadow-sm);
             font-size: 13px;
             font-weight: 600;
             color: var(--text-main);
-            margin-top: 6px;
         }
 
         .hero-author-badge span.company {
@@ -435,71 +237,118 @@
         .hero-cta-box {
             display: flex;
             gap: 12px;
-            margin-top: 14px;
+            margin-top: 8px;
             flex-wrap: wrap;
             justify-content: center;
         }
 
         .btn-cta {
-            height: 44px;
-            padding: 0 20px;
-            border-radius: 8px;
+            height: 46px;
+            padding: 0 22px;
+            border-radius: 10px;
             font-size: 14px;
-            font-weight: 700;
+            font-weight: 800;
             display: inline-flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
             cursor: pointer;
             text-decoration: none;
-            transition: all 0.15s;
+            transition: all 0.18s;
+            border: 1px solid transparent;
         }
 
         .btn-cta-primary {
-            background: var(--primary);
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
             color: #fff;
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+            box-shadow: 0 6px 18px rgba(37, 99, 235, 0.32);
         }
 
         .btn-cta-primary:hover {
-            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .btn-cta-emerald {
+            background: linear-gradient(135deg, #059669, #10b981);
+            color: #fff;
+            box-shadow: 0 6px 18px rgba(16, 185, 129, 0.28);
+        }
+
+        .btn-cta-emerald:hover {
             transform: translateY(-2px);
         }
 
         .btn-cta-outline {
-            background: #fff;
+            background: var(--card-bg);
             color: var(--text-main);
-            border: 1px solid var(--border);
+            border-color: var(--border);
         }
 
         .btn-cta-outline:hover {
-            background: #f8fafc;
-            border-color: #cbd5e1;
+            border-color: var(--primary);
+            color: var(--primary);
         }
 
-        /* === LAYOUT WITH SIDEBAR & CONTENT === */
-        .layout-container {
-            max-width: 1200px;
-            margin: 40px auto;
-            padding: 0 24px;
+        /* === HERO KPI STRIP === */
+        .kpi-strip {
+            width: 100%;
+            max-width: 1060px;
+            margin-top: 24px;
             display: grid;
-            grid-template-columns: 280px 1fr;
-            gap: 40px;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
+            text-align: left;
         }
 
-        /* Sidebar Navigation */
-        .sidebar-nav {
-            position: sticky;
-            top: 80px;
-            height: fit-content;
-            background: #fff;
+        .kpi-pill-card {
+            background: var(--card-bg);
             border: 1px solid var(--border);
             border-radius: var(--radius-md);
-            padding: 20px 16px;
+            padding: 16px 18px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .kpi-pill-card strong {
+            display: block;
+            font-size: 20px;
+            font-weight: 900;
+            color: var(--primary);
+            margin-bottom: 4px;
+        }
+
+        .kpi-pill-card strong.emerald {
+            color: var(--accent);
+        }
+
+        .kpi-pill-card span {
+            font-size: 12.5px;
+            color: var(--text-muted);
+            line-height: 1.45;
+            display: block;
+        }
+
+        /* === MAIN TWO-COLUMN LAYOUT === */
+        .layout-container {
+            max-width: 1240px;
+            margin: 44px auto;
+            padding: 0 24px;
+            display: grid;
+            grid-template-columns: 270px 1fr;
+            gap: 36px;
+        }
+
+        .sidebar-nav {
+            position: sticky;
+            top: 82px;
+            height: fit-content;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 18px 14px;
             box-shadow: var(--shadow-sm);
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 5px;
         }
 
         .sidebar-title {
@@ -508,8 +357,8 @@
             text-transform: uppercase;
             letter-spacing: 0.6px;
             color: var(--text-light);
-            margin-bottom: 8px;
-            padding-left: 8px;
+            margin-bottom: 6px;
+            padding-left: 10px;
         }
 
         .sidebar-link {
@@ -517,163 +366,202 @@
             font-weight: 600;
             color: var(--text-muted);
             text-decoration: none;
-            padding: 8px 12px;
-            border-radius: 6px;
+            padding: 8px 10px;
+            border-radius: 8px;
             transition: all 0.15s;
-            display: flex;
-            align-items: center;
-            gap: 8px;
         }
 
         .sidebar-link:hover {
-            background: #f1f5f9;
+            background: var(--subtle-bg);
             color: var(--primary);
         }
 
-        /* Main Guide Content */
         .content-area {
             display: flex;
             flex-direction: column;
-            gap: 36px;
+            gap: 34px;
         }
 
         .guide-card {
             background: var(--card-bg);
             border: 1px solid var(--border);
             border-radius: var(--radius-lg);
-            padding: 32px;
+            padding: 34px;
             box-shadow: var(--shadow-sm);
             display: flex;
             flex-direction: column;
-            gap: 16px;
+            gap: 18px;
         }
 
         .guide-section-badge {
-            font-size: 11px;
+            font-size: 11.5px;
             font-weight: 800;
             color: var(--primary);
             text-transform: uppercase;
-            letter-spacing: 0.6px;
+            letter-spacing: 0.7px;
             display: inline-block;
         }
 
         .guide-heading {
-            font-size: 24px;
-            font-weight: 800;
-            color: #0f172a;
-            line-height: 1.3;
+            font-size: clamp(22px, 2.6vw, 28px);
+            font-weight: 900;
+            color: var(--text-main);
+            line-height: 1.25;
             letter-spacing: -0.5px;
         }
 
         .guide-text {
             font-size: 15px;
             color: var(--text-muted);
-            line-height: 1.7;
+            line-height: 1.68;
         }
 
-        /* Sector Grid */
-        .sector-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 12px;
-            margin-top: 10px;
-        }
-
-        .sector-pill {
-            background: #f8fafc;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 10px 14px;
-            font-size: 13px;
-            font-weight: 600;
+        .guide-text strong {
             color: var(--text-main);
-            display: flex;
-            align-items: center;
-            gap: 8px;
         }
 
-        /* Callout Box */
-        .callout-box {
-            background: #eff6ff;
-            border-left: 4px solid var(--primary);
-            border-radius: 0 8px 8px 0;
-            padding: 16px 20px;
-            font-size: 14px;
-            color: #1e3a8a;
-            line-height: 1.6;
+        /* === BENEFIT CARDS === */
+        .benefit-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+            margin-top: 6px;
         }
 
-        .callout-box strong {
-            color: #1e40af;
-        }
-
-        /* Process Steps */
-        .process-steps {
+        .benefit-card {
+            background: var(--subtle-bg);
+            border: 1px solid var(--border);
+            border-top: 3px solid var(--primary);
+            border-radius: var(--radius-md);
+            padding: 22px;
             display: flex;
             flex-direction: column;
-            gap: 14px;
-            margin-top: 10px;
+            gap: 10px;
+            transition: transform 0.18s, box-shadow 0.18s;
         }
 
-        .process-step-item {
-            display: flex;
-            gap: 14px;
-            background: #f8fafc;
+        .benefit-card.emerald-top {
+            border-top-color: var(--accent);
+        }
+
+        .benefit-card.amber-top {
+            border-top-color: var(--warn);
+        }
+
+        .benefit-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .benefit-tag {
+            align-self: flex-start;
+            font-size: 11px;
+            font-weight: 800;
+            padding: 3px 10px;
+            border-radius: 99px;
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--primary);
+        }
+
+        .benefit-tag.emerald {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--accent);
+        }
+
+        .benefit-title {
+            font-size: 16.5px;
+            font-weight: 800;
+            color: var(--text-main);
+            line-height: 1.3;
+        }
+
+        .benefit-desc {
+            font-size: 13.8px;
+            color: var(--text-muted);
+            line-height: 1.55;
+        }
+
+        .benefit-result {
+            margin-top: auto;
+            padding-top: 10px;
+            border-top: 1px dashed var(--border);
+            font-size: 12.5px;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        /* === COMPARISON TABLE === */
+        .table-wrapper {
+            width: 100%;
+            overflow-x: auto;
             border: 1px solid var(--border);
             border-radius: var(--radius-md);
-            padding: 16px 20px;
         }
 
-        .step-number {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background: var(--primary);
-            color: #fff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .comp-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13.5px;
+            min-width: 620px;
+        }
+
+        .comp-table th,
+        .comp-table td {
+            padding: 13px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .comp-table th {
+            background: var(--subtle-bg);
             font-weight: 800;
-            font-size: 14px;
-            flex-shrink: 0;
+            color: var(--text-main);
+            font-size: 12.5px;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
         }
 
-        .step-content {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
+        .comp-table tr:last-child td {
+            border-bottom: none;
         }
 
-        .step-title {
-            font-size: 15px;
+        .badge-bad {
+            display: inline-block;
+            background: rgba(239, 68, 68, 0.14);
+            color: #ef4444;
             font-weight: 700;
-            color: #0f172a;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 12px;
         }
 
-        .step-desc {
-            font-size: 14px;
-            color: var(--text-muted);
-            line-height: 1.5;
+        .badge-good {
+            display: inline-block;
+            background: rgba(16, 185, 129, 0.16);
+            color: var(--accent);
+            font-weight: 800;
+            padding: 3px 9px;
+            border-radius: 6px;
+            font-size: 12px;
         }
 
-        /* Features Matrix */
+        /* === FEATURE MATRIX === */
         .feature-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(265px, 1fr));
             gap: 16px;
-            margin-top: 12px;
+            margin-top: 8px;
         }
 
         .feature-box {
-            background: #ffffff;
+            background: var(--subtle-bg);
             border: 1px solid var(--border);
             border-radius: var(--radius-md);
             padding: 20px;
-            box-shadow: var(--shadow-sm);
             display: flex;
             flex-direction: column;
             gap: 8px;
-            transition: transform 0.2s, box-shadow 0.2s;
+            transition: transform 0.18s, box-shadow 0.18s;
         }
 
         .feature-box:hover {
@@ -682,46 +570,126 @@
         }
 
         .feature-icon {
-            font-size: 26px;
+            font-size: 25px;
         }
 
         .feature-box-title {
-            font-size: 16px;
-            font-weight: 700;
-            color: #0f172a;
+            font-size: 15.5px;
+            font-weight: 800;
+            color: var(--text-main);
+            line-height: 1.3;
         }
 
         .feature-box-desc {
-            font-size: 13px;
+            font-size: 13.3px;
             color: var(--text-muted);
-            line-height: 1.5;
+            line-height: 1.55;
         }
 
-        /* Installation Checklist Box */
-        .install-box {
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-            color: #fff;
-            border-radius: var(--radius-lg);
-            padding: 32px;
+        /* === CALLOUT & STEPS === */
+        .callout-box {
+            background: rgba(59, 130, 246, 0.1);
+            border-left: 4px solid var(--primary);
+            border-radius: 0 10px 10px 0;
+            padding: 16px 20px;
+            font-size: 14px;
+            color: var(--text-main);
+            line-height: 1.6;
+        }
+
+        .process-steps {
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 13px;
+        }
+
+        .process-step-item {
+            display: flex;
+            gap: 15px;
+            background: var(--subtle-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 18px 20px;
+            align-items: flex-start;
+        }
+
+        .step-number {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #2563eb, #06b6d4);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .step-title {
+            font-size: 15.5px;
+            font-weight: 800;
+            color: var(--text-main);
+            margin-bottom: 3px;
+        }
+
+        .step-desc {
+            font-size: 13.8px;
+            color: var(--text-muted);
+            line-height: 1.55;
+        }
+
+        .sector-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            gap: 12px;
+        }
+
+        .sector-pill {
+            background: var(--subtle-bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 13px 15px;
+            font-size: 13.5px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .sector-pill small {
+            display: block;
+            font-weight: 500;
+            color: var(--text-light);
+            font-size: 12px;
+            margin-top: 3px;
+        }
+
+        /* === INSTALL BOX === */
+        .install-box {
+            background: linear-gradient(135deg, #070b14 0%, #0f172a 100%);
+            color: #fff;
+            border: 1px solid #1e293b;
+            border-radius: var(--radius-lg);
+            padding: 34px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
         }
 
         .install-heading {
-            font-size: 22px;
-            font-weight: 800;
+            font-size: 23px;
+            font-weight: 900;
             color: #fff;
         }
 
         .install-steps {
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 11px;
         }
 
         .install-step-card {
-            background: rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, 0.06);
             border: 1px solid rgba(255, 255, 255, 0.12);
             border-radius: 10px;
             padding: 14px 18px;
@@ -750,18 +718,19 @@
         }
 
         .install-step-card code {
-            background: rgba(0, 0, 0, 0.4);
-            padding: 2px 6px;
-            border-radius: 4px;
+            background: #030712;
+            padding: 2px 7px;
+            border-radius: 5px;
             color: #93c5fd;
             font-family: monospace;
             font-size: 13px;
+            border: 1px solid #1e293b;
         }
 
-        /* Author Credit Footer */
+        /* === AUTHOR CARD & FOOTER === */
         .author-card {
-            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
-            border: 1.5px solid #bfdbfe;
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.12) 0%, rgba(16, 185, 129, 0.1) 100%);
+            border: 1.5px solid rgba(59, 130, 246, 0.32);
             border-radius: var(--radius-lg);
             padding: 32px;
             display: flex;
@@ -771,184 +740,87 @@
             flex-wrap: wrap;
         }
 
-        .author-info {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-
         .author-title {
-            font-size: 20px;
+            font-size: 22px;
             font-weight: 900;
-            color: #1e3a8a;
+            color: var(--text-main);
         }
 
         .author-meta {
-            font-size: 14px;
-            color: #3b82f6;
-            font-weight: 600;
+            font-size: 12px;
+            color: var(--primary);
+            font-weight: 800;
+            letter-spacing: 0.7px;
+            text-transform: uppercase;
         }
 
         .author-desc {
             font-size: 14px;
-            color: #1e293b;
-            max-width: 580px;
-            line-height: 1.5;
+            color: var(--text-muted);
+            max-width: 610px;
+            margin-top: 6px;
         }
 
-        /* Footer */
         .main-footer {
             border-top: 1px solid var(--border);
-            padding: 32px 24px;
-            background: #fff;
+            padding: 34px 24px;
+            background: var(--card-bg);
             text-align: center;
             font-size: 13px;
             color: var(--text-light);
-            margin-top: 50px;
+            margin-top: 52px;
         }
 
-        /* === COMPREHENSIVE RESPONSIVE MOBILE SYSTEM === */
-        @media (max-width: 860px) {
-            .topbar {
-                padding: 10px 14px;
+        @media (max-width: 920px) {
+            .kpi-strip {
+                grid-template-columns: repeat(2, 1fr);
             }
-
-            .topbar-content {
-                flex-direction: column;
-                align-items: stretch;
-                gap: 10px;
-            }
-
-            .brand-box {
-                justify-content: space-between;
-                width: 100%;
-            }
-
-            .topbar-nav {
-                display: flex;
-                overflow-x: auto;
-                flex-wrap: nowrap;
-                gap: 8px;
-                padding-bottom: 4px;
-                width: 100%;
-                -webkit-overflow-scrolling: touch;
-                scrollbar-width: none;
-            }
-
-            .topbar-nav::-webkit-scrollbar {
-                display: none;
-            }
-
-            .topbar-nav a {
-                white-space: nowrap;
-                font-size: 12px;
-                padding: 6px 10px;
-                border-radius: 6px;
-                background: #f1f5f9;
-                flex-shrink: 0;
-            }
-
-            .btn-crm-nav {
-                background: var(--primary) !important;
-                color: #fff !important;
-            }
-
-            .hero {
-                padding: 36px 16px 28px;
-            }
-
-            .hero-title {
-                font-size: 28px;
-                line-height: 1.22;
-                letter-spacing: -0.5px;
-            }
-
-            .hero-subtitle {
-                font-size: 15px;
-            }
-
-            .hero-author-badge {
-                font-size: 12px;
-                padding: 4px 12px;
-            }
-
-            .hero-cta-box {
-                flex-direction: column;
-                width: 100%;
-                gap: 8px;
-            }
-
-            .btn-cta {
-                width: 100%;
-                height: 44px;
-                font-size: 14px;
-            }
-
             .layout-container {
                 grid-template-columns: 1fr;
-                padding: 0 14px;
-                gap: 20px;
+                padding: 0 16px;
             }
-
             .sidebar-nav {
                 display: none;
             }
-
-            .guide-card {
-                padding: 20px 16px;
-                border-radius: 12px;
-            }
-
-            .guide-heading {
-                font-size: 20px;
-            }
-
-            .table-wrapper {
-                overflow-x: auto;
-                -webkit-overflow-scrolling: touch;
-                width: 100%;
-            }
-
-            .author-card {
-                padding: 20px 16px;
+            .topbar-content {
                 flex-direction: column;
                 align-items: stretch;
-                text-align: center;
-                gap: 16px;
             }
-
-            .author-card a {
-                width: 100%;
+            .brand-box {
+                justify-content: space-between;
+            }
+            .topbar-nav {
+                overflow-x: auto;
+                flex-wrap: nowrap;
+                padding-bottom: 4px;
+            }
+            .topbar-nav a {
+                white-space: nowrap;
+                padding: 6px 10px;
+                background: var(--subtle-bg);
+                border-radius: 6px;
+                font-size: 12px;
             }
         }
 
-        @media (max-width: 480px) {
-            .hero-title {
-                font-size: 24px;
+        @media (max-width: 560px) {
+            .kpi-strip {
+                grid-template-columns: 1fr;
             }
-
-            .hero-subtitle {
-                font-size: 13px;
+            .hero {
+                padding: 40px 16px 32px;
             }
-
-            .guide-card {
-                padding: 16px 12px;
+            .hero-cta-box {
+                flex-direction: column;
+                width: 100%;
             }
-
-            .install-step-card {
-                padding: 10px 12px;
-                gap: 10px;
-                font-size: 13px;
+            .btn-cta {
+                width: 100%;
             }
-
-            .process-step-item {
-                gap: 10px;
-            }
-
-            .step-number {
-                width: 32px;
-                height: 32px;
-                font-size: 13px;
+            .guide-card,
+            .install-box,
+            .author-card {
+                padding: 22px 16px;
             }
         }
     </style>
@@ -959,18 +831,20 @@
     <header class="topbar">
         <div class="topbar-content">
             <a href="dashboard.html" class="brand-box">
-                <div class="brand-logo">🌐</div>
-                <div class="brand-name">Atlas<span>IQ</span></div>
-                <span class="topbar-badge">v4.0 Extreme</span>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <div class="brand-logo">🌐</div>
+                    <div class="brand-name">Atlas<span>IQ</span></div>
+                </div>
+                <span class="topbar-badge">v4.5 Revenue Engine</span>
             </a>
             <nav class="topbar-nav">
-                <a href="#que-es">¿Qué es?</a>
-                <a href="#google-maps">Google Maps</a>
-                <a href="#scoring-ia">Scoring IA</a>
-                <a href="#proceso">Estrategia</a>
+                <a href="#beneficios">Beneficios Reales</a>
+                <a href="#comparativa">Comparativa</a>
+                <a href="#motores-comerciales">12 Motores &amp; Funciones</a>
+                <a href="#casos-uso">Nichos &amp; Tickets</a>
                 <a href="#instalacion">Instalación</a>
-                <button id="btn-toggle-theme" class="btn-cta btn-cta-outline" style="height: 32px; padding: 0 10px; font-size: 12px; border-radius: 6px; cursor: pointer;" title="Alternar Modo Oscuro / Claro">
-                    🌙 Modo Oscuro
+                <button id="btn-toggle-theme" class="btn-cta btn-cta-outline" style="height: 34px; padding: 0 12px; font-size: 12px; border-radius: 8px;" title="Alternar Modo Oscuro / Claro">
+                    ☀️ Modo Claro
                 </button>
                 <a href="dashboard.html" class="btn-crm-nav">📊 Abrir CRM Dashboard</a>
             </nav>
@@ -981,358 +855,428 @@
     <section class="hero">
         <div class="hero-inner">
             <div class="hero-pill">
-                🚀 Sistema de Prospección B2B Profesional
+                🚀 Inteligencia Geoespacial · Auditoría Web · Automatización IA 24/7
             </div>
             <h1 class="hero-title">
-                Consigue prospectos <span>gratuitos e ilimitados</span>
+                No extraigas simples listas: <span>encuentra empresas perdiendo dinero hoy</span> y ciérralas con una Demo IA lista
             </h1>
             <p class="hero-subtitle">
-                Deja de esperar a que los clientes lleguen solos. Aprende a encontrar empresas que necesitan tus productos o servicios y construye tu propia base de prospectos de alta conversión.
+                <strong>AtlasIQ Enterprise</strong> transforma Google Maps en tu motor privado de ventas B2B. Escanea desde tu ubicación GPS, detecta quién no tiene web o atiende 100% manual, calcula cuántos dólares pierde cada mes, genera su <strong>Prototipo Web + Recepcionista IA 24/7</strong> en 1 clic y te alerta en vivo apenas abre tu propuesta.
             </p>
             <div class="hero-author-badge">
-                <span>Desarrollado por:</span>
+                <span>Arquitectura Oficial:</span>
                 <strong>Joseph Castillo (CEO)</strong>
                 <span>·</span>
                 <span class="company">WINDOWSTELECOM</span>
             </div>
             <div class="hero-cta-box">
                 <a href="dashboard.html" class="btn-cta btn-cta-primary">
-                    📊 Abrir CRM AtlasIQ
+                    📊 Entrar al CRM AtlasIQ
                 </a>
-                <a href="AtlasIQ-Enterprise-v4.0-Client.zip" download id="btn-download-ext-zip" class="btn-cta btn-cta-outline" style="display: none; border-color: #10b981; color: #10b981;">
-                    📦 Descargar Extensión v4.0 (.ZIP)
+                <a href="AtlasIQ-Enterprise-v4.0-Client.zip" download id="btn-download-ext-zip" class="btn-cta btn-cta-emerald" style="display: none;">
+                    📦 Descargar Extensión Chrome (.ZIP)
                 </a>
-                <a href="#instalacion" class="btn-cta btn-cta-outline">
-                    ⚙️ Guía de Instalación
+                <a href="#beneficios" class="btn-cta btn-cta-outline">
+                    💰 Ver Beneficios y Retorno
                 </a>
+            </div>
+
+            <!-- 4 CONCRETE ROI METRICS -->
+            <div class="kpi-strip">
+                <div class="kpi-pill-card">
+                    <strong class="emerald">$0 USD / mes en APIs</strong>
+                    <span>Cero créditos por lead. Reemplaza suscripciones costosas de Apollo, Hunter o scrapers en la nube.</span>
+                </div>
+                <div class="kpi-pill-card">
+                    <strong>x4 Más Respuestas</strong>
+                    <span>No envías spam genérico: entregas una auditoría real frente a sus 3 competidores vecinos + Demo viva.</span>
+                </div>
+                <div class="kpi-pill-card">
+                    <strong class="emerald">Tickets $650 – $1,200+</strong>
+                    <span>Justifica tu precio mostrando la fuga mensual exacta en USD por rubro antes de presentar tu oferta.</span>
+                </div>
+                <div class="kpi-pill-card">
+                    <strong>1 Clic = Demo con su Marca</strong>
+                    <span>El dueño prueba su futura Web + Agente IA de WhatsApp 24/7 con su propio nombre antes de pagarte.</span>
+                </div>
             </div>
         </div>
     </section>
 
-    <!-- MAIN TWO-COLUMN LAYOUT -->
+    <!-- MAIN CONTENT WITH STICKY SIDEBAR -->
     <div class="layout-container">
-        <!-- STICKY SIDEBAR -->
         <aside class="sidebar-nav">
-            <div class="sidebar-title">Contenido del Manual</div>
-            <a href="#problema" class="sidebar-link">1. El Problema Comercial</a>
-            <a href="#que-es" class="sidebar-link">2. Prospección en Frío</a>
-            <a href="#google-maps" class="sidebar-link">3. Directorio Google Maps</a>
-            <a href="#cliente-ideal" class="sidebar-link">4. Definir tu Cliente Ideal</a>
-            <a href="#scoring-ia" class="sidebar-link">5. Calificación con IA</a>
-            <a href="#estrategia" class="sidebar-link">6. De Prospectos a Clientes</a>
-            <a href="#atlasiq-features" class="sidebar-link">7. Qué es AtlasIQ</a>
-            <a href="#instalacion" class="sidebar-link">8. Instalación en Chrome</a>
-            <a href="#como-prospectar" class="sidebar-link">9. Cómo Prospectar</a>
-            <a href="#creditos" class="sidebar-link">10. Créditos y Autor</a>
+            <div class="sidebar-title">Guía Estratégica</div>
+            <a href="#beneficios" class="sidebar-link">1. Beneficios Comerciales</a>
+            <a href="#comparativa" class="sidebar-link">2. Tradicional vs. AtlasIQ</a>
+            <a href="#motores-comerciales" class="sidebar-link">3. Las 12 Funciones Clave</a>
+            <a href="#casos-uso" class="sidebar-link">4. Qué Vender y Cuánto Cobrar</a>
+            <a href="#flujo-cierre" class="sidebar-link">5. Método de Cierre en 5 Pasos</a>
+            <a href="#instalacion" class="sidebar-link">6. Instalar en 60 Segundos</a>
+            <a href="#creditos" class="sidebar-link">7. Respaldo WINDOWSTELECOM</a>
         </aside>
 
-        <!-- CONTENT AREA -->
         <main class="content-area">
-            <!-- SECTION 1: EL PROBLEMA COMERCIAL -->
-            <article class="guide-card" id="problema">
-                <span class="guide-section-badge">Introducción</span>
-                <h2 class="guide-heading">El desafío de conseguir nuevos clientes B2B</h2>
+            <!-- SECTION 1: CORE BENEFITS -->
+            <article class="guide-card" id="beneficios">
+                <span class="guide-section-badge">Retorno de Inversión Inmediato</span>
+                <h2 class="guide-heading">1. ¿Qué beneficios reales obtienes al usar AtlasIQ todos los días?</h2>
                 <p class="guide-text">
-                    Si tienes una agencia, vendes servicios profesionales o tienes un negocio B2B, probablemente conoces este problema: <strong>conseguir clientes nuevos requiere tiempo, esfuerzo y, muchas veces, presupuesto publicitario</strong>.
+                    El 95% de las agencias y consultores fracasan prospectando porque envían el mismo mensaje frío a cientos de negocios sin saber qué les duele. <strong>AtlasIQ invierte por completo las reglas del juego</strong>: te dice quién tiene presupuesto, cuánto dinero está perdiendo hoy y te arma el entregable visual para cerrar la venta en tiempo récord.
                 </p>
-                <p class="guide-text">
-                    Publicamos en redes sociales, invertimos en anuncios, creamos contenido y esperamos que alguien se interese en nuestros servicios. Pero existe una alternativa mucho más directa y predecible: <strong>la prospección en frío</strong>.
-                </p>
-                <div class="callout-box">
-                    En lugar de esperar pasivamente a que los clientes nos encuentren, <strong>salimos a buscar activamente empresas</strong> que tienen necesidades reales que podemos resolver hoy mismo.
-                </div>
-            </article>
 
-            <!-- SECTION 2: QUÉ ES LA PROSPECCIÓN EN FRÍO -->
-            <article class="guide-card" id="que-es">
-                <span class="guide-section-badge">Fundamentos Comerciales</span>
-                <h2 class="guide-heading">1. ¿Qué es la prospección en frío y por qué sigue siendo vital?</h2>
-                <p class="guide-text">
-                    La prospección en frío consiste en identificar potenciales clientes con los que todavía no tenemos una relación comercial y establecer un primer contacto estratégico.
-                </p>
-                <div class="process-steps">
-                    <div class="process-step-item">
-                        <div class="step-number">🎯</div>
-                        <div class="step-content">
-                            <div class="step-title">Agencias de Marketing Digital</div>
-                            <div class="step-desc">Buscan restaurantes, clínicas o comercios locales que necesitan mejorar su presencia online, crear campañas o renovar su web.</div>
+                <div class="benefit-grid">
+                    <div class="benefit-card emerald-top">
+                        <span class="benefit-tag emerald">Beneficio #1 · Cierre Financiero</span>
+                        <div class="benefit-title">Vendes dinero recuperado, no "páginas bonitas"</div>
+                        <div class="benefit-desc">
+                            Cuando le muestras al dueño de una clínica o inmobiliaria que está perdiendo <strong>~$1,450 USD al mes</strong> por no tener web propia y dejar el 42% de mensajes nocturnos sin responder, tu propuesta deja de verse como un gasto y pasa a ser urgente.
                         </div>
+                        <div class="benefit-result">✓ Multiplica tu tasa de aceptación de presupuestos</div>
                     </div>
-                    <div class="process-step-item">
-                        <div class="step-number">💻</div>
-                        <div class="step-content">
-                            <div class="step-title">Empresas de Software y Desarrollo</div>
-                            <div class="step-desc">Identifican negocios que podrían beneficiarse de una aplicación móvil, automatizaciones o un portal de reservas.</div>
+
+                    <div class="benefit-card">
+                        <span class="benefit-tag">Beneficio #2 · Precisión Quirúrgica</span>
+                        <div class="benefit-title">Sabes qué venderle a cada negocio en 1 segundo</div>
+                        <div class="benefit-desc">
+                            Nunca más ofrecerás diseño web a quien ya tiene una web excelente, ni automatización a quien no tiene flujo. El <strong>Doble Motor de Scoring</strong> separa automáticamente a quién venderle <strong>Página Web</strong>, a quién <strong>Agente IA 24/7</strong> y a quién el <strong>Pack Completo</strong>.
                         </div>
+                        <div class="benefit-result">✓ Cero tiempo perdido en prospectos mal enfocados</div>
                     </div>
-                    <div class="process-step-item">
-                        <div class="step-number">💼</div>
-                        <div class="step-content">
-                            <div class="step-title">Consultores y Servicios Profesionales</div>
-                            <div class="step-desc">Localizan compañías con desafíos operativos, fiscales o estratégicos alineados con su oferta.</div>
+
+                    <div class="benefit-card emerald-top">
+                        <span class="benefit-tag emerald">Beneficio #3 · Efecto "Wow" Instantáneo</span>
+                        <div class="benefit-title">Entras con la solución ya construida con su nombre</div>
+                        <div class="benefit-desc">
+                            En vez de pedir 30 minutos para explicar qué es un chatbot IA, pulsas un botón y le envías un <strong>prototipo funcional de su propia Web + Recepcionista IA 24/7</strong> respondiendo citas y precios de su rubro. El cliente lo toca en su celular y quiere comprarlo.
                         </div>
+                        <div class="benefit-result">✓ Elimina objeciones técnicas sin programar nada previo</div>
+                    </div>
+
+                    <div class="benefit-card amber-top">
+                        <span class="benefit-tag">Beneficio #4 · Timing Perfecto</span>
+                        <div class="benefit-title">Sabes exactamente quién abrió tu propuesta y cuándo</div>
+                        <div class="benefit-desc">
+                            Con el <strong>Radar de Aperturas Cloud</strong> ves la insignia <strong>🔥 Visto 3x</strong> apenas el dueño abre tu diagnóstico interactivo. Llamar o escribir por WhatsApp en ese preciso minuto multiplica por 5 la probabilidad de agendar y cobrar.
+                        </div>
+                        <div class="benefit-result">✓ Priorizas siempre a los prospectos más calientes</div>
+                    </div>
+
+                    <div class="benefit-card">
+                        <span class="benefit-tag">Beneficio #5 · Presión Competitiva Local</span>
+                        <div class="benefit-title">Activas el gatillo psicológico más fuerte: sus vecinos</div>
+                        <div class="benefit-desc">
+                            Ningún empresario quiere perder clientes frente al negocio de enfrente. AtlasIQ cruza coordenadas reales y arma la tabla <strong>"Tú vs. Top 3 de tu Cuadrante"</strong> mostrando a cuántos metros están sus rivales y qué ventajas digitales tienen.
+                        </div>
+                        <div class="benefit-result">✓ Despierta urgencia real en dueños indecisos</div>
+                    </div>
+
+                    <div class="benefit-card emerald-top">
+                        <span class="benefit-tag emerald">Beneficio #6 · Costo Operativo $0</span>
+                        <div class="benefit-title">Ahorras horas diarias y cientos de dólares al mes</div>
+                        <div class="benefit-desc">
+                            Lo que antes requería 5 pestañas manuales (revisar Maps, abrir la web, buscar correos en el aviso legal, revisar si tienen píxel de Meta, verificar el correo y redactar el mensaje) AtlasIQ lo ejecuta solo en segundo plano en tu propio navegador.
+                        </div>
+                        <div class="benefit-result">✓ De 4 horas de investigación manual a 5 minutos</div>
                     </div>
                 </div>
-                <div class="callout-box" style="margin-top: 10px;">
-                    La gran diferencia frente al marketing tradicional es que <strong>nosotros elegimos a quién contactar</strong>. No se trata de contactar a más personas, sino de <strong>contactar mejor</strong>.
+            </article>
+
+            <!-- SECTION 2: COMPARISON TABLE -->
+            <article class="guide-card" id="comparativa">
+                <span class="guide-section-badge">Ventaja Injusta en el Mercado</span>
+                <h2 class="guide-heading">2. Prospección Tradicional y Scrapers Básicos vs. AtlasIQ Enterprise</h2>
+                <p class="guide-text">
+                    Un extractor común solo te entrega un archivo Excel frío lleno de teléfonos sin contexto. <strong>AtlasIQ es un ecosistema completo de inteligencia y cierre comercial</strong>:
+                </p>
+
+                <div class="table-wrapper">
+                    <table class="comp-table">
+                        <thead>
+                            <tr>
+                                <th>Capacidad Comercial</th>
+                                <th>Scrapers Básicos / Manual</th>
+                                <th>AtlasIQ Enterprise v4.5</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Punto de partida geográfico</strong></td>
+                                <td><span class="badge-bad">Búsqueda manual limitada</span></td>
+                                <td><span class="badge-good">📍 Punto Cero GPS (Tu Ubicación) + Malla GeoGrid 2×2 y 3×3</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Detección de "Falsas Webs"</strong></td>
+                                <td><span class="badge-bad">Cree que Linktree o Instagram es web</span></td>
+                                <td><span class="badge-good">🔗 Detecta Linktree, wa.me, Canva, webs caídas o sin SSL</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Calificación de qué vender</strong></td>
+                                <td><span class="badge-bad">No existe (revisión 1 por 1)</span></td>
+                                <td><span class="badge-good">🎯 Doble Score separado: 🌐 Venta Web vs. 🤖 Bot IA + Ticket</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Argumento económico en dólares</strong></td>
+                                <td><span class="badge-bad">Discurso subjetivo sin números</span></td>
+                                <td><span class="badge-good">💸 Calcula fuga mensual en USD según rubro y comisiones</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Demostración al cliente</strong></td>
+                                <td><span class="badge-bad">Texto plano ignorado en WhatsApp</span></td>
+                                <td><span class="badge-good">✨ Demo Web + Simulador Recepcionista IA 24/7 + PDF Marca Blanca</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Rastreo de lectura y seguimiento</strong></td>
+                                <td><span class="badge-bad">A ciegas, olvidando prospectos</span></td>
+                                <td><span class="badge-good">🔥 Radar de Aperturas en vivo + Cadencia Día 1 → Día 3 → Día 7</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Costo mensual en créditos / APIs</strong></td>
+                                <td><span class="badge-bad">$79 a $299 USD/mes con límites</span></td>
+                                <td><span class="badge-good">$0 en APIs externas · Extracción local ilimitada</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </article>
 
-            <!-- SECTION 3: GOOGLE MAPS COMO DIRECTORIO -->
-            <article class="guide-card" id="google-maps">
-                <span class="guide-section-badge">Fuente de Datos</span>
-                <h2 class="guide-heading">2. Google Maps: El mayor directorio de oportunidades comerciales</h2>
+            <!-- SECTION 3: ALL 12 DETAILED FUNCTIONS -->
+            <article class="guide-card" id="motores-comerciales">
+                <span class="guide-section-badge">Ingeniería a Detalle</span>
+                <h2 class="guide-heading">3. Todas las funciones de AtlasIQ explicadas al detalle</h2>
                 <p class="guide-text">
-                    Google Maps no es solo para encontrar un restaurante o una gasolinera: es la <strong>base de datos comercial más actualizada del planeta</strong>. Cada negocio verificado cuenta con ubicación, sitio web, teléfono, reseñas y actividad reciente.
+                    Cada botón dentro de la extensión, el Panel Lateral Copiloto y el Dashboard CRM fue diseñado con un único propósito: <strong>convertir datos públicos en contratos firmados</strong>.
                 </p>
-                <p class="guide-text">
-                    Ejemplos de búsquedas con alto potencial comercial:
-                </p>
-                <div class="sector-grid">
-                    <div class="sector-pill">🍽 Restaurantes y Bares</div>
-                    <div class="sector-pill">🦷 Clínicas y Consultorios</div>
-                    <div class="sector-pill">🏋️ Gimnasios y Fitness</div>
-                    <div class="sector-pill">🏢 Inmobiliarias</div>
-                    <div class="sector-pill">🎓 Escuelas y Academias</div>
-                    <div class="sector-pill">🚚 Empresas de Transporte</div>
-                    <div class="sector-pill">🏨 Hoteles y Alojamientos</div>
-                    <div class="sector-pill">⚖️ Despachos y Abogados</div>
-                </div>
-                <p class="guide-text" style="margin-top: 10px;">
-                    Basta con buscar <em>«Clínicas dentales en Madrid»</em> o <em>«Restaurantes en Guadalajara»</em> para tener acceso a cientos de oportunidades comerciales con necesidades concretas.
-                </p>
-            </article>
 
-            <!-- SECTION 4: DEFINE A QUIÉN VENDERLE -->
-            <article class="guide-card" id="cliente-ideal">
-                <span class="guide-section-badge">Estrategia ICP</span>
-                <h2 class="guide-heading">3. Define primero a quién quieres venderle (Tu Cliente Ideal)</h2>
-                <p class="guide-text">
-                    Antes de recopilar prospectos, necesitas definir tu <strong>Cliente Ideal (ICP)</strong>. No todos los negocios son buenos prospectos para todos los productos o servicios.
-                </p>
-                <p class="guide-text">
-                    Por ejemplo, si desarrollas aplicaciones móviles o sistemas de pedidos para restaurantes, busca características como:
-                </p>
-                <div class="sector-grid">
-                    <div class="sector-pill">✅ Varias sucursales activas</div>
-                    <div class="sector-pill">✅ Servicio a domicilio propio</div>
-                    <div class="sector-pill">✅ Menús digitales interactivos</div>
-                    <div class="sector-pill">✅ Programas de fidelización</div>
-                    <div class="sector-pill">✅ Gestión de pedidos recurrentes</div>
-                </div>
-                <div class="callout-box" style="margin-top: 12px;">
-                    <strong>Regla de oro:</strong> Cuanto mejor definas tu mercado, menos tiempo perderás contactando empresas que nunca contratarían tus servicios.
-                </div>
-            </article>
-
-            <!-- SECTION 5: SCORING E INTELIGENCIA ARTIFICIAL -->
-            <article class="guide-card" id="scoring-ia">
-                <span class="guide-section-badge">Inteligencia Artificial</span>
-                <h2 class="guide-heading">4. Utiliza Inteligencia Artificial para calificar prospectos</h2>
-                <p class="guide-text">
-                    Encontrar empresas es solo el primer paso. El verdadero desafío es <strong>saber cuáles merecen tu atención inmediata</strong>. Aquí es donde la IA y los algoritmos predictivos marcan la diferencia.
-                </p>
-                <p class="guide-text">
-                    AtlasIQ aplica un sistema de <strong>Scoring Comercial (0 a 100)</strong> basado en:
-                </p>
                 <div class="feature-grid">
                     <div class="feature-box">
-                        <div class="feature-icon">🌐</div>
-                        <div class="feature-box-title">Presencia Digital y Web</div>
-                        <div class="feature-box-desc">Detecta si la empresa carece de sitio web (oportunidad de diseño) o si usa CMS tradicionales y carece de pixeles de conversión.</div>
+                        <div class="feature-icon">📍</div>
+                        <div class="feature-box-title">1. Escaneo "Punto Cero" GPS + GeoGrid</div>
+                        <div class="feature-box-desc">Toma tu ubicación actual exacta como primera referencia para barrer los negocios que te rodean, o despliega mallas automáticas 2×2 y 3×3 para superar el límite de 120 resultados de Google Maps.</div>
                     </div>
+
                     <div class="feature-box">
-                        <div class="feature-icon">⭐</div>
-                        <div class="feature-box-title">Reputación y Reseñas</div>
-                        <div class="feature-box-desc">Analiza calificaciones altas (4.5★) con pocas opiniones (oportunidad de reputación y reseñas locales).</div>
+                        <div class="feature-icon">🔗</div>
+                        <div class="feature-box-title">2. Detector de Falsas Webs y Caídas</div>
+                        <div class="feature-box-desc">Descubre al instante quién puso un Linktree, Instagram, Facebook, link de WhatsApp o Canva en lugar de una web real, además de detectar hostings vencidos, falta de SSL HTTPS o webs obsoletas.</div>
                     </div>
+
                     <div class="feature-box">
-                        <div class="feature-icon">📞</div>
-                        <div class="feature-box-title">Contactabilidad Directa</div>
-                        <div class="feature-box-desc">Verifica la presencia de teléfono directo para WhatsApp y correos corporativos reales.</div>
+                        <div class="feature-icon">🎯</div>
+                        <div class="feature-box-title">3. Doble Scoring (Web vs. Bot IA)</div>
+                        <div class="feature-box-desc">Evalúa con algoritmos independientes la urgencia de Diseño Web (0–99) frente a la urgencia de Automatización IA (0–99), asignando la oferta ideal y el ticket recomendado de instalación + mensualidad.</div>
+                    </div>
+
+                    <div class="feature-box">
+                        <div class="feature-icon">🩸</div>
+                        <div class="feature-box-title">4. Escáner de Stack IA y Comisiones</div>
+                        <div class="feature-box-desc">Identifica +40 firmas técnicas (WordPress, Shopify, Wix, Meta/Google/TikTok Pixel, ManyChat, GoHighLevel, Kommo, Botpress) y detecta negocios desangrándose en comisiones de Rappi, UberEats, Doctoralia o Booksy.</div>
+                    </div>
+
+                    <div class="feature-box">
+                        <div class="feature-icon">💸</div>
+                        <div class="feature-box-title">5. Calculadora de Fuga en USD</div>
+                        <div class="feature-box-desc">Cruza volumen de reseñas, ticket promedio de 8 verticales comerciales, fricción móvil y desatención fuera de horario para estimar cuántos dólares mensuales pierde cada empresa hoy mismo.</div>
+                    </div>
+
+                    <div class="feature-box">
+                        <div class="feature-icon">🏆</div>
+                        <div class="feature-box-title">6. Benchmark Top 3 del Cuadrante</div>
+                        <div class="feature-box-desc">Calcula en milisegundos el ranking del prospecto frente a los 3 competidores mejor posicionados de su misma zona y rubro (distancia en metros, estrellas, reseñas, web propia y anuncios).</div>
+                    </div>
+
+                    <div class="feature-box">
+                        <div class="feature-icon">✨</div>
+                        <div class="feature-box-title">7. Prototipo en Vivo (Web + Bot IA 24/7)</div>
+                        <div class="feature-box-desc">Genera sin escribir código una vista previa de página web de alta conversión + simulador interactivo de Recepcionista IA adaptado al nicho del cliente, descargable en 1 archivo <code>.html</code> para WhatsApp.</div>
+                    </div>
+
+                    <div class="feature-box">
+                        <div class="feature-icon">🔥</div>
+                        <div class="feature-box-title">8. Micrositios Cloud + Radar de Aperturas</div>
+                        <div class="feature-box-desc">Publica diagnósticos con Demo IA en un enlace único de Cloudflare y rastrea en tiempo real cuántas veces el prospecto abrió tu propuesta para atacar en el momento exacto.</div>
+                    </div>
+
+                    <div class="feature-box">
+                        <div class="feature-icon">⚡</div>
+                        <div class="feature-box-title">9. Cadencia Día 1→3→7 + Modo Ráfaga</div>
+                        <div class="feature-box-desc">Genera guiones hiper-personalizados para WhatsApp Día 1, Seguimiento Día 3, Cierre Día 7, Email ROI, Llamada de 30s y estrategia profunda con Gemini 2.5 Flash o Gemini Nano local.</div>
+                    </div>
+
+                    <div class="feature-box">
+                        <div class="feature-icon">🕵️</div>
+                        <div class="feature-box-title">10. OSINT Fiscal, DNS/DMARC y Ad Spy</div>
+                        <div class="feature-box-desc">Extrae emails ocultos, Razón Social, NIF/RFC/RIF y nombre del decisor; verifica registros MX, SPF y DMARC vía Cloudflare DoH y abre Meta Ad Library y Google Ads Transparency en 1 clic.</div>
+                    </div>
+
+                    <div class="feature-box">
+                        <div class="feature-icon">🗺️</div>
+                        <div class="feature-box-title">11. Mapa de Calor, Kanban CRM y BI</div>
+                        <div class="feature-box-desc">Visualiza océanos azules y saturación comercial O(N) sobre mapas interactivos, mueve negocios por tu embudo Kanban arrastrando tarjetas y analiza métricas ejecutivas en tiempo real.</div>
+                    </div>
+
+                    <div class="feature-box">
+                        <div class="feature-icon">📄</div>
+                        <div class="feature-box-title">12. PDF Marca Blanca y Webhooks</div>
+                        <div class="feature-box-desc">Descarga auditorías ejecutivas en PDF firmadas con el nombre y WhatsApp de tu agencia, exporta en CSV, Excel XLSX, JSON o vCard para tu celular y sincroniza con n8n, Make, HubSpot o GoHighLevel.</div>
                     </div>
                 </div>
             </article>
 
-            <!-- SECTION 6: ESTRATEGIA DE ACERCAMIENTO -->
-            <article class="guide-card" id="estrategia">
-                <span class="guide-section-badge">Metodología de Ventas</span>
-                <h2 class="guide-heading">5. De encontrar prospectos a conseguir clientes reales</h2>
+            <!-- SECTION 4: MONETIZATION BY NICHE -->
+            <article class="guide-card" id="casos-uso">
+                <span class="guide-section-badge">Monetización Directa</span>
+                <h2 class="guide-heading">4. ¿Qué servicios puedes vender con AtlasIQ en cualquier nicho?</h2>
                 <p class="guide-text">
-                    Una lista de mil empresas no tiene valor si no sabes cómo abordarlas. Esta es la metodología en 5 pasos recomendada:
+                    AtlasIQ ya trae pre-calibrados los perfiles económicos, argumentos de dolor y simuladores de IA para los rubros más rentables del mercado hispano e internacional:
                 </p>
+
+                <div class="sector-grid">
+                    <div class="sector-pill">
+                        🦷 Clínicas, Médicos y Odontología
+                        <small>Web + Recepcionista IA de citas y recordatorios ($890 + $197/mes)</small>
+                    </div>
+                    <div class="sector-pill">
+                        🏢 Inmobiliarias y Constructoras
+                        <small>Embudo de propiedades + Calificador IA de presupuesto ($1,200 + $297/mes)</small>
+                    </div>
+                    <div class="sector-pill">
+                        🍽️ Restaurantes y Gastronomía
+                        <small>Menú y pedidos directos sin pagar 28% a apps ($690 + $147/mes)</small>
+                    </div>
+                    <div class="sector-pill">
+                        ⚖️ Abogados, Contadores y B2B
+                        <small>Web corporativa + Pre-calificador ejecutivo de casos ($950 + $247/mes)</small>
+                    </div>
+                    <div class="sector-pill">
+                        ✨ Estética, MedSpa y Barberías
+                        <small>Agenda 24/7 por WhatsApp cero inasistencias ($650 + $147/mes)</small>
+                    </div>
+                    <div class="sector-pill">
+                        🔧 Talleres, Concesionarios y Repuestos
+                        <small>Cotizador IA rápido + recordatorios de servicio ($750 + $167/mes)</small>
+                    </div>
+                    <div class="sector-pill">
+                        🏋️ Gimnasios, Academias y Escuelas
+                        <small>Closer IA de pases de prueba e inscripciones ($690 + $167/mes)</small>
+                    </div>
+                    <div class="sector-pill">
+                        📈 SEO Local y Tráfico Pago (Ads)
+                        <small>Reclamación de ficha Maps + Píxeles + Campañas Meta/Google</small>
+                    </div>
+                </div>
+
+                <div class="callout-box">
+                    <strong>Con un solo cliente cerrado al mes</strong> recuperas decenas de veces tu tiempo y construyes ingresos recurrentes mensuales por mantenimiento de automatizaciones y agentes de IA.
+                </div>
+            </article>
+
+            <!-- SECTION 5: 5-STEP CLOSING PLAYBOOK -->
+            <article class="guide-card" id="flujo-cierre">
+                <span class="guide-section-badge">Flujo de Trabajo Ganador</span>
+                <h2 class="guide-heading">5. El protocolo de 15 minutos diarios para generar reuniones y ventas</h2>
                 <div class="process-steps">
                     <div class="process-step-item">
                         <div class="step-number">1</div>
-                        <div class="step-content">
-                            <div class="step-title">Investiga antes de contactar</div>
-                            <div class="step-desc">Revisa el sitio web, las opiniones y las características del negocio.</div>
+                        <div>
+                            <div class="step-title">Escanea desde tu Ubicación ("Punto Cero") o ciudad objetivo</div>
+                            <div class="step-desc">Abre la extensión, escribe un rubro rentable (ej. <em>«Clínicas dentales»</em> o <em>«Inmobiliarias»</em>) y pulsa <strong>📍 1. Escanear desde Mi Ubicación</strong>. AtlasIQ recolectará negocios y auditará sus webs y redes automáticamente.</div>
                         </div>
                     </div>
                     <div class="process-step-item">
                         <div class="step-number">2</div>
-                        <div class="step-content">
-                            <div class="step-title">Identifica una necesidad real</div>
-                            <div class="step-desc">Busca oportunidades concretas donde tu solución genere retorno de inversión. No inventes problemas.</div>
+                        <div>
+                            <div class="step-title">Filtra las joyas ocultas en 1 clic dentro del CRM</div>
+                            <div class="step-desc">Usa los chips superiores <strong>🌐 Vender Web</strong>, <strong>🤖 Vender Bot IA</strong> o <strong>🔗 Falsa Web / Caída</strong> para quedarte únicamente con empresas activas que tienen una urgencia evidente hoy mismo.</div>
                         </div>
                     </div>
                     <div class="process-step-item">
                         <div class="step-number">3</div>
-                        <div class="step-content">
-                            <div class="step-title">Personaliza el mensaje</div>
-                            <div class="step-desc">Evita los correos masivos genéricos. Explica brevemente por qué los contactas y qué valor puedes aportarles.</div>
+                        <div>
+                            <div class="step-title">Genera su Demo Pre-Construida o PDF Marca Blanca</div>
+                            <div class="step-desc">Abre el Inspector 360° del prospecto, revisa su fuga mensual en USD y su puesto frente al Top 3 del cuadrante, y pulsa <strong>✨ Ver Demo Pre-Construida</strong> o <strong>🌐 Link + Demo Cloud</strong>.</div>
                         </div>
                     </div>
                     <div class="process-step-item">
                         <div class="step-number">4</div>
-                        <div class="step-content">
-                            <div class="step-title">Sé profesional y respetuoso</div>
-                            <div class="step-desc">La prospección nunca debe ser spam. Respeta las normativas de privacidad y el tiempo del destinatario.</div>
+                        <div>
+                            <div class="step-title">Dispara la Cola de Contacto Rápido ("Modo Ráfaga")</div>
+                            <div class="step-desc">Envía por WhatsApp el diagnóstico personalizado de Día 1. El sistema moverá automáticamente el prospecto a <em>Contactado</em> y agendará sus toques de Día 3 (Demo) y Día 7 (Cierre).</div>
                         </div>
                     </div>
                     <div class="process-step-item">
                         <div class="step-number">5</div>
-                        <div class="step-content">
-                            <div class="step-title">Organiza el seguimiento continuo</div>
-                            <div class="step-desc">Registra los estados de contacto en tu CRM. La mayoría de las ventas se cierran en el seguimiento, no en el primer mensaje.</div>
+                        <div>
+                            <div class="step-title">Remata a quienes abren tu propuesta en vivo</div>
+                            <div class="step-desc">Pulsa <strong>🔥 Radar Aperturas</strong>: verás al instante quién acaba de abrir tu link y probar su simulador de Recepcionista IA. Llámalo o escríbele en caliente para cerrar el acuerdo.</div>
                         </div>
                     </div>
                 </div>
             </article>
 
-            <!-- SECTION 7: QUÉ ES ATLASIQ -->
-            <article class="guide-card" id="atlasiq-features">
-                <span class="guide-section-badge">La Solución</span>
-                <h2 class="guide-heading">6. AtlasIQ: La herramienta definitiva de prospección</h2>
-                <p class="guide-text">
-                    <strong>AtlasIQ</strong> fue desarrollada precisamente para automatizar y simplificar todo este flujo: extraer negocios de Google Maps, enriquecer sus datos con correos y redes, calcular su scoring comercial y organizarlos en un CRM moderno.
-                </p>
-                <div class="feature-grid">
-                    <div class="feature-box">
-                        <div class="feature-icon">⚡</div>
-                        <div class="feature-box-title">Intercepción de Red RPC</div>
-                        <div class="feature-box-desc">Captura prospectos directamente desde la capa de red interna de Google Maps a máxima velocidad.</div>
-                    </div>
-                    <div class="feature-box">
-                        <div class="feature-icon">🤖</div>
-                        <div class="feature-box-title">Scoring y Pitches IA</div>
-                        <div class="feature-box-desc">Califica cada empresa de 0 a 100 y genera propuestas listas para enviar por WhatsApp o Email.</div>
-                    </div>
-                    <div class="feature-box">
-                        <div class="feature-icon">📊</div>
-                        <div class="feature-box-title">CRM y Métricas en Vivo</div>
-                        <div class="feature-box-desc">Panel con KPIs de conversión, filtros por email/teléfono y cajón lateral de inspección 360°.</div>
-                    </div>
-                    <div class="feature-box">
-                        <div class="feature-icon">🚀</div>
-                        <div class="feature-box-title">Sincronización Webhook</div>
-                        <div class="feature-box-desc">Envía prospectos en un clic a Zapier, Make.com, HubSpot o GoHighLevel.</div>
-                    </div>
-                    <div class="feature-box">
-                        <div class="feature-icon">🔒</div>
-                        <div class="feature-box-title">100% Local y Privada</div>
-                        <div class="feature-box-desc">Se ejecuta en tu propio navegador. Tus datos y prospectos permanecen bajo tu control.</div>
-                    </div>
-                    <div class="feature-box">
-                        <div class="feature-icon">📥</div>
-                        <div class="feature-box-title">Exportación Completa</div>
-                        <div class="feature-box-desc">Descarga en CSV con codificación UTF-8 BOM para Excel, archivos XLSX o formato JSON.</div>
-                    </div>
+            <!-- SECTION 6: CHROME INSTALLATION -->
+            <article class="install-box" id="instalacion">
+                <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;">
+                    <div class="install-heading">⚙️ Cómo instalar AtlasIQ Enterprise en Google Chrome (60 segundos)</div>
+                    <a href="AtlasIQ-Enterprise-v4.0-Client.zip" download class="btn-cta btn-cta-emerald js-ext-download-btn" style="display: none; height: 40px; font-size: 13px;">
+                        📥 Descargar Paquete .ZIP Oficial
+                    </a>
                 </div>
-            </article>
-
-            <!-- SECTION 8: INSTALACIÓN EN GOOGLE CHROME -->
-            <article class="guide-card install-box" id="instalacion">
-                <div class="install-heading">⚙️ Cómo instalar AtlasIQ en Google Chrome</div>
                 <p style="font-size: 14px; color: #94a3b8;">
-                    La extensión se instala en menos de 1 minuto en modo desarrollador sin necesidad de conocimientos técnicos:
+                    Se instala directamente en Google Chrome, Brave o Microsoft Edge sin configuraciones complejas:
                 </p>
                 <div class="install-steps">
                     <div class="install-step-card">
                         <div class="num">1</div>
-                        <div class="text">Conserva la carpeta de <strong>AtlasIQ</strong> descomprimida en tu computadora.</div>
+                        <div class="text">Descarga el paquete <code>AtlasIQ-Enterprise-v4.0-Client.zip</code> y descomprímelo en una carpeta fija en tu PC.</div>
                     </div>
                     <div class="install-step-card">
                         <div class="num">2</div>
-                        <div class="text">Abre Chrome y navega a la dirección: <code>chrome://extensions</code></div>
+                        <div class="text">Abre tu navegador Chrome y escribe en la barra superior: <code>chrome://extensions</code></div>
                     </div>
                     <div class="install-step-card">
                         <div class="num">3</div>
-                        <div class="text">En la esquina superior derecha, activa el interruptor <strong>Modo de desarrollador</strong>.</div>
+                        <div class="text">Activa el interruptor <strong>Modo de desarrollador</strong> en la esquina superior derecha.</div>
                     </div>
                     <div class="install-step-card">
                         <div class="num">4</div>
-                        <div class="text">Haz clic en el botón <strong>Cargar descomprimida</strong> (Load unpacked).</div>
+                        <div class="text">Haz clic en <strong>Cargar descomprimida</strong> (<em>Load unpacked</em>) y selecciona la carpeta descomprimida.</div>
                     </div>
                     <div class="install-step-card">
                         <div class="num">5</div>
-                        <div class="text">Selecciona la carpeta de <strong>AtlasIQ</strong>. ¡Listo! Chrome cargará la extensión.</div>
+                        <div class="text">Fija el icono de <strong>AtlasIQ</strong> en tu barra, activa tu licencia firmada <code>ATQ4.</code> y comienza a prospectar sin límites.</div>
                     </div>
                 </div>
             </article>
 
-            <!-- SECTION 9: CÓMO EMPEZAR A PROSPECTAR -->
-            <article class="guide-card" id="como-prospectar">
-                <span class="guide-section-badge">Paso a Paso</span>
-                <h2 class="guide-heading">7. Cómo empezar a prospectar con AtlasIQ</h2>
-                <div class="process-steps">
-                    <div class="process-step-item">
-                        <div class="step-number">1</div>
-                        <div class="step-content">
-                            <div class="step-title">Abre Google Maps</div>
-                            <div class="step-desc">Ve a Google Maps o haz clic en el icono de AtlasIQ para buscar un rubro (ej. <em>«Clínicas en Madrid»</em>).</div>
-                        </div>
-                    </div>
-                    <div class="process-step-item">
-                        <div class="step-number">2</div>
-                        <div class="step-content">
-                            <div class="step-title">Inicia la Extracción desde el Dock Flotante</div>
-                            <div class="step-desc">El dock flotante aparecerá al lado del panel de búsqueda. Ajusta el límite o velocidad y presiona <strong>▶ Iniciar Extracción</strong>.</div>
-                        </div>
-                    </div>
-                    <div class="process-step-item">
-                        <div class="step-number">3</div>
-                        <div class="step-content">
-                            <div class="step-title">Abre el CRM Dashboard</div>
-                            <div class="step-desc">Presiona <strong>📊 Ver en CRM</strong> para analizar los prospectos calificados, explorar redes y tech stack.</div>
-                        </div>
-                    </div>
-                    <div class="process-step-item">
-                        <div class="step-number">4</div>
-                        <div class="step-content">
-                            <div class="step-title">Genera Pitches y Contacta</div>
-                            <div class="step-desc">Usa el generador de propuestas de 1 clic para abrir WhatsApp Web con el mensaje pre-cargado o sincroniza con tu CRM vía Webhook.</div>
-                        </div>
-                    </div>
-                </div>
-            </article>
-
-            <!-- SECTION 10: CRÉDITOS Y EMPRESA -->
+            <!-- SECTION 7: CORPORATE CREDITS -->
             <article class="author-card" id="creditos">
-                <div class="author-info">
-                    <div class="author-meta">PROYECTO OFICIAL</div>
-                    <div class="author-title">AtlasIQ Enterprise</div>
+                <div>
+                    <div class="author-meta">INGENIERÍA COMERCIAL OFICIAL</div>
+                    <div class="author-title">AtlasIQ Enterprise · WINDOWSTELECOM</div>
                     <div class="author-desc">
-                        Desarrollada por <strong>Joseph Castillo (CEO)</strong> y respaldada por <strong>WINDOWSTELECOM</strong>, con el objetivo de dotar a las empresas de herramientas profesionales de prospección automatizada con tecnología de punta.
+                        Creado y dirigido por <strong>Joseph Castillo (CEO)</strong> en <strong>WINDOWSTELECOM</strong> para equipar a agencias de desarrollo web, integradores de Inteligencia Artificial y equipos B2B con tecnología de adquisición de clientes de grado empresarial.
                     </div>
                 </div>
-                <div style="display: flex; gap: 10px;">
-                    <a href="dashboard.html" class="btn-cta btn-cta-primary" style="height: 40px; font-size: 13px;">
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <a href="dashboard.html" class="btn-cta btn-cta-primary" style="height: 42px; font-size: 13.5px;">
                         📊 Abrir CRM AtlasIQ
+                    </a>
+                    <a href="AtlasIQ-Enterprise-v4.0-Client.zip" download class="btn-cta btn-cta-emerald js-ext-download-btn" style="display: none; height: 42px; font-size: 13.5px;">
+                        📦 Descargar Extensión
                     </a>
                 </div>
             </article>
         </main>
     </div>
 
-    <!-- MAIN FOOTER -->
+    <!-- FOOTER -->
     <footer class="main-footer">
-        <p><strong>AtlasIQ Enterprise</strong> · Diseñado y desarrollado por <strong>Joseph Castillo</strong> · CEO de <strong>WINDOWSTELECOM</strong></p>
-        <p style="margin-top: 6px; font-size: 12px; color: #94a3b8;">Tecnología comercial para explorar nuevas oportunidades, investigar, conectar y convertir prospectos en clientes.</p>
+        <p><strong>AtlasIQ Enterprise v4.5</strong> · Desarrollado por <strong>Joseph Castillo (CEO)</strong> · <strong>WINDOWSTELECOM</strong></p>
+        <p style="margin-top: 6px; font-size: 12px; color: #94a3b8;">Inteligencia Geoespacial, Auditoría Web, Automatización con IA y Prospección B2B de Alta Conversión.</p>
     </footer>
 
     <script src="js/guide-ui.js"></script>
 </body>
 
 </html>
-
