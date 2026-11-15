@@ -112,6 +112,17 @@ async function persistAllLeads() {
     }
 }
 
+function isLeadFollowupDue(lead) {
+    if (!lead) return false;
+    if ((parseInt(lead.audit_views, 10) || 0) > 0 && lead.pipeline_stage !== "ganado" && lead.pipeline_stage !== "descartado") {
+        return true;
+    }
+    if (lead.pipeline_stage === "contactado" && lead.last_contacted_at) {
+        return (Date.now() - Number(lead.last_contacted_at)) >= 48 * 3600 * 1000;
+    }
+    return false;
+}
+
 function normalizeLeadRecord(lead) {
     if (!lead || typeof lead !== "object") return;
     if (!lead.dedupeKey) lead.dedupeKey = getLeadKey(lead);
@@ -121,6 +132,13 @@ function normalizeLeadRecord(lead) {
 
     const s = calculateLeadScore(lead);
     lead.lead_score = s.score;
+    lead.web_score = s.webScore;
+    lead.automation_score = s.automationScore;
+    lead.web_status = s.webStatus;
+    lead.offer_type = s.offerType;
+    lead.recommended_offer = s.recommendedOffer;
+    lead.suggested_ticket = s.suggestedTicket;
+    lead.revenue_leak_usd = s.monthlyLeakUsd;
     lead.priority = s.priority;
     lead.opportunities = s.opportunities.join(", ");
 }
@@ -134,17 +152,17 @@ function initTable() {
     const isMobile = window.innerWidth < 768;
     table = new Tabulator("#example-table", {
         layout: isMobile ? "fitDataFill" : "fitColumns",
-        placeholder: "Base de datos vacía. Abre Google Maps y activa el Harvester v4.0 (Simple o Matriz Geo-Grid) para capturar prospectos.",
+        placeholder: "Base de datos vacía. Abre Google Maps y activa el Harvester (Desde Mi Ubicación o Matriz Geo-Grid) para capturar prospectos.",
         selectable: true,
         pagination: "local",
         paginationSize: 25,
         paginationSizeSelector: [10, 25, 50, 100, 250, 500],
         columns: [
             {
-                title: "Empresa & Señales OSINT",
+                title: "Empresa & Señales Comerciales",
                 field: "name",
-                widthGrow: 2.3,
-                minWidth: 185,
+                widthGrow: 2.25,
+                minWidth: 190,
                 formatter: (cell) => {
                     const row = cell.getRow().getData();
                     const safeName = escapeHtml(cell.getValue() || "Sin nombre");
@@ -153,11 +171,19 @@ function initTable() {
                         ? `<a href="${mUrl}" target="_blank" rel="noopener noreferrer" title="Abrir ficha en Google Maps" style="margin-left: 5px; text-decoration: none;">📍</a>`
                         : "";
                     let badges = "";
+                    if ((parseInt(row.audit_views, 10) || 0) > 0) {
+                        badges += ` <span style="background: rgba(249,115,22,0.18); color: #ea580c; border: 1px solid rgba(249,115,22,0.45); padding: 1px 5px; border-radius: 4px; font-size: 9.5px; font-weight: 800;" title="El prospecto abrió tu link de propuesta">🔥 Visto ${parseInt(row.audit_views, 10)}x</span>`;
+                    } else if (isLeadFollowupDue(row)) {
+                        badges += ` <span style="background: rgba(234,179,8,0.18); color: #ca8a04; padding: 1px 5px; border-radius: 4px; font-size: 9.5px; font-weight: 800;" title="Han pasado +48h desde el último contacto">⏰ Seguimiento</span>`;
+                    }
                     if (row.unclaimed) {
                         badges += ` <span style="background: rgba(245,158,11,0.16); color: #d97706; border: 1px solid rgba(245,158,11,0.35); padding: 1px 5px; border-radius: 4px; font-size: 9.5px; font-weight: 800;" title="Ficha Google Business No Reclamada">🏴 Sin Reclamar</span>`;
                     }
                     if (row.ad_spend_active) {
                         badges += ` <span style="background: rgba(16,185,129,0.15); color: #059669; border: 1px solid rgba(16,185,129,0.35); padding: 1px 5px; border-radius: 4px; font-size: 9.5px; font-weight: 800;" title="Píxeles publicitarios activos detectados">💰 Ads</span>`;
+                    }
+                    if (row.commission_bleed) {
+                        badges += ` <span style="background: rgba(168,85,247,0.15); color: #9333ea; padding: 1px 5px; border-radius: 4px; font-size: 9.5px; font-weight: 800;" title="Paga comisiones a ${escapeHtml(row.booking_platform || 'apps')}">💸 Comisión</span>`;
                     }
                     if (row.decision_maker || row.tax_id) {
                         badges += ` <span style="background: rgba(59,130,246,0.14); color: #2563eb; padding: 1px 5px; border-radius: 4px; font-size: 9.5px; font-weight: 700;" title="${escapeHtml([row.decision_maker, row.tax_id].filter(Boolean).join(' · '))}">🕵️ OSINT</span>`;
@@ -168,8 +194,8 @@ function initTable() {
             {
                 title: "Rating",
                 field: "averageRating",
-                width: 105,
-                minWidth: 92,
+                width: 98,
+                minWidth: 88,
                 hozAlign: "center",
                 formatter: (cell) => {
                     const val = cell.getValue();
@@ -180,18 +206,24 @@ function initTable() {
                 }
             },
             {
-                title: "Score v4",
+                title: "Web · Bot IA · Fuga",
                 field: "lead_score",
-                width: 90,
-                minWidth: 80,
+                width: 158,
+                minWidth: 145,
                 hozAlign: "center",
                 sorter: "number",
                 formatter: (cell) => {
-                    const score = parseInt(cell.getValue(), 10) || 50;
-                    let cls = "tl-score-med";
-                    if (score >= 75) cls = "tl-score-high";
-                    else if (score < 45) cls = "tl-score-low";
-                    return `<span class="tl-badge-score ${cls}">${score}</span>`;
+                    const row = cell.getRow().getData();
+                    const ws = parseInt(row.web_score, 10) || parseInt(cell.getValue(), 10) || 55;
+                    const as = parseInt(row.automation_score, 10) || 50;
+                    const leakK = row.revenue_leak_usd ? `-$${(row.revenue_leak_usd / 1000).toFixed(1)}k` : "";
+                    const wCls = ws >= 74 ? "color:#059669;background:rgba(16,185,129,0.15);" : "color:#64748b;background:rgba(148,163,184,0.14);";
+                    const aCls = as >= 72 ? "color:#2563eb;background:rgba(59,130,246,0.16);" : "color:#64748b;background:rgba(148,163,184,0.14);";
+                    return `<div style="display:inline-flex;align-items:center;gap:4px;" title="Oferta recomendada: ${escapeHtml(row.recommended_offer || '')} (${escapeHtml(row.suggested_ticket || '')})">`
+                        + `<span style="${wCls}padding:2px 5px;border-radius:5px;font-size:10px;font-weight:800;">🌐${ws}</span>`
+                        + `<span style="${aCls}padding:2px 5px;border-radius:5px;font-size:10px;font-weight:800;">🤖${as}</span>`
+                        + (leakK ? `<span style="color:#ef4444;font-size:9.5px;font-weight:800;">${leakK}</span>` : "")
+                        + `</div>`;
                 }
             },
             {
@@ -270,21 +302,33 @@ function initTable() {
                 }
             },
             {
-                title: "Web · Stack · Speed",
+                title: "Web · Salud · Bots IA",
                 field: "website",
-                widthGrow: 1.7,
-                minWidth: 145,
+                widthGrow: 1.85,
+                minWidth: 155,
                 formatter: (cell) => {
                     const val = cell.getValue();
                     const row = cell.getRow().getData();
-                    if (!val) return '<span style="color: #ef4444; font-size: 11px; font-weight: 700;">⚡ Sin Web</span>';
+                    const ws = classifyWebsiteStatus(row);
+                    if (!val || ws.status === "none") {
+                        return '<span style="color: #ef4444; font-size: 11px; font-weight: 800;">⚡ Sin Web</span>';
+                    }
                     const safeHref = safeExternalUrl(val);
                     const domain = escapeHtml(extractDomain(val) || val);
                     let badges = "";
-                    const stack = String(row.tech_stack || "");
-                    if (stack.includes("Shopify")) badges += ' <span style="background: #dcfce7; color: #15803d; padding: 1px 4px; border-radius: 4px; font-size: 9.5px; font-weight: 700;">Shopify</span>';
-                    else if (stack.includes("WordPress")) badges += ' <span style="background: #e0f2fe; color: #0369a1; padding: 1px 4px; border-radius: 4px; font-size: 9.5px; font-weight: 700;">WP</span>';
-                    else if (stack.includes("Wix")) badges += ' <span style="background: #fef3c7; color: #b45309; padding: 1px 4px; border-radius: 4px; font-size: 9.5px; font-weight: 700;">Wix</span>';
+
+                    if (ws.status !== "active") {
+                        badges += ` <span style="background:${ws.bg};color:${ws.color};padding:1px 5px;border-radius:4px;font-size:9.5px;font-weight:800;" title="${escapeHtml(ws.label)}">${escapeHtml(ws.shortBadge)}</span>`;
+                    } else {
+                        const stack = String(row.tech_stack || "");
+                        if (stack.includes("Shopify")) badges += ' <span style="background: #dcfce7; color: #15803d; padding: 1px 4px; border-radius: 4px; font-size: 9.5px; font-weight: 700;">Shopify</span>';
+                        else if (stack.includes("WordPress")) badges += ' <span style="background: #e0f2fe; color: #0369a1; padding: 1px 4px; border-radius: 4px; font-size: 9.5px; font-weight: 700;">WP</span>';
+                        else if (stack.includes("Wix")) badges += ' <span style="background: #fef3c7; color: #b45309; padding: 1px 4px; border-radius: 4px; font-size: 9.5px; font-weight: 700;">Wix</span>';
+                    }
+
+                    if (row.has_ai_automation) {
+                        badges += ` <span style="background:rgba(16,185,129,0.16);color:#059669;padding:1px 4px;border-radius:4px;font-size:9.5px;font-weight:800;" title="Automatización activa: ${escapeHtml(row.automation_stack || 'CRM/Bot')}">🤖 IA</span>`;
+                    }
 
                     if (typeof row.pagespeed_mobile === "number") {
                         const ps = row.pagespeed_mobile;
@@ -456,6 +500,10 @@ async function loadDashboardData() {
         recalculateDistances();
         populateNicheDropdown();
         applyFilters();
+
+        if (data.tl_edge_worker_url) {
+            refreshAllAuditOpens(true);
+        }
     });
 }
 
@@ -529,13 +577,22 @@ function applyFilters() {
             const haystack = [
                 lead.name, lead.legal_name, lead.tax_id, lead.decision_maker,
                 lead.phone, lead.email, lead.address, lead.category, lead.secondaryCategories,
-                lead.website, lead.opportunities, lead.tech_stack, lead.review_pain_points,
-                lead.booking_platform
+                lead.website, lead.opportunities, lead.tech_stack, lead.automation_stack,
+                lead.recommended_offer, lead.review_pain_points, lead.booking_platform
             ].filter(Boolean).join(" ").toLowerCase();
             if (!haystack.includes(searchVal)) return false;
         }
 
-        if (currentFilter === "high-score") {
+        if (currentFilter === "sell-web") {
+            const ws = classifyWebsiteStatus(lead);
+            if (!ws.needsWeb && (parseInt(lead.web_score, 10) || 0) < 74) return false;
+        } else if (currentFilter === "sell-auto") {
+            if ((parseInt(lead.automation_score, 10) || 0) < 72) return false;
+        } else if (currentFilter === "fake-web") {
+            if (classifyWebsiteStatus(lead).status !== "social_link") return false;
+        } else if (currentFilter === "followup-due") {
+            if (!isLeadFollowupDue(lead)) return false;
+        } else if (currentFilter === "high-score") {
             if ((parseInt(lead.lead_score, 10) || 0) < 75) return false;
         } else if (currentFilter === "unclaimed") {
             if (!lead.unclaimed) return false;
@@ -546,7 +603,7 @@ function applyFilters() {
         } else if (currentFilter === "has-phone") {
             if (!lead.phone || String(lead.phone).length <= 5) return false;
         } else if (currentFilter === "no-website") {
-            if (lead.website && String(lead.website).trim().length > 0) return false;
+            if (!classifyWebsiteStatus(lead).needsWeb) return false;
         }
 
         if (nicheVal && nicheVal !== "all") {
@@ -1011,15 +1068,26 @@ function renderKanbanBoard(leadsToRender) {
         card.draggable = true;
         card.setAttribute("data-lead-key", rawKey);
 
+        const openViews = parseInt(lead.audit_views, 10) || 0;
+        const dueFollowup = isLeadFollowupDue(lead);
+        const cadenceAlert = openViews > 0
+            ? `<div style="margin-top:4px;font-size:10px;font-weight:800;color:#ea580c;">🔥 Abrió propuesta (${openViews}x) · ¡Llamar hoy!</div>`
+            : (dueFollowup ? `<div style="margin-top:4px;font-size:10px;font-weight:800;color:#ca8a04;">⏰ Toca seguimiento (Día ${(lead.followup_step || 1) >= 2 ? "7 Cierre" : "3 Demo"})</div>` : "");
+        const offerLine = lead.recommended_offer
+            ? `<div style="margin-top:3px;font-size:10.5px;color:#3b82f6;font-weight:700;">🎯 ${escapeHtml(lead.recommended_offer)}${lead.revenue_leak_usd ? ` · <span style="color:#ef4444;">-$${Math.round(lead.revenue_leak_usd / 100) / 10}k/m</span>` : ""}</div>`
+            : "";
+
         card.innerHTML = `
             <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:6px;">
                 <strong class="tl-kanban-lead-title btn-kanban-open-drawer" data-lead-key="${safeKey}" style="font-size:13px;line-height:1.3;cursor:pointer;">${escapeHtml(lead.name || "Empresa")}</strong>
-                <span class="tl-badge-score ${scoreClass}" style="font-size:10px;padding:1px 5px;">${score}</span>
+                <span class="tl-badge-score ${scoreClass}" style="font-size:10px;padding:1px 5px;" title="Web: ${lead.web_score || score} · Bot IA: ${lead.automation_score || score}">${score}</span>
             </div>
             <div class="tl-kanban-lead-meta" style="font-size:11px;display:flex;justify-content:space-between;">
                 <span>★ ${escapeHtml(lead.averageRating || "-")} · ${escapeHtml(lead.category || "General")}</span>
                 <span>📍 ${escapeHtml(distStr)}</span>
             </div>
+            ${offerLine}
+            ${cadenceAlert}
             <div style="display:flex;align-items:center;justify-content:space-between;margin-top:4px;padding-top:6px;border-top:1px solid var(--border-color);">
                 <div class="tl-kanban-lead-phone" style="font-size:11px;">
                     ${lead.phone ? `📞 ${escapeHtml(lead.phone)}` : '<span style="color:var(--text-muted);">Sin teléfono</span>'}
@@ -1087,6 +1155,10 @@ function initKanbanDropzones() {
             const targetLead = findLeadByKey(leadKey);
             if (targetLead && targetLead.pipeline_stage !== st) {
                 targetLead.pipeline_stage = st;
+                if (st === "contactado" && !targetLead.last_contacted_at) {
+                    targetLead.last_contacted_at = Date.now();
+                    targetLead.followup_step = 1;
+                }
                 await persistAllLeads();
                 renderKanbanBoard(currentFilteredLeads);
                 if (activeViewId === "analytics") renderAnalyticsBiCharts(currentFilteredLeads);
@@ -1133,13 +1205,13 @@ function renderAnalyticsBiCharts(dataset) {
     const tooltipBg = isDark ? "#0f172a" : "#ffffff";
     const tooltipBorder = isDark ? "#334155" : "#cbd5e1";
 
-    // 1. Opportunity Signals Bar Chart
-    const sigNoWeb = leads.filter(l => !l.website || !String(l.website).trim()).length;
-    const sigNoPixel = leads.filter(l => l.website && !l.ad_spend_active).length;
-    const sigUnclaimed = leads.filter(l => Boolean(l.unclaimed)).length;
+    // 1. Opportunity Signals Bar Chart (Web Sales vs AI Automation Signals)
+    const sigNoWeb = leads.filter(l => classifyWebsiteStatus(l).status === "none").length;
+    const sigFakeOrBroken = leads.filter(l => ["social_link", "broken", "outdated"].includes(classifyWebsiteStatus(l).status)).length;
+    const sigManualHighFlow = leads.filter(l => (parseInt(l.automation_score, 10) || 0) >= 72).length;
+    const sigCommissionBleed = leads.filter(l => Boolean(l.commission_bleed)).length;
     const sigAdsActive = leads.filter(l => Boolean(l.ad_spend_active)).length;
-    const sigPainPoints = leads.filter(l => Boolean(l.review_pain_points)).length;
-    const sigOsintExec = leads.filter(l => Boolean(l.decision_maker || l.tax_id || l.legal_name)).length;
+    const sigUnclaimed = leads.filter(l => Boolean(l.unclaimed)).length;
 
     const cSignals = ensureBiChartInstance("signals", "chart-signals");
     if (cSignals) {
@@ -1151,18 +1223,18 @@ function renderAnalyticsBiCharts(dataset) {
             yAxis: {
                 type: "category",
                 axisLabel: { color: textColor, fontWeight: 600 },
-                data: ["OSINT Fiscal/Decisor", "Dolor en Reseñas", "Pagan Ads Activos", "Ficha No Reclamada", "Web sin Píxeles", "Sin Sitio Web"]
+                data: ["Sangría Comisiones", "Pagan Ads Activos", "Ficha No Reclamada", "Falsa Web / Obsoleta", "Venta Automatización IA", "Sin Sitio Web"]
             },
             series: [{
                 name: "Prospectos",
                 type: "bar",
                 barWidth: "56%",
                 data: [
-                    { value: sigOsintExec, itemStyle: { color: "#06b6d4" } },
-                    { value: sigPainPoints, itemStyle: { color: "#f97316" } },
+                    { value: sigCommissionBleed, itemStyle: { color: "#a855f7" } },
                     { value: sigAdsActive, itemStyle: { color: "#10b981" } },
                     { value: sigUnclaimed, itemStyle: { color: "#f59e0b" } },
-                    { value: sigNoPixel, itemStyle: { color: "#6366f1" } },
+                    { value: sigFakeOrBroken, itemStyle: { color: "#f97316" } },
+                    { value: sigManualHighFlow, itemStyle: { color: "#3b82f6" } },
                     { value: sigNoWeb, itemStyle: { color: "#ef4444" } }
                 ],
                 label: { show: true, position: "right", color: textColor, fontWeight: 700 }
@@ -1329,20 +1401,91 @@ function openLeadDrawer(lead) {
     }
 
     const score = parseInt(lead.lead_score, 10) || 50;
+    const wScore = parseInt(lead.web_score, 10) || score;
+    const aScore = parseInt(lead.automation_score, 10) || score;
+    const econ = estimateNicheRevenueLeak(lead);
+    const ws = classifyWebsiteStatus(lead);
+    const bench = computeQuadrantTop3Benchmark(lead, allLeads);
+
     const scoreEl = document.getElementById("drawer-ai-score");
-    scoreEl.textContent = score;
-    scoreEl.className = "tl-badge-score " + (score >= 75 ? "tl-score-high" : (score < 45 ? "tl-score-low" : "tl-score-med"));
-    document.getElementById("drawer-ai-priority").textContent = lead.priority || "Media";
+    if (scoreEl) {
+        scoreEl.textContent = score;
+        scoreEl.className = "tl-badge-score " + (score >= 75 ? "tl-score-high" : (score < 45 ? "tl-score-low" : "tl-score-med"));
+    }
+    const webScoreEl = document.getElementById("drawer-web-score");
+    if (webScoreEl) {
+        webScoreEl.textContent = `🌐 Web: ${wScore}`;
+        webScoreEl.className = "tl-badge-score " + (wScore >= 74 ? "tl-score-high" : (wScore < 45 ? "tl-score-low" : "tl-score-med"));
+    }
+    const autoScoreEl = document.getElementById("drawer-auto-score");
+    if (autoScoreEl) {
+        autoScoreEl.textContent = `🤖 Bot IA: ${aScore}`;
+        autoScoreEl.className = "tl-badge-score " + (aScore >= 72 ? "tl-score-high" : (aScore < 45 ? "tl-score-low" : "tl-score-med"));
+    }
+
+    const recOfferEl = document.getElementById("drawer-recommended-offer");
+    if (recOfferEl) recOfferEl.textContent = lead.recommended_offer || "Pack Web + Agente IA 24/7";
+
+    const ticketEl = document.getElementById("drawer-suggested-ticket");
+    if (ticketEl) ticketEl.textContent = lead.suggested_ticket || `$${econ.setupUsd} setup + $${econ.retainerUsd}/mes`;
+
+    const leakEl = document.getElementById("drawer-revenue-leak");
+    if (leakEl) leakEl.textContent = `~$${econ.monthlyLeakUsd.toLocaleString("en-US")} USD/mes`;
+
+    const priEl = document.getElementById("drawer-ai-priority");
+    if (priEl) priEl.textContent = lead.priority || "Media";
 
     const psVal = document.getElementById("drawer-pagespeed-val");
     if (psVal) {
-        if (!lead.website) {
-            psVal.innerHTML = `<span style="color:#ef4444;font-weight:700;">No aplica (Sin sitio web)</span>`;
+        if (!lead.website || ws.status === "none") {
+            psVal.innerHTML = `<span style="color:#ef4444;font-weight:800;">⚡ Sin sitio web propio</span>`;
+        } else if (ws.status === "social_link" || ws.status === "broken") {
+            psVal.innerHTML = `<strong style="color:${ws.color};">${escapeHtml(ws.label)}</strong>`;
         } else if (typeof lead.pagespeed_mobile === "number") {
             const c = lead.pagespeed_mobile >= 75 ? "#10b981" : (lead.pagespeed_mobile >= 50 ? "#f59e0b" : "#ef4444");
             psVal.innerHTML = `<strong style="color:${c};">${lead.pagespeed_mobile}/100 Móvil</strong> <small style="color:var(--text-muted);">(SEO: ${lead.pagespeed_seo || "-"} · LCP: ${escapeHtml(lead.pagespeed_lcp || "N/A")})</small>`;
         } else {
-            psVal.textContent = "Sin auditar (Clic en ⚡ Auditar arriba)";
+            psVal.innerHTML = `<span style="color:${ws.color};font-weight:700;">${escapeHtml(ws.label)}</span> <small style="color:var(--text-muted);">· Clic en ⚡ Auditar</small>`;
+        }
+    }
+
+    // Cloud Proposal Open Telemetry in Drawer
+    const telemEl = document.getElementById("drawer-audit-telemetry");
+    if (telemEl) {
+        if (lead.cloud_audit_url) {
+            const v = parseInt(lead.audit_views, 10) || 0;
+            const ago = lead.audit_last_viewed_at
+                ? ` · última vez hace ${Math.max(1, Math.round((Date.now() - lead.audit_last_viewed_at) / 60000))} min`
+                : "";
+            const safeAuditUrl = safeExternalUrl(lead.cloud_audit_url);
+            telemEl.innerHTML = v > 0
+                ? `<strong style="color:#ea580c;">🔥 Abierto ${v}x${escapeHtml(ago)}</strong> · <a href="${safeAuditUrl}" target="_blank" rel="noopener noreferrer" style="color:#3b82f6;">Ver link ↗</a>`
+                : `<span style="color:#64748b;">Publicado (0 aperturas aún)</span> · <a href="${safeAuditUrl}" target="_blank" rel="noopener noreferrer" style="color:#3b82f6;">Abrir ↗</a>`;
+        } else {
+            telemEl.textContent = "Sin publicar aún (Clic en 🌐 Link + Demo Cloud)";
+        }
+    }
+
+    // Top 3 Quadrant Competitor Benchmark
+    const rankBadge = document.getElementById("drawer-quadrant-rank");
+    if (rankBadge) rankBadge.textContent = `Puesto #${bench.rank} de ${bench.totalPeers}`;
+    const top3ListEl = document.getElementById("drawer-top3-list");
+    if (top3ListEl) {
+        if (bench.top3.length === 0) {
+            top3ListEl.innerHTML = `<span style="color:var(--text-muted);">Único prospecto capturado en este rubro por ahora.</span>`;
+        } else {
+            top3ListEl.innerHTML = bench.top3.map((c) => {
+                const webTag = c.hasRealWeb
+                    ? `<span style="color:#10b981;font-weight:700;">✓ Web</span>`
+                    : `<span style="color:#ef4444;">Sin Web</span>`;
+                const botTag = c.hasAuto
+                    ? `<span style="color:#3b82f6;font-weight:700;">🤖 Bot/Agenda</span>`
+                    : `<span style="color:#94a3b8;">Manual</span>`;
+                return `<div style="display:flex;justify-content:space-between;align-items:center;gap:6px;padding:5px 8px;background:var(--bg-main);border:1px solid var(--border-color);border-radius:6px;">`
+                    + `<div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><strong>#${c.pos} ${escapeHtml(c.name)}</strong> <small style="color:var(--text-muted);">(${escapeHtml(c.distStr)})</small></div>`
+                    + `<div style="display:flex;gap:6px;align-items:center;flex-shrink:0;font-size:10.5px;"><span>★${escapeHtml(c.rating)} (${c.reviews})</span>${webTag}${botTag}</div>`
+                    + `</div>`;
+            }).join("");
         }
     }
 
@@ -1433,19 +1576,29 @@ function openLeadDrawer(lead) {
         }
     }
 
-    // Website & Tech Stack
+    // Website, Tech Stack, AI Bots & 1-Click Ad Spy
     const webLink = document.getElementById("drawer-website");
     const safeWeb = safeExternalUrl(lead.website);
     if (safeWeb) {
         webLink.href = safeWeb;
-        webLink.textContent = extractDomain(lead.website);
-        webLink.style.color = "#3b82f6";
+        webLink.textContent = `${extractDomain(lead.website)} (${ws.shortBadge})`;
+        webLink.style.color = ws.needsWeb ? ws.color : "#3b82f6";
     } else {
         webLink.removeAttribute("href");
         webLink.textContent = "Sin Sitio Web (Venta Directa)";
         webLink.style.color = "#ef4444";
     }
-    document.getElementById("drawer-tech").textContent = lead.tech_stack || "Sin stack ni píxeles detectados";
+    const stackParts = [
+        lead.tech_stack || "",
+        lead.has_ai_automation ? `Bots/CRM: ${lead.automation_stack || "Activo"}` : "Bots IA: Ninguno (100% Manual)"
+    ].filter(Boolean).join(" · ");
+    document.getElementById("drawer-tech").textContent = stackParts;
+
+    const spy = getAdSpyLinks(lead);
+    const metaSpyBtn = document.getElementById("btn-spy-meta-ads");
+    if (metaSpyBtn) metaSpyBtn.href = spy.metaAdsUrl;
+    const googleSpyBtn = document.getElementById("btn-spy-google-ads");
+    if (googleSpyBtn) googleSpyBtn.href = spy.googleAdsUrl;
 
     // Social Links
     const socialContainer = document.getElementById("drawer-socials");
@@ -1488,7 +1641,8 @@ function closeLeadDrawer() {
 function updatePitchPreview() {
     if (!activeLeadForDrawer) return;
     const channel = currentPitchChannel === "gemini" ? "whatsapp" : currentPitchChannel;
-    const pitch = generateOutreachPitch(activeLeadForDrawer, channel);
+    const bench = computeQuadrantTop3Benchmark(activeLeadForDrawer, allLeads);
+    const pitch = generateOutreachPitch(activeLeadForDrawer, channel, bench);
     document.getElementById("drawer-pitch-text").textContent = pitch;
 
     const pInfo = formatPhone(activeLeadForDrawer.phone);
@@ -1531,10 +1685,20 @@ let speedIndex = 0;
 
 function startSpeedOutreach() {
     const candidates = (currentFilteredLeads && currentFilteredLeads.length > 0) ? currentFilteredLeads : allLeads;
-    speedQueue = candidates.filter(l => l && l.phone && formatPhone(l.phone).whatsappUrl);
+    speedQueue = candidates
+        .filter(l => l && l.phone && formatPhone(l.phone).whatsappUrl && l.pipeline_stage !== "ganado" && l.pipeline_stage !== "descartado")
+        .sort((a, b) => {
+            const aHot = (parseInt(a.audit_views, 10) || 0) > 0 ? 1 : 0;
+            const bHot = (parseInt(b.audit_views, 10) || 0) > 0 ? 1 : 0;
+            if (bHot !== aHot) return bHot - aHot;
+            const aDue = isLeadFollowupDue(a) ? 1 : 0;
+            const bDue = isLeadFollowupDue(b) ? 1 : 0;
+            if (bDue !== aDue) return bDue - aDue;
+            return (parseInt(b.lead_score, 10) || 0) - (parseInt(a.lead_score, 10) || 0);
+        });
 
     if (speedQueue.length === 0) {
-        alert("No hay prospectos con línea de WhatsApp válida en la vista actual.");
+        alert("No hay prospectos con línea de WhatsApp válida pendientes en la vista actual.");
         return;
     }
 
@@ -1554,13 +1718,17 @@ function renderSpeedLead() {
 
     const lead = speedQueue[speedIndex];
     const total = speedQueue.length;
+    const step = parseInt(lead.followup_step, 10) || 0;
+    const autoChannel = step === 0 ? "whatsapp" : (step === 1 ? "followup" : "closing");
+    const stepLabel = step === 0 ? "Toque 1 (Diagnóstico)" : (step === 1 ? "Toque 2 (Día 3 Demo)" : "Toque 3 (Día 7 Cierre)");
 
     document.getElementById("speed-queue-counter").textContent = `${speedIndex + 1} / ${total}`;
     document.getElementById("speed-progress-fill").style.width = `${Math.round((speedIndex / total) * 100)}%`;
-    document.getElementById("speed-lead-name").textContent = lead.name || "Empresa";
+    document.getElementById("speed-lead-name").textContent = `${lead.name || "Empresa"} · ${stepLabel}`;
 
     const distStr = lead.distanceKm ? ` · 📍 ${lead.distanceKm < 1 ? Math.round(lead.distanceKm * 1000) + "m" : lead.distanceKm + "km"}` : "";
-    document.getElementById("speed-lead-meta").textContent = `${lead.category || "General"}${distStr} · ${lead.address || "Zona activa"}`;
+    const offerStr = lead.recommended_offer ? ` · 🎯 ${lead.recommended_offer}` : "";
+    document.getElementById("speed-lead-meta").textContent = `${lead.category || "General"}${distStr}${offerStr}`;
 
     const score = parseInt(lead.lead_score, 10) || 50;
     const scoreEl = document.getElementById("speed-lead-score");
@@ -1568,7 +1736,8 @@ function renderSpeedLead() {
     scoreEl.className = `tl-badge-score ${score >= 75 ? "tl-score-high" : score < 45 ? "tl-score-low" : "tl-score-med"}`;
 
     document.getElementById("speed-lead-phone").textContent = lead.phone || "-";
-    document.getElementById("speed-pitch-box").textContent = generateOutreachPitch(lead, "whatsapp");
+    const bench = computeQuadrantTop3Benchmark(lead, allLeads);
+    document.getElementById("speed-pitch-box").textContent = generateOutreachPitch(lead, autoChannel, bench);
 }
 
 async function sendSpeedAndAdvance() {
@@ -1581,13 +1750,125 @@ async function sendSpeedAndAdvance() {
         window.open(`${pInfo.whatsappUrl}?text=${encodeURIComponent(pitch)}`, "_blank", "noopener");
     }
 
-    lead.pipeline_stage = "contactado";
+    lead.pipeline_stage = lead.pipeline_stage === "negociacion" ? "negociacion" : "contactado";
+    lead.last_contacted_at = Date.now();
+    lead.followup_step = (parseInt(lead.followup_step, 10) || 0) + 1;
     await persistAllLeads();
     renderKanbanBoard(currentFilteredLeads);
 
     playAudioNotification("success");
     speedIndex++;
     renderSpeedLead();
+}
+
+/**
+ * Live Cloudflare Proposal Open Radar + Interactive Client Website & 24/7 AI Bot Demo Modal
+ */
+async function refreshAllAuditOpens(silent = false) {
+    storageAdapter.get(["tl_edge_worker_url"], async (cfg) => {
+        const edgeUrl = (cfg.tl_edge_worker_url || "").trim();
+        const publishedLeads = allLeads.filter(l => Boolean(l.cloud_audit_url));
+        if (!edgeUrl) {
+            if (!silent) {
+                alert("Configura la URL de tu Cloudflare Edge Worker en ⚙️ Ajustes para rastrear en tiempo real quién abre tus propuestas.");
+            }
+            return;
+        }
+        if (publishedLeads.length === 0) {
+            if (!silent) {
+                alert("Aún no has generado links de propuesta con tracking (botón '🌐 Link + Demo Cloud' en el inspector 360° de un prospecto).");
+            }
+            return;
+        }
+
+        const btn = document.getElementById("btn-refresh-audit-opens");
+        const origText = btn ? btn.textContent : "🔥 Radar Aperturas";
+        if (btn && !silent) {
+            btn.disabled = true;
+            btn.textContent = "⏳ Consultando...";
+        }
+
+        let hotCount = 0;
+        let updatedAny = false;
+        for (const lead of publishedLeads) {
+            try {
+                const stats = await fetchCloudAuditStats(edgeUrl, lead.cloud_audit_url);
+                if (stats && stats.found) {
+                    const prevViews = parseInt(lead.audit_views, 10) || 0;
+                    lead.audit_views = parseInt(stats.views, 10) || 0;
+                    lead.audit_last_viewed_at = stats.lastViewedAt || null;
+                    if (lead.audit_views > 0) hotCount++;
+                    if (lead.audit_views !== prevViews) updatedAny = true;
+                }
+            } catch (_) {}
+        }
+
+        if (updatedAny) {
+            await persistAllLeads();
+        }
+        if (table) table.replaceData(currentFilteredLeads);
+        renderKanbanBoard(currentFilteredLeads);
+        if (activeLeadForDrawer) openLeadDrawer(activeLeadForDrawer);
+
+        if (btn && !silent) {
+            btn.textContent = `🔥 ${hotCount} Abiertos`;
+            playAudioNotification("success");
+            setTimeout(() => {
+                btn.textContent = origText;
+                btn.disabled = false;
+            }, 2600);
+        }
+    });
+}
+
+let activeDemoLead = null;
+
+function appendDemoChatBubble(role, text) {
+    const box = document.getElementById("demo-chat-messages");
+    if (!box) return;
+    const div = document.createElement("div");
+    if (role === "user") {
+        div.style.cssText = "align-self:flex-end;max-width:85%;background:#2563eb;color:#ffffff;padding:8px 11px;border-radius:10px 10px 2px 10px;line-height:1.4;";
+    } else {
+        div.style.cssText = "align-self:flex-start;max-width:88%;background:#1e293b;color:#f1f5f9;border:1px solid #334155;padding:8px 11px;border-radius:10px 10px 10px 2px;line-height:1.4;";
+    }
+    div.textContent = text;
+    box.appendChild(div);
+    box.scrollTop = box.scrollHeight;
+}
+
+function openClientDemoModal(lead) {
+    if (!lead) return;
+    activeDemoLead = lead;
+    const econ = estimateNicheRevenueLeak(lead);
+    const name = lead.name || "Empresa";
+
+    const setTxt = (id, val) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = val;
+    };
+
+    setTxt("demo-modal-title", `✨ Prototipo Comercial: ${name}`);
+    setTxt("demo-modal-subtitle", `Oferta recomendada: ${lead.recommended_offer || "Web + Agente IA 24/7"} (${lead.suggested_ticket || ""})`);
+    setTxt("demo-site-pill", `★ ${lead.averageRating || "4.9"} en Google · ${lead.category || econ.verticalLabel}`);
+    setTxt("demo-leak-pill", `Recupera ~$${econ.monthlyLeakUsd.toLocaleString("en-US")}/mes`);
+    setTxt("demo-site-headline", `${name}: ${econ.heroHeadline}`);
+    setTxt("demo-site-desc", `📍 ${lead.address || "Tu ciudad"} · ${lead.phone || "WhatsApp 24/7"}. Embudo móvil de alta conversión conectado a recepción inteligente.`);
+    setTxt("demo-bot-role-box", `🤖 ${econ.botRole}`);
+    setTxt("demo-bot-header-name", `🤖 Asistente IA · ${name}`);
+
+    const chatBox = document.getElementById("demo-chat-messages");
+    if (chatBox) chatBox.innerHTML = "";
+    appendDemoChatBubble("user", econ.sampleQ);
+    appendDemoChatBubble("bot", econ.sampleA);
+
+    document.getElementById("client-demo-modal")?.classList.add("open");
+    document.getElementById("tl-modal-backdrop")?.classList.add("open");
+}
+
+function closeClientDemoModal() {
+    document.getElementById("client-demo-modal")?.classList.remove("open");
+    document.getElementById("tl-modal-backdrop")?.classList.remove("open");
 }
 
 function skipSpeedLead() {
@@ -1892,42 +2173,114 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
-    // White-Label PDF Audit Download
+    // Track Cadence Step & Timestamp Automatically When Clicking WhatsApp Send
+    document.getElementById("btn-send-wa")?.addEventListener("click", async () => {
+        if (!activeLeadForDrawer) return;
+        if (!activeLeadForDrawer.pipeline_stage || activeLeadForDrawer.pipeline_stage === "nuevo") {
+            activeLeadForDrawer.pipeline_stage = "contactado";
+        }
+        activeLeadForDrawer.last_contacted_at = Date.now();
+        activeLeadForDrawer.followup_step = (parseInt(activeLeadForDrawer.followup_step, 10) || 0) + 1;
+        await persistAllLeads();
+        if (table) table.replaceData(currentFilteredLeads);
+        renderKanbanBoard(currentFilteredLeads);
+    });
+
+    // White-Label PDF Audit Download (with Dual Score + USD Leak + Top 3 Benchmark)
     document.getElementById("btn-download-pdf-audit")?.addEventListener("click", () => {
         if (activeLeadForDrawer) {
-            generateLeadPdfAudit(activeLeadForDrawer, currentBranding);
+            generateLeadPdfAudit(activeLeadForDrawer, currentBranding, allLeads);
         }
     });
 
-    // Live Tracked Cloud Audit Microsite Publisher
-    document.getElementById("btn-publish-cloud-audit")?.addEventListener("click", () => {
-        if (!activeLeadForDrawer) return;
+    // Shared Publisher Helper for Drawer & Demo Modal
+    async function publishCloudProposalForLead(targetLead, triggerBtn) {
+        if (!targetLead) return;
         storageAdapter.get(["tl_edge_worker_url"], async (cfg) => {
-            const edgeUrl = cfg.tl_edge_worker_url || "";
+            const edgeUrl = (cfg.tl_edge_worker_url || "").trim();
             if (!edgeUrl) {
-                alert("Configura primero la URL de tu Cloudflare Edge Worker en ⚙️ Ajustes para publicar micrositios con tracking de lectura.");
+                alert("Configura primero la URL de tu Cloudflare Edge Worker en ⚙️ Ajustes para publicar micrositios con Demo IA + tracking de apertura en tiempo real.");
                 document.getElementById("settings-modal")?.classList.add("open");
                 document.getElementById("tl-modal-backdrop")?.classList.add("open");
                 return;
             }
-            const btn = document.getElementById("btn-publish-cloud-audit");
-            const orig = btn.textContent;
-            btn.disabled = true;
-            btn.textContent = "⏳ Publicando...";
+            const orig = triggerBtn ? triggerBtn.textContent : "";
+            if (triggerBtn) {
+                triggerBtn.disabled = true;
+                triggerBtn.textContent = "⏳ Publicando...";
+            }
             try {
-                const pub = await publishLiveCloudAudit(edgeUrl, activeLeadForDrawer, currentBranding);
-                activeLeadForDrawer.cloud_audit_url = pub.auditUrl;
+                const bench = computeQuadrantTop3Benchmark(targetLead, allLeads);
+                const pub = await publishLiveCloudAudit(edgeUrl, targetLead, currentBranding, bench);
+                targetLead.cloud_audit_url = pub.auditUrl;
+                targetLead.cloud_audit_slug = pub.slug;
                 await persistAllLeads();
+                if (table) table.replaceData(currentFilteredLeads);
+                renderKanbanBoard(currentFilteredLeads);
+                if (activeLeadForDrawer === targetLead) openLeadDrawer(targetLead);
                 await navigator.clipboard.writeText(pub.auditUrl).catch(() => {});
                 playAudioNotification("success");
-                alert(`✅ Micrositio B2B publicado y copiado al portapapeles:\n\n${pub.auditUrl}\n\nEnvíalo por WhatsApp o Email: registrará cada apertura en tiempo real.`);
+                alert(`✅ Propuesta + Demo IA publicada y copiada al portapapeles:\n\n${pub.auditUrl}\n\nEnvíala por WhatsApp o Email: el botón '🔥 Radar Aperturas' te avisará apenas el dueño la abra.`);
             } catch (err) {
                 alert("Error al publicar auditoría: " + err.message);
             } finally {
-                btn.textContent = orig;
-                btn.disabled = false;
+                if (triggerBtn) {
+                    triggerBtn.textContent = orig;
+                    triggerBtn.disabled = false;
+                }
             }
         });
+    }
+
+    // Live Tracked Cloud Audit Microsite Publisher
+    document.getElementById("btn-publish-cloud-audit")?.addEventListener("click", (e) => {
+        publishCloudProposalForLead(activeLeadForDrawer, e.currentTarget);
+    });
+
+    // Global Proposal Open Radar Button
+    document.getElementById("btn-refresh-audit-opens")?.addEventListener("click", () => {
+        refreshAllAuditOpens(false);
+    });
+
+    // Interactive Pre-Built Website + 24/7 AI Receptionist Modal Controls
+    document.getElementById("btn-open-live-demo")?.addEventListener("click", () => {
+        if (activeLeadForDrawer) openClientDemoModal(activeLeadForDrawer);
+    });
+    document.getElementById("btn-close-demo-modal")?.addEventListener("click", closeClientDemoModal);
+    document.getElementById("btn-demo-close-bottom")?.addEventListener("click", closeClientDemoModal);
+
+    document.getElementById("demo-quick-chips")?.addEventListener("click", (e) => {
+        const chip = e.target.closest(".btn-demo-sim-msg");
+        if (!chip) return;
+        const lead = activeDemoLead || activeLeadForDrawer || { name: "Empresa" };
+        const econ = estimateNicheRevenueLeak(lead);
+        const simType = chip.getAttribute("data-sim");
+        if (simType === "book") {
+            appendDemoChatBubble("user", "📅 Quiero agendar un turno para mañana");
+            setTimeout(() => {
+                appendDemoChatBubble("bot", `¡Excelente! ✅ En ${lead.name || "nuestro centro"} tengo cupo disponible mañana a las 10:30 AM o 4:00 PM. ¿Cuál prefieres para bloquearte en agenda y enviarte recordatorio automático por WhatsApp?`);
+            }, 260);
+        } else if (simType === "price") {
+            appendDemoChatBubble("user", "💰 ¿Cuáles son sus precios y promociones?");
+            setTimeout(() => {
+                appendDemoChatBubble("bot", `¡Con gusto! 📋 Nuestro servicio promedio parte desde referencias competitivas en ${econ.verticalLabel} con beneficio exclusivo por reserva directa web (0% comisiones de apps). ¿Te envío el catálogo interactivo aquí mismo?`);
+            }, 260);
+        } else {
+            appendDemoChatBubble("user", "🌙 Hola, escribo a las 11:15 PM, ¿siguen atendiendo?");
+            setTimeout(() => {
+                appendDemoChatBubble("bot", `¡Hola! 👋 Nuestro local físico descansa a esta hora, pero soy la Recepcionista IA 24/7 de ${lead.name || "la empresa"}. Puedo responder tus dudas y dejarte confirmado ahora mismo en 30 segundos sin esperar a mañana.`);
+            }, 260);
+        }
+    });
+
+    document.getElementById("btn-demo-download-html")?.addEventListener("click", () => {
+        const target = activeDemoLead || activeLeadForDrawer;
+        if (target) downloadStandaloneClientDemoHtml(target, currentBranding);
+    });
+
+    document.getElementById("btn-demo-publish-cloud")?.addEventListener("click", (e) => {
+        const target = activeDemoLead || activeLeadForDrawer;
+        publishCloudProposalForLead(target, e.currentTarget);
     });
 
     // Exporters & JSON Importer
@@ -2060,6 +2413,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Universal Backdrop Close
     document.getElementById("tl-modal-backdrop")?.addEventListener("click", () => {
         closeSpeedOutreach();
+        closeClientDemoModal();
         document.getElementById("settings-modal")?.classList.remove("open");
         document.getElementById("license-modal")?.classList.remove("open");
         document.getElementById("tl-modal-backdrop")?.classList.remove("open");

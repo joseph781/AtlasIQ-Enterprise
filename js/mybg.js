@@ -155,7 +155,38 @@ function cleanSocialUrl(url) {
     }
 }
 
-async function fetchHtmlWithTimeout(url, timeoutMs = 7500) {
+const FAKE_WEB_HOST_PATTERNS = [
+    /(?:^|\.)linktr\.ee$/i,
+    /(?:^|\.)beacons\.ai$/i,
+    /(?:^|\.)bio\.site$/i,
+    /(?:^|\.)lnk\.bio$/i,
+    /(?:^|\.)taplink\.cc$/i,
+    /(?:^|\.)solo\.to$/i,
+    /(?:^|\.)campsite\.bio$/i,
+    /(?:^|\.)milkshake\.app$/i,
+    /(?:^|\.)instagram\.com$/i,
+    /(?:^|\.)instagr\.am$/i,
+    /(?:^|\.)facebook\.com$/i,
+    /(?:^|\.)fb\.com$/i,
+    /(?:^|\.)tiktok\.com$/i,
+    /(?:^|\.)wa\.me$/i,
+    /(?:^|\.)wa\.link$/i,
+    /(?:^|\.)api\.whatsapp\.com$/i,
+    /(?:^|\.)canva\.site$/i,
+    /(?:^|\.)sites\.google\.com$/i,
+    /(?:^|\.)docs\.google\.com$/i,
+    /(?:^|\.)forms\.gle$/i,
+    /(?:^|\.)carrd\.co$/i,
+    /(?:^|\.)bit\.ly$/i
+];
+
+function isSocialOrLinkInBioHost(hostname) {
+    if (!hostname) return false;
+    const h = hostname.replace(/^www\./i, "").toLowerCase();
+    return FAKE_WEB_HOST_PATTERNS.some(rx => rx.test(h));
+}
+
+async function fetchHtmlDetailed(url, timeoutMs = 7500) {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), timeoutMs);
     try {
@@ -171,23 +202,34 @@ async function fetchHtmlWithTimeout(url, timeoutMs = 7500) {
                 "Accept-Language": "es-ES,es;q=0.9,en;q=0.8"
             }
         });
-        if (!response.ok) return "";
-        return (await response.text()) || "";
+        const finalUrl = response.url || cleanUrl;
+        if (!response.ok) {
+            return { ok: false, status: response.status, finalUrl, html: "" };
+        }
+        const html = (await response.text()) || "";
+        return { ok: true, status: response.status, finalUrl, html };
     } catch (err) {
-        return "";
+        return { ok: false, status: 0, finalUrl: url, html: "" };
     } finally {
         clearTimeout(timeout);
     }
 }
 
+async function fetchHtmlWithTimeout(url, timeoutMs = 7500) {
+    const res = await fetchHtmlDetailed(url, timeoutMs);
+    return res.html || "";
+}
+
 /**
- * 26+ Enterprise Tech Stack, Ad Pixels, CRM, E-Commerce & Chat Signatures
+ * 40+ Enterprise Tech Stack, Ad Pixels, AI Agents, CRM, E-Commerce & Automation Signatures
  */
 function detectTechStack(html) {
-    if (!html) return { stack: [], adSpendActive: false };
+    if (!html) return { stack: [], automationStack: [], adSpendActive: false, hasAiAutomation: false };
     const lower = html.toLowerCase();
     const stack = [];
+    const automationStack = [];
     let adSpendActive = false;
+    let hasAiAutomation = false;
 
     // CMS & E-Commerce
     if (lower.includes("wp-content") || lower.includes("wp-includes")) stack.push("WordPress");
@@ -200,6 +242,7 @@ function detectTechStack(html) {
     if (lower.includes("magento") || lower.includes("mage/cookies")) stack.push("Magento");
     if (lower.includes("_next/static") || lower.includes("__next_data__")) stack.push("Next.js");
     if (lower.includes("astro-island") || lower.includes("_astro/")) stack.push("Astro");
+    if (lower.includes("framerusercontent.com")) stack.push("Framer");
 
     // Advertising & Retargeting Pixels (Signals Active Ad Budget!)
     if (lower.includes("connect.facebook.net") || lower.includes("fbq('init'") || lower.includes("fbq(\"init\"")) {
@@ -225,20 +268,83 @@ function detectTechStack(html) {
     if (lower.includes("static.hotjar.com")) stack.push("Hotjar");
     if (lower.includes("clarity.ms/tag")) stack.push("MS Clarity");
 
-    // CRM, Automation & Live Chat
-    if (lower.includes("js.hs-scripts.com") || lower.includes("hubspot")) stack.push("HubSpot");
-    if (lower.includes("klaviyo.com")) stack.push("Klaviyo");
+    // AI Agents, Chatbots, CRM & Workflow Automation Signatures
+    if (lower.includes("leadconnectorhq.com") || lower.includes("msgsndr.com")) {
+        stack.push("GoHighLevel CRM");
+        automationStack.push("GoHighLevel");
+        hasAiAutomation = true;
+    }
+    if (lower.includes("manychat.com") || lower.includes("mcwidget")) {
+        stack.push("ManyChat");
+        automationStack.push("ManyChat");
+        hasAiAutomation = true;
+    }
+    if (lower.includes("kommo.com") || lower.includes("amocrm")) {
+        stack.push("Kommo CRM");
+        automationStack.push("Kommo");
+        hasAiAutomation = true;
+    }
+    if (lower.includes("botpress") || lower.includes("cdn.botpress.cloud")) {
+        stack.push("Botpress IA");
+        automationStack.push("Botpress IA");
+        hasAiAutomation = true;
+    }
+    if (lower.includes("voiceflow.com")) {
+        stack.push("Voiceflow IA");
+        automationStack.push("Voiceflow IA");
+        hasAiAutomation = true;
+    }
+    if (lower.includes("chatbase.co")) {
+        stack.push("Chatbase IA");
+        automationStack.push("Chatbase IA");
+        hasAiAutomation = true;
+    }
+    if (lower.includes("typebot.io")) {
+        stack.push("Typebot");
+        automationStack.push("Typebot");
+        hasAiAutomation = true;
+    }
+    if (lower.includes("elevenlabs.io/convai") || lower.includes("vapi.ai")) {
+        stack.push("Agente Voz IA");
+        automationStack.push("Agente Voz IA");
+        hasAiAutomation = true;
+    }
+    if (lower.includes("js.hs-scripts.com") || lower.includes("hubspot")) {
+        stack.push("HubSpot");
+        automationStack.push("HubSpot");
+        hasAiAutomation = true;
+    }
+    if (lower.includes("klaviyo.com")) {
+        stack.push("Klaviyo");
+        automationStack.push("Klaviyo");
+    }
     if (lower.includes("chimpstatic.com") || lower.includes("mailchimp")) stack.push("Mailchimp");
-    if (lower.includes("widget.intercom.io")) stack.push("Intercom");
-    if (lower.includes("code.tidio.co")) stack.push("Tidio Chat");
-    if (lower.includes("client.crisp.chat")) stack.push("Crisp Chat");
-    if (lower.includes("api.whatsapp.com") || lower.includes("wa.me/")) stack.push("WhatsApp Web");
+    if (lower.includes("widget.intercom.io")) {
+        stack.push("Intercom");
+        automationStack.push("Intercom");
+        hasAiAutomation = true;
+    }
+    if (lower.includes("code.tidio.co")) {
+        stack.push("Tidio Chat");
+        automationStack.push("Tidio Chat");
+        hasAiAutomation = true;
+    }
+    if (lower.includes("client.crisp.chat")) {
+        stack.push("Crisp Chat");
+        automationStack.push("Crisp Chat");
+        hasAiAutomation = true;
+    }
+    if (lower.includes("api.whatsapp.com") || lower.includes("wa.me/") || lower.includes("wa.link/")) {
+        stack.push("WhatsApp CTA");
+    }
     if (lower.includes("js.stripe.com")) stack.push("Stripe");
     if (lower.includes("mercadopago")) stack.push("MercadoPago");
 
     return {
         stack: Array.from(new Set(stack)),
-        adSpendActive
+        automationStack: Array.from(new Set(automationStack)),
+        adSpendActive,
+        hasAiAutomation
     };
 }
 
@@ -274,12 +380,15 @@ async function enrichWebsite(websiteUrl, businessName = "", deepCrawl = true) {
     await ensurePersistentCacheLoaded();
 
     let domain = "";
+    let fullUrlKey = websiteUrl.toLowerCase();
     try {
         const u = new URL(websiteUrl.startsWith("http") ? websiteUrl : "https://" + websiteUrl);
         domain = u.hostname.replace(/^www\./, "").toLowerCase();
+        fullUrlKey = `${domain}${u.pathname}`.replace(/\/$/, "").toLowerCase();
     } catch (e) {}
 
-    const cacheKey = domain || websiteUrl.toLowerCase();
+    const isFakeSocialWeb = isSocialOrLinkInBioHost(domain);
+    const cacheKey = isFakeSocialWeb ? fullUrlKey : (domain || fullUrlKey);
     if (memoryDomainCache.has(cacheKey)) {
         return memoryDomainCache.get(cacheKey);
     }
@@ -302,7 +411,16 @@ async function enrichWebsite(websiteUrl, businessName = "", deepCrawl = true) {
             youtube: "",
             tiktok: "",
             tech_stack: "",
+            automation_stack: "",
+            has_ai_automation: false,
             ad_spend_active: false,
+            web_status: isFakeSocialWeb ? "social_link" : "active",
+            ssl_insecure: /^http:\/\//i.test(websiteUrl.trim()),
+            copyright_year: null,
+            has_viewport: true,
+            has_lead_form: false,
+            has_whatsapp_cta: false,
+            commission_bleed: false,
             meta_description: "",
             legal_name: "",
             tax_id: "",
@@ -322,8 +440,15 @@ async function enrichWebsite(websiteUrl, businessName = "", deepCrawl = true) {
             tiktok: new Set()
         };
 
-        const html = await fetchHtmlWithTimeout(websiteUrl, 7500);
+        const fetched = await fetchHtmlDetailed(websiteUrl, 7500);
+        if (fetched.finalUrl && /^http:\/\//i.test(fetched.finalUrl)) {
+            result.ssl_insecure = true;
+        }
+        const html = fetched.html || "";
         if (!html) {
+            if (!isFakeSocialWeb) {
+                result.web_status = "broken";
+            }
             persistDomainCacheEntry(cacheKey, result);
             return result;
         }
@@ -336,9 +461,11 @@ async function enrichWebsite(websiteUrl, businessName = "", deepCrawl = true) {
             result.meta_description = metaDescMatch[1].trim().substring(0, 260);
         }
 
-        // Tech Stack & Active Ad Spend
+        // Tech Stack, AI Agents & Active Ad Spend
         const techInfo = detectTechStack(html);
         result.tech_stack = techInfo.stack.join(", ");
+        result.automation_stack = techInfo.automationStack.join(", ");
+        result.has_ai_automation = Boolean(techInfo.hasAiAutomation);
         result.ad_spend_active = techInfo.adSpendActive;
 
         // Direct Phone / WhatsApp Link
@@ -346,6 +473,7 @@ async function enrichWebsite(websiteUrl, businessName = "", deepCrawl = true) {
         const telMatch = html.match(/href=["']tel:([^"'>\s]+)/i);
         if (waMatch && waMatch[1]) {
             result.phone = "+" + waMatch[1];
+            result.has_whatsapp_cta = true;
         } else if (telMatch && telMatch[1]) {
             result.phone = telMatch[1].replace(/[^\d+]/g, "").trim();
         }
@@ -353,7 +481,7 @@ async function enrichWebsite(websiteUrl, businessName = "", deepCrawl = true) {
         // Raw HTML Emails & Socials
         harvestEmailsAndSocialsFromRawHtml(html, emailsFound, socialFound);
 
-        // Deep Offscreen DOM + Schema.org JSON-LD + Fiscal OSINT
+        // Deep Offscreen DOM + Schema.org JSON-LD + Web Health & Friction OSINT
         const osint = await parseViaOffscreen(html);
         if (osint) {
             if (osint.legalName) result.legal_name = osint.legalName;
@@ -362,6 +490,16 @@ async function enrichWebsite(websiteUrl, businessName = "", deepCrawl = true) {
             if (osint.bookingPlatform) result.booking_platform = osint.bookingPlatform;
             if (osint.bookingUrl) result.booking_url = osint.bookingUrl;
             if (osint.schemaType) result.schema_type = osint.schemaType;
+            if (osint.commissionBleed) result.commission_bleed = true;
+            if (osint.copyrightYear) result.copyright_year = osint.copyrightYear;
+            result.has_viewport = osint.hasViewport !== false;
+            if (osint.hasLeadForm) result.has_lead_form = true;
+            if (osint.hasWhatsappCta) result.has_whatsapp_cta = true;
+            if (osint.isParkedOrSuspended && !isFakeSocialWeb) {
+                result.web_status = "broken";
+            } else if (!isFakeSocialWeb && ((osint.copyrightYear && osint.copyrightYear <= 2022) || osint.hasViewport === false)) {
+                result.web_status = "outdated";
+            }
             (osint.jsonLdEmails || []).forEach(e => emailsFound.add(e));
             (osint.deobfuscatedEmails || []).forEach(e => emailsFound.add(e));
             if (!result.phone && osint.jsonLdPhones?.length) {
@@ -377,8 +515,8 @@ async function enrichWebsite(websiteUrl, businessName = "", deepCrawl = true) {
             });
         }
 
-        // Subpage Crawl (/contacto, /aviso-legal, /about) when missing email or fiscal/executive data
-        if (deepCrawl && domain && (emailsFound.size === 0 || !result.legal_name || !result.decision_maker)) {
+        // Subpage Crawl (/contacto, /aviso-legal, /about) when missing email or fiscal/executive data (only on real domains)
+        if (deepCrawl && domain && !isFakeSocialWeb && result.web_status !== "broken" && (emailsFound.size === 0 || !result.legal_name || !result.decision_maker)) {
             const subLinks = CONTACT_PATHS.slice(0, 3).map(p => `https://${domain}${p}`);
             const subHtmls = await Promise.all(subLinks.map(link => fetchHtmlWithTimeout(link, 4500)));
 

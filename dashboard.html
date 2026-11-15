@@ -128,17 +128,21 @@
 
             <div class="tl-filter-chips">
                 <span class="tl-chip active" data-filter="all">Todos</span>
-                <span class="tl-chip" data-filter="high-score">🔥 Score 75+</span>
-                <span class="tl-chip" data-filter="unclaimed">🏴 No Reclamados</span>
+                <span class="tl-chip" data-filter="sell-web" title="Sin web, Falsa Web (Linktree/IG), caída o móvil lenta">🌐 Venta Web</span>
+                <span class="tl-chip" data-filter="sell-auto" title="Negocios con flujo real operando manual o pagando comisiones">🤖 Venta Automatización</span>
+                <span class="tl-chip" data-filter="fake-web" title="Usan Linktree, Instagram, Facebook o wa.me como sitio web">🔗 Falsa Web (IG/Linktree)</span>
+                <span class="tl-chip" data-filter="followup-due" title="Abrieron tu link de auditoría o requieren seguimiento Día 3/7">⏰ Seguimiento / Calientes</span>
                 <span class="tl-chip" data-filter="ads-active">💰 Pagan Ads</span>
+                <span class="tl-chip" data-filter="unclaimed">🏴 No Reclamados</span>
                 <span class="tl-chip" data-filter="has-email">✉️ Con Email</span>
-                <span class="tl-chip" data-filter="has-phone">📞 Con Teléfono</span>
-                <span class="tl-chip" data-filter="no-website">⚡ Sin Web</span>
             </div>
 
             <div class="tl-toolbar-actions">
-                <button id="btn-start-speed-outreach" class="tl-btn tl-btn-success" style="height: 32px; font-size: 12px; font-weight: 700;" title="Iniciar sesión guiada de WhatsApp">
+                <button id="btn-start-speed-outreach" class="tl-btn tl-btn-success" style="height: 32px; font-size: 12px; font-weight: 700;" title="Iniciar sesión guiada de WhatsApp (Prioriza seguimientos y calientes)">
                     ⚡ Cola Rápida WA
+                </button>
+                <button id="btn-refresh-audit-opens" class="tl-btn tl-btn-outline" style="height: 32px; font-size: 12px; border-color: #f97316; color: #f97316; font-weight: 700;" title="Consultar quién acaba de abrir tus links de auditoría en Cloudflare">
+                    🔥 Radar Aperturas
                 </button>
                 <button id="btn-verify-all-emails" class="tl-btn tl-btn-outline" style="height: 32px; font-size: 12px;" title="Auditar DNS MX + SPF + DMARC en lote ($0 Cloudflare DoH)">
                     🛡️ Auditar DNS/DMARC
@@ -436,30 +440,56 @@
             </div>
 
             <div class="tl-drawer-body">
-                <!-- AI OPPORTUNITY & CORE WEB VITALS CARD -->
+                <!-- DUAL SCORE, REVENUE LEAK & OFFER ROUTER CARD -->
                 <div class="tl-detail-card" style="border-left: 4px solid #2563eb;">
                     <div class="tl-detail-title" style="justify-content: space-between;">
-                        <span>🤖 Diagnóstico Deep OSINT & Velocidad Web</span>
+                        <span>🤖 Diagnóstico Dual (Web vs Automatización IA)</span>
                         <button id="btn-audit-pagespeed" class="tl-btn tl-btn-outline" style="height: 24px; font-size: 10.5px; padding: 0 8px;">
-                            ⚡ Auditar PageSpeed Móvil
+                            ⚡ Auditar PageSpeed
                         </button>
                     </div>
                     <div class="tl-detail-row">
-                        <span class="tl-detail-label">Score Predictivo v4.0:</span>
-                        <span class="tl-badge-score tl-score-high" id="drawer-ai-score">85</span>
+                        <span class="tl-detail-label">Motores de Oportunidad:</span>
+                        <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
+                            <span class="tl-badge-score tl-score-high" id="drawer-web-score" title="Score Venta Página Web">🌐 Web: 85</span>
+                            <span class="tl-badge-score tl-score-med" id="drawer-auto-score" title="Score Venta Automatización / Agente IA">🤖 Bot IA: 78</span>
+                            <span class="tl-badge-score tl-score-high" id="drawer-ai-score" style="display: none;">85</span>
+                        </div>
                     </div>
                     <div class="tl-detail-row">
-                        <span class="tl-detail-label">Prioridad Comercial:</span>
-                        <span class="tl-detail-val" id="drawer-ai-priority">Alta</span>
+                        <span class="tl-detail-label">🎯 Oferta Ganadora:</span>
+                        <span class="tl-detail-val" id="drawer-recommended-offer" style="color: #3b82f6; font-weight: 800;">Pack Web + Agente IA 24/7</span>
                     </div>
                     <div class="tl-detail-row">
-                        <span class="tl-detail-label">Google PageSpeed Móvil:</span>
-                        <span class="tl-detail-val" id="drawer-pagespeed-val">Sin auditar (Clic arriba)</span>
+                        <span class="tl-detail-label">💰 Ticket Sugerido:</span>
+                        <span class="tl-detail-val" id="drawer-suggested-ticket" style="font-weight: 700;">$850 setup + $197/mes</span>
                     </div>
+                    <div class="tl-detail-row">
+                        <span class="tl-detail-label">💸 Fuga Estimada Rubro:</span>
+                        <span class="tl-detail-val" id="drawer-revenue-leak" style="color: #ef4444; font-weight: 800;">~$1,450 USD/mes</span>
+                    </div>
+                    <div class="tl-detail-row">
+                        <span class="tl-detail-label">Estado Real Web / Speed:</span>
+                        <span class="tl-detail-val" id="drawer-pagespeed-val">Sin auditar</span>
+                    </div>
+                    <div class="tl-detail-row">
+                        <span class="tl-detail-label">📡 Radar Propuesta Cloud:</span>
+                        <span class="tl-detail-val" id="drawer-audit-telemetry" style="font-size: 11px;">Sin link publicado</span>
+                    </div>
+                    <span id="drawer-ai-priority" style="display: none;">Alta</span>
                     <div class="tl-detail-row" style="flex-direction: column; align-items: flex-start; gap: 4px;">
-                        <span class="tl-detail-label">Señales de Venta Detectadas:</span>
+                        <span class="tl-detail-label">Señales Comerciales Detectadas:</span>
                         <div id="drawer-ai-opps" style="margin-top: 4px;"></div>
                     </div>
+                </div>
+
+                <!-- TOP 3 QUADRANT COMPETITOR BENCHMARK -->
+                <div class="tl-detail-card" style="border-left: 4px solid #f59e0b;">
+                    <div class="tl-detail-title" style="justify-content: space-between;">
+                        <span>🏆 Benchmark: Tú vs. Top 3 del Cuadrante</span>
+                        <span id="drawer-quadrant-rank" style="font-size: 10.5px; font-weight: 800; color: #f59e0b;">Puesto #--</span>
+                    </div>
+                    <div id="drawer-top3-list" style="display: flex; flex-direction: column; gap: 6px; font-size: 11.5px; margin-top: 4px;"></div>
                 </div>
 
                 <!-- OSINT CORPORATE, FISCAL & CONTACT PROFILE -->
@@ -516,30 +546,38 @@
                     </div>
                 </div>
 
-                <!-- SOCIAL & TECH STACK -->
+                <!-- SOCIAL, TECH STACK & 1-CLICK AD SPY -->
                 <div class="tl-detail-card">
                     <div class="tl-detail-title">
-                        <span>🌐 Stack Tecnológico, Píxeles Ads & RRSS</span>
+                        <span>🌐 Stack, Bots IA, RRSS & Espía de Anuncios</span>
                     </div>
                     <div class="tl-detail-row">
-                        <span class="tl-detail-label">Tecnologías & Píxeles:</span>
+                        <span class="tl-detail-label">Tecnologías & Bots:</span>
                         <span class="tl-detail-val" id="drawer-tech" style="max-width: 65%;">-</span>
                     </div>
                     <div class="tl-detail-row">
                         <span class="tl-detail-label">Redes Sociales:</span>
                         <div id="drawer-socials" style="display: flex; gap: 6px; flex-wrap: wrap;"></div>
                     </div>
+                    <div class="tl-detail-row" style="padding-top: 6px;">
+                        <span class="tl-detail-label">🕵️ Espiar Anuncios:</span>
+                        <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                            <a href="#" target="_blank" rel="noopener noreferrer" id="btn-spy-meta-ads" class="tl-btn tl-btn-outline" style="height: 24px; font-size: 10.5px; padding: 0 8px; text-decoration: none;">📘 Meta Ads</a>
+                            <a href="#" target="_blank" rel="noopener noreferrer" id="btn-spy-google-ads" class="tl-btn tl-btn-outline" style="height: 24px; font-size: 10.5px; padding: 0 8px; text-decoration: none;">🔎 Google Ads</a>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- OMNICHANNEL SEQUENCER & GEMINI 2.5 AI -->
+                <!-- OMNICHANNEL CADENCE SEQUENCER, LIVE DEMO & GEMINI 2.5 AI -->
                 <div class="tl-detail-card">
                     <div class="tl-detail-title">
-                        <span>⚡ Secuenciador Omnicanal & Gemini 2.5 IA</span>
+                        <span>⚡ Cadencia Comercial (Día 1→7), Demo IA & Gemini 2.5</span>
                     </div>
                     <div class="tl-pitch-tabs" style="flex-wrap: wrap;">
-                        <button class="tl-pitch-tab active" data-channel="whatsapp">WA Toque 1</button>
-                        <button class="tl-pitch-tab" data-channel="followup">Toque 2 (48h)</button>
-                        <button class="tl-pitch-tab" data-channel="email">Email Frío</button>
+                        <button class="tl-pitch-tab active" data-channel="whatsapp">WA Día 1</button>
+                        <button class="tl-pitch-tab" data-channel="followup">Día 3 (Demo)</button>
+                        <button class="tl-pitch-tab" data-channel="closing">Día 7 (Cierre)</button>
+                        <button class="tl-pitch-tab" data-channel="email">Email ROI</button>
                         <button class="tl-pitch-tab" data-channel="call">Llamada 30s</button>
                         <button class="tl-pitch-tab" data-channel="gemini" style="background: linear-gradient(135deg, #eff6ff, #dbeafe); color: #1e40af; border: 1px solid #bfdbfe;">✨ Gemini 2.5 IA</button>
                     </div>
@@ -557,12 +595,15 @@
                             💬 Enviar WhatsApp
                         </a>
                     </div>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px;">
+                    <button id="btn-open-live-demo" class="tl-btn tl-btn-primary" style="width: 100%; margin-top: 8px; background: linear-gradient(135deg, #059669, #0284c7); border: none; font-weight: 800; font-size: 12px;">
+                        ✨ Ver Demo Pre-Construida (Web + Recepcionista IA 24/7)
+                    </button>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px;">
                         <button id="btn-download-pdf-audit" class="tl-btn tl-btn-outline" style="font-weight: 700; font-size: 11.5px;">
                             📄 PDF Marca Blanca
                         </button>
-                        <button id="btn-publish-cloud-audit" class="tl-btn tl-btn-outline" style="font-weight: 700; font-size: 11.5px; border-color: #3b82f6; color: #3b82f6;" title="Publica landing personalizada en Cloudflare con tracking de lectura">
-                            🌐 Link con Tracking
+                        <button id="btn-publish-cloud-audit" class="tl-btn tl-btn-outline" style="font-weight: 700; font-size: 11.5px; border-color: #3b82f6; color: #3b82f6;" title="Publica micrositio con Demo + Tracking de apertura en tiempo real">
+                            🌐 Link + Demo Cloud
                         </button>
                     </div>
                 </div>
@@ -721,6 +762,82 @@
             <button class="tl-btn tl-btn-primary" id="btn-submit-license" style="height: 40px; font-size: 13px; font-weight: 800;">
                 🚀 Activar Licencia ECDSA
             </button>
+        </div>
+    </div>
+
+    <!-- INTERACTIVE CLIENT WEBSITE + 24/7 AI BOT SIMULATOR MODAL -->
+    <div class="tl-modal" id="client-demo-modal" style="width: 820px; max-width: 96vw;">
+        <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; gap: 8px; flex-wrap: wrap;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 20px;">✨</span>
+                <div>
+                    <h3 id="demo-modal-title" style="font-size: 15.5px; font-weight: 800; color: var(--text-primary); margin: 0;">Prototipo en Vivo: Web + Recepcionista IA 24/7</h3>
+                    <small id="demo-modal-subtitle" style="color: var(--text-muted); font-size: 11px;">Muéstralo en videollamada o descárgalo en 1 archivo para enviarlo por WhatsApp</small>
+                </div>
+            </div>
+            <button class="tl-btn tl-btn-ghost" id="btn-close-demo-modal" style="font-size: 15px; height: 28px; padding: 0 8px;">✕</button>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1.12fr 0.88fr; gap: 14px; margin-top: 12px; align-items: stretch;">
+            <!-- Left: Custom Niche Website Hero Preview -->
+            <div style="background: linear-gradient(145deg, #0b1120, #111827); border: 1px solid #1e293b; border-radius: 12px; padding: 18px; color: #f8fafc; display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-bottom: 12px;">
+                        <span id="demo-site-pill" style="background: rgba(59,130,246,0.18); border: 1px solid rgba(59,130,246,0.4); color: #93c5fd; font-size: 10.5px; font-weight: 700; padding: 3px 9px; border-radius: 99px;">★ 4.9 · Rubro</span>
+                        <span id="demo-leak-pill" style="background: rgba(16,185,129,0.16); color: #6ee7b7; font-size: 10.5px; font-weight: 800; padding: 3px 9px; border-radius: 99px;">Recupera ~$1,450/mes</span>
+                    </div>
+                    <h4 id="demo-site-headline" style="font-size: 19px; font-weight: 900; line-height: 1.22; color: #ffffff; margin: 0 0 8px 0;">Empresa</h4>
+                    <p id="demo-site-desc" style="font-size: 12px; color: #94a3b8; line-height: 1.45; margin: 0 0 14px 0;">Web móvil ultra-rápida conectada con Agente IA 24/7.</p>
+                </div>
+                <div>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px;">
+                        <div style="background: #0f172a; border: 1px solid #1e293b; border-radius: 8px; padding: 8px; text-align: center;">
+                            <strong style="display: block; color: #38bdf8; font-size: 13px;">&lt; 1.1s</strong>
+                            <span style="font-size: 10px; color: #94a3b8;">Carga Móvil</span>
+                        </div>
+                        <div style="background: #0f172a; border: 1px solid #1e293b; border-radius: 8px; padding: 8px; text-align: center;">
+                            <strong style="display: block; color: #34d399; font-size: 13px;">24/7 IA</strong>
+                            <span style="font-size: 10px; color: #94a3b8;">Cero Espera</span>
+                        </div>
+                        <div style="background: #0f172a; border: 1px solid #1e293b; border-radius: 8px; padding: 8px; text-align: center;">
+                            <strong style="display: block; color: #fbbf24; font-size: 13px;">0% Comis.</strong>
+                            <span style="font-size: 10px; color: #94a3b8;">Canal Propio</span>
+                        </div>
+                    </div>
+                    <div id="demo-bot-role-box" style="background: rgba(37,99,235,0.12); border: 1px solid rgba(59,130,246,0.3); border-radius: 8px; padding: 8px 10px; font-size: 11px; color: #bfdbfe; font-weight: 600;">
+                        🤖 Rol IA activo
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Live Interactive 24/7 AI Receptionist Chat -->
+            <div style="background: #0f172a; border: 1.5px solid #10b981; border-radius: 12px; overflow: hidden; display: flex; flex-direction: column;">
+                <div style="background: linear-gradient(135deg, #065f46, #047857); padding: 10px 12px; color: #ffffff; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <strong id="demo-bot-header-name" style="font-size: 12.5px; display: block;">🤖 Recepcionista IA 24/7</strong>
+                        <span style="font-size: 10px; color: #a7f3d0;">● Respondiendo en &lt;10 seg por WhatsApp</span>
+                    </div>
+                    <span style="font-size: 9.5px; font-weight: 800; background: rgba(0,0,0,0.28); padding: 2px 7px; border-radius: 99px;">SIMULADOR</span>
+                </div>
+                <div id="demo-chat-messages" style="padding: 12px; height: 215px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; background: #090d16; font-size: 12px;"></div>
+                <div style="padding: 8px 10px; background: #0f172a; border-top: 1px solid #1e293b; display: flex; gap: 5px; flex-wrap: wrap;" id="demo-quick-chips">
+                    <button type="button" class="tl-btn tl-btn-outline btn-demo-sim-msg" data-sim="book" style="height: 24px; font-size: 10.5px; padding: 0 8px;">📅 Agendar Cita</button>
+                    <button type="button" class="tl-btn tl-btn-outline btn-demo-sim-msg" data-sim="price" style="height: 24px; font-size: 10.5px; padding: 0 8px;">💰 Precios</button>
+                    <button type="button" class="tl-btn tl-btn-outline btn-demo-sim-msg" data-sim="night" style="height: 24px; font-size: 10.5px; padding: 0 8px;">🌙 Consulta 11 PM</button>
+                </div>
+            </div>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-top: 14px; flex-wrap: wrap;">
+            <button type="button" class="tl-btn tl-btn-ghost" id="btn-demo-close-bottom" style="font-size: 12px;">Cerrar</button>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                <button type="button" class="tl-btn tl-btn-outline" id="btn-demo-publish-cloud" style="font-size: 12px; border-color: #3b82f6; color: #3b82f6; font-weight: 700;">
+                    🌐 Generar Link con Tracking
+                </button>
+                <button type="button" class="tl-btn tl-btn-success" id="btn-demo-download-html" style="font-size: 12px; font-weight: 800;">
+                    📥 Descargar Demo (.html) para Enviar al Cliente
+                </button>
+            </div>
         </div>
     </div>
 

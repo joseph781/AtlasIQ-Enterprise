@@ -50,10 +50,16 @@
             }
 
             const badges = [];
-            if (!l.website) badges.push("Sin Web");
-            if (l.unclaimed) badges.push("No Reclamado");
+            const ws = typeof classifyWebsiteStatus === "function" ? classifyWebsiteStatus(l) : null;
+            const econ = typeof estimateNicheRevenueLeak === "function" ? estimateNicheRevenueLeak(l) : null;
+            if (!l.website) badges.push("🚨 Sin Web");
+            else if (ws && ws.status === "social_link") badges.push("⚠️ Falsa Web");
+            else if (ws && ws.status === "broken") badges.push("💀 Web Caída");
+            if (l.offer_type === "automation") badges.push("🤖 Vender Bot IA");
+            else if (l.offer_type === "combo") badges.push("🚀 Web + Bot IA");
+            if (econ && econ.monthlyLeakUsd) badges.push(`💸 -$${(econ.monthlyLeakUsd / 1000).toFixed(1)}k/m`);
+            if (l.commission_bleed) badges.push("🩸 App Comisión");
             if (l.email) badges.push("✉️ Email");
-            if (l.ad_spend_active) badges.push("💰 Ads Activos");
 
             return `
                 <div class="lead-item">

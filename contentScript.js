@@ -23,28 +23,46 @@ let uiExportBtnEl = null;
 let uiGpsCoordEl = null;
 let uiGpsNicheEl = null;
 
-// Pain-point dictionary for automated negative-review & snippet mining
+// Pain-point dictionary for automated negative-review & snippet mining (Web + AI Automation Signals)
 const PAIN_POINT_KEYWORDS = [
     { kw: "no contestan", label: "Atención telefónica deficiente" },
     { kw: "nunca contestan", label: "Llamadas perdidas" },
+    { kw: "no responden", label: "WhatsApp/Mensajes sin respuesta" },
+    { kw: "whatsapp", label: "Fricción en atención por WhatsApp" },
     { kw: "tardan", label: "Demora en servicio" },
+    { kw: "demoran", label: "Cotización/Atención lenta" },
     { kw: "cita", label: "Fricción en agendamiento" },
     { kw: "reserva", label: "Sistema de reservas mejorable" },
     { kw: "espera", label: "Altos tiempos de espera" },
     { kw: "efectivo", label: "Falta de pagos digitales" },
-    { kw: "página", label: "Quejas sobre sitio web" }
+    { kw: "página", label: "Quejas sobre sitio web" },
+    { kw: "web", label: "Fricción digital / Web" }
 ];
 
+const FAKE_WEB_HOST_RX = /(?:^|\.)(?:linktr\.ee|beacons\.ai|bio\.site|lnk\.bio|taplink\.cc|solo\.to|campsite\.bio|milkshake\.app|instagram\.com|instagr\.am|facebook\.com|fb\.com|tiktok\.com|wa\.me|wa\.link|api\.whatsapp\.com|canva\.site|sites\.google\.com|docs\.google\.com|forms\.gle|carrd\.co|bit\.ly)$/i;
+
+function isFakeWebUrl(rawUrl) {
+    if (!rawUrl) return false;
+    try {
+        const u = new URL(rawUrl.startsWith("http") ? rawUrl : "https://" + rawUrl);
+        return FAKE_WEB_HOST_RX.test(u.hostname.replace(/^www\./i, ""));
+    } catch (_) {
+        return false;
+    }
+}
+
 const BOOKING_DOMAIN_HINTS = [
-    { match: "calendly.com", name: "Calendly" },
-    { match: "doctoralia", name: "Doctoralia" },
-    { match: "booksy.com", name: "Booksy" },
-    { match: "opentable", name: "OpenTable" },
-    { match: "ubereats.com", name: "UberEats" },
-    { match: "rappi.", name: "Rappi" },
-    { match: "pedidosya", name: "PedidosYa" },
-    { match: "treatwell", name: "Treatwell" },
-    { match: "agendapro", name: "AgendaPro" }
+    { match: "calendly.com", name: "Calendly", commission: false },
+    { match: "cal.com", name: "Cal.com", commission: false },
+    { match: "agendapro", name: "AgendaPro", commission: false },
+    { match: "doctoralia", name: "Doctoralia", commission: true },
+    { match: "booksy.com", name: "Booksy", commission: true },
+    { match: "fresha.com", name: "Fresha", commission: true },
+    { match: "opentable", name: "OpenTable", commission: true },
+    { match: "ubereats.com", name: "UberEats", commission: true },
+    { match: "rappi.", name: "Rappi", commission: true },
+    { match: "pedidosya", name: "PedidosYa", commission: true },
+    { match: "treatwell", name: "Treatwell", commission: true }
 ];
 
 function getLeadDeduplicationKey(lead) {
@@ -157,59 +175,108 @@ function persistLeadsToStorage(immediate = false) {
     else syncTimeout = setTimeout(writeFn, 450);
 }
 
-// Deep Multi-Signal Opportunity Scoring Engine (In-Memory Fast Path)
+// Dual-Engine Opportunity Scoring (Web Design Score + AI Automation Score)
 function computeLeadScore(lead) {
-    let score = 45;
+    let webScore = 40;
+    let autoScore = 38;
     const opps = [];
 
-    if (!lead.website) {
-        score += 26;
+    const hasRawWeb = Boolean(lead.website && String(lead.website).trim());
+    const fakeWeb = hasRawWeb && (lead.web_status === "social_link" || isFakeWebUrl(lead.website));
+    const brokenWeb = hasRawWeb && lead.web_status === "broken";
+    const outdatedWeb = hasRawWeb && (lead.web_status === "outdated" || (lead.copyright_year && lead.copyright_year <= 2022) || lead.has_viewport === false);
+
+    if (!hasRawWeb) {
+        lead.web_status = "none";
+        webScore += 42;
         opps.push("Sin Sitio Web (Venta Directa Web)");
+    } else if (fakeWeb) {
+        lead.web_status = "social_link";
+        webScore += 44;
+        autoScore += 12;
+        opps.push("Falsa Web: Solo Linktree/RRSS (Cierre Rápido Web)");
+    } else if (brokenWeb) {
+        webScore += 45;
+        opps.push("Web Caída / Hosting Roto (Urgencia Alta)");
     } else {
-        score += 4;
         const t = (lead.tech_stack || "").toLowerCase();
-        if (t && !t.includes("pixel") && !t.includes("gtm")) {
-            score += 12;
-            opps.push("Sin Píxel Ads (Oportunidad Tráfico)");
+        if (outdatedWeb) {
+            webScore += 28;
+            opps.push(lead.copyright_year ? `Web Obsoleta (©${lead.copyright_year})` : "Web No Adaptada a Móvil");
         }
-        if (lead.ad_spend_active) {
-            score += 8;
-            opps.push("Invierte en Ads Activamente");
+        if (lead.ssl_insecure) {
+            webScore += 16;
+            opps.push("Sitio Inseguro (Sin SSL HTTPS)");
+        }
+        if (t && !t.includes("pixel") && !t.includes("gtm")) {
+            webScore += 12;
+            autoScore += 10;
+            opps.push("Sin Píxel Ads (Fuga Retargeting)");
         }
         if (t.includes("wix") || t.includes("squarespace")) {
-            opps.push("CMS Limitado (Migración)");
+            webScore += 18;
+            opps.push("CMS Limitado (Rediseño)");
         }
     }
 
+    const reviews = parseInt(lead.reviewCount, 10) || 0;
+    const rating = parseFloat(lead.averageRating) || 0;
+
+    // AI Automation & CRM Scoring
+    if (!lead.has_ai_automation) {
+        if (reviews >= 30) {
+            autoScore += 26;
+            opps.push("Flujo Real sin Agente IA 24/7");
+        } else if (reviews >= 10) {
+            autoScore += 16;
+        }
+    }
+    if (lead.ad_spend_active) {
+        autoScore += 18;
+        opps.push("Invierte en Ads Activamente");
+    }
+    if (lead.commission_bleed || (lead.booking_platform && /ubereats|rappi|pedidosya|doctoralia|booksy|fresha|treatwell|opentable/i.test(lead.booking_platform))) {
+        lead.commission_bleed = true;
+        autoScore += 20;
+        webScore += 10;
+        opps.push(`Paga Comisiones (${lead.booking_platform}) · Canal Propio`);
+    } else if (!lead.booking_platform && reviews >= 25) {
+        autoScore += 12;
+        opps.push("Sin Agenda / Pedidos Automatizados");
+    }
+
     if (lead.unclaimed) {
-        score += 18;
+        webScore += 16;
+        autoScore += 8;
         opps.push("Ficha Google No Reclamada (SEO Local)");
     }
 
     if (lead.review_pain_points) {
-        score += 10;
+        autoScore += 18;
         opps.push(`Dolor Clientes: ${lead.review_pain_points}`);
     }
 
-    if (lead.phone) score += 8;
-    if (lead.email) score += 12;
-    if (lead.decision_maker || lead.legal_name) score += 6;
-
-    const rating = parseFloat(lead.averageRating) || 0;
-    const reviews = parseInt(lead.reviewCount) || 0;
+    if (lead.phone) { webScore += 6; autoScore += 10; }
+    if (lead.email) { webScore += 8; autoScore += 8; }
+    if (lead.decision_maker || lead.legal_name) { webScore += 4; autoScore += 6; }
 
     if (rating >= 4.5 && reviews > 0 && reviews < 25) {
-        score += 8;
+        webScore += 6;
         opps.push("Alta Calidad / Pocas Reseñas");
     } else if (rating > 0 && rating < 4.1 && reviews >= 10) {
-        score += 9;
-        opps.push("Crisis de Reputación (<4.1★)");
-    } else if (reviews >= 120) {
-        score += 7;
-        opps.push("Alto Volumen Comercial");
+        autoScore += 10;
+        opps.push("Automatizar Reseñas (<4.1★)");
     }
 
-    lead.lead_score = Math.min(99, Math.max(15, score));
+    lead.web_score = Math.min(99, Math.max(15, webScore));
+    lead.automation_score = Math.min(99, Math.max(15, autoScore));
+    lead.lead_score = Math.max(lead.web_score, lead.automation_score);
+    lead.offer_type = (lead.web_score >= 74 && lead.automation_score >= 72)
+        ? "combo"
+        : (lead.web_score >= lead.automation_score ? "web" : "automation");
+    lead.recommended_offer = lead.offer_type === "combo"
+        ? "Pack Web + Agente IA 24/7"
+        : (lead.offer_type === "web" ? "Diseño Web + SEO Local" : "Agente IA WhatsApp + CRM");
     lead.priority = lead.lead_score >= 75 ? "Alta" : (lead.lead_score >= 50 ? "Media" : "Baja");
     lead.opportunities = Array.from(new Set(opps)).join(", ");
 }
@@ -234,7 +301,16 @@ async function enrichLeadWebsite(lead) {
             if (res.youtube) lead.youtube = res.youtube;
             if (res.tiktok) lead.tiktok = res.tiktok;
             if (res.tech_stack) lead.tech_stack = res.tech_stack;
+            if (res.automation_stack) lead.automation_stack = res.automation_stack;
+            if (res.has_ai_automation !== undefined) lead.has_ai_automation = res.has_ai_automation;
             if (res.ad_spend_active !== undefined) lead.ad_spend_active = res.ad_spend_active;
+            if (res.web_status) lead.web_status = res.web_status;
+            if (res.ssl_insecure !== undefined) lead.ssl_insecure = res.ssl_insecure;
+            if (res.copyright_year) lead.copyright_year = res.copyright_year;
+            if (res.has_viewport !== undefined) lead.has_viewport = res.has_viewport;
+            if (res.has_lead_form !== undefined) lead.has_lead_form = res.has_lead_form;
+            if (res.has_whatsapp_cta !== undefined) lead.has_whatsapp_cta = res.has_whatsapp_cta;
+            if (res.commission_bleed !== undefined) lead.commission_bleed = res.commission_bleed;
             if (res.meta_description) lead.meta_description = res.meta_description;
             if (res.legal_name) lead.legal_name = res.legal_name;
             if (res.tax_id) lead.tax_id = res.tax_id;

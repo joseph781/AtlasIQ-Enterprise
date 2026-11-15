@@ -59,76 +59,262 @@ function formatPhone(phone, countryCodeHint = "") {
     };
 }
 
+const FAKE_WEB_HOSTS_UTIL = /(?:^|\.)(?:linktr\.ee|beacons\.ai|bio\.site|lnk\.bio|taplink\.cc|solo\.to|campsite\.bio|milkshake\.app|instagram\.com|instagr\.am|facebook\.com|fb\.com|tiktok\.com|wa\.me|wa\.link|api\.whatsapp\.com|canva\.site|sites\.google\.com|docs\.google\.com|forms\.gle|carrd\.co|bit\.ly)$/i;
+
+function classifyWebsiteStatus(lead) {
+    const raw = (lead && lead.website) ? String(lead.website).trim() : "";
+    if (!raw) {
+        return { status: "none", label: "⚡ Sin Web", shortBadge: "⚡ Sin Web", color: "#ef4444", bg: "rgba(239,68,68,0.14)", needsWeb: true };
+    }
+    let host = "";
+    try {
+        host = new URL(normalizeUrl(raw)).hostname.replace(/^www\./i, "").toLowerCase();
+    } catch (_) {}
+
+    if (lead.web_status === "social_link" || (host && FAKE_WEB_HOSTS_UTIL.test(host))) {
+        return { status: "social_link", label: "🔗 Falsa Web (Linktree/RRSS)", shortBadge: "🔗 Solo Link/RRSS", color: "#f97316", bg: "rgba(249,115,22,0.16)", needsWeb: true };
+    }
+    if (lead.web_status === "broken") {
+        return { status: "broken", label: "💀 Web Caída / Hosting Roto", shortBadge: "💀 Caída", color: "#dc2626", bg: "rgba(220,38,38,0.16)", needsWeb: true };
+    }
+    if (typeof lead.pagespeed_mobile === "number" && lead.pagespeed_mobile < 55) {
+        return { status: "slow", label: `🐢 Móvil Lenta (${lead.pagespeed_mobile}/100)`, shortBadge: `🐢 ${lead.pagespeed_mobile}/100`, color: "#d97706", bg: "rgba(245,158,11,0.16)", needsWeb: true };
+    }
+    if (lead.web_status === "outdated" || (lead.copyright_year && lead.copyright_year <= 2022) || lead.has_viewport === false) {
+        const yr = lead.copyright_year ? ` ©${lead.copyright_year}` : "";
+        return { status: "outdated", label: `🦖 Web Obsoleta${yr}`, shortBadge: `🦖 Obsoleta${yr}`, color: "#d97706", bg: "rgba(245,158,11,0.15)", needsWeb: true };
+    }
+    if (lead.ssl_insecure) {
+        return { status: "insecure", label: "🔓 Sin SSL (HTTP)", shortBadge: "🔓 Sin SSL", color: "#ea580c", bg: "rgba(234,88,12,0.15)", needsWeb: true };
+    }
+    return { status: "active", label: "✓ Web Propia Activa", shortBadge: "✓ Activa", color: "#10b981", bg: "rgba(16,185,129,0.14)", needsWeb: false };
+}
+
+const NICHE_REVENUE_PROFILES = [
+    { key: "clinic", label: "Salud, Clínica & Odontología", rx: /cl[ií]nica|odont|dent|m[eé]dic|salud|hospital|pedia|dermat|oftalm|fisiot|psicol|veterin/i, avgTicket: 115, setupUsd: 890, retainerUsd: 197, botRole: "Recepcionista Médica IA 24/7 (Citas + Recordatorios Anti-Inasistencia)", heroHeadline: "Agenda tu valoración en menos de 60 segundos sin esperas telefónicas", sampleQ: "Hola, ¿tienen disponibilidad para consulta esta semana y qué costo tiene?", sampleA: "¡Hola! 👋 Sí, tenemos cupos disponibles mañana a las 10:30 AM y el jueves a las 4:00 PM. La valoración inicial incluye diagnóstico completo. ¿Cuál horario prefieres que te reserve ahora mismo?" },
+    { key: "realestate", label: "Inmobiliaria & Bienes Raíces", rx: /inmobil|bienes\s*ra[ií]ces|propiedad|arquitect|construct|urbaniz|broker/i, avgTicket: 1850, setupUsd: 1200, retainerUsd: 297, botRole: "Calificador Inmobiliario IA 24/7 (Filtro de Presupuesto + Agendamiento Visitas)", heroHeadline: "Encuentra tu propiedad ideal con asesoría inmediata y recorrido agendado hoy", sampleQ: "Hola, vi una propiedad en su perfil, ¿sigue disponible y aceptan financiamiento?", sampleA: "¡Un gusto saludarte! 🏡 Sí, sigue disponible para entrega inmediata y aceptamos crédito bancario o financiamiento directo. ¿Buscas para inversión o vivienda familiar para enviarte la ficha PDF y agendar visita?" },
+    { key: "legal", label: "Legal, Contable & Consultoría B2B", rx: /abogad|jur[ií]dic|notar|contab|contador|fiscal|consultor|auditor|seguros|agencia/i, avgTicket: 380, setupUsd: 950, retainerUsd: 247, botRole: "Asistente Ejecutivo IA (Pre-Calificación de Casos + Agenda Directa)", heroHeadline: "Protección legal y estrategia corporativa con respuesta ejecutiva inmediata", sampleQ: "Buenas noches, necesito asesoría urgente para mi empresa, ¿cómo agendamos?", sampleA: "¡Buenas noches! ⚖️ Tomamos tus datos de inmediato para priorizar tu caso a primera hora. Cuéntame en una línea el tema principal y elige si prefieres videollamada o reunión presencial mañana." },
+    { key: "beauty", label: "Estética, Spa & Barbería", rx: /est[eé]tic|spa|belleza|peluquer|barber|u[ñn]as|salon|sal[oó]n|masaje|laser|cosm[eé]t/i, avgTicket: 65, setupUsd: 650, retainerUsd: 147, botRole: "Concierge IA de Reservas 24/7 (Cero Comisiones Booksy + Reconfirmación WA)", heroHeadline: "Reserva tu experiencia de bienestar en 1 clic con confirmación instantánea", sampleQ: "Hola! Quiero agendar corte y tratamiento para el sábado, ¿tienen turno?", sampleA: "¡Hola! ✨ Qué alegría atenderte. Para este sábado nos quedan 2 espacios: 11:00 AM y 3:30 PM, con 10% de beneficio reservando directo por aquí. ¿A qué nombre te bloqueo el turno?" },
+    { key: "food", label: "Restaurante, Café & Gastronomía", rx: /restauran|caf[eé]|pizz|sushi|hamburg|panader|pasteler|gastron|bar|parrill|comida|bodeg/i, avgTicket: 32, setupUsd: 690, retainerUsd: 147, botRole: "Motor Propio de Pedidos & Reservas WA (Ahorra 28% de Comisión Delivery)", heroHeadline: "Pide directo sin recargos de apps o reserva tu mesa VIP en segundos", sampleQ: "Hola, ¿tienen delivery hasta mi zona y me pasan el menú actualizado?", sampleA: "¡Hola! 🍽️ Sí, llegamos en 25 min con envío bonificado pidiendo directo aquí (sin recargos de apps). Aquí tienes nuestro menú interactivo: ¿deseas ordenar a domicilio o reservar mesa para hoy?" },
+    { key: "auto", label: "Automotriz, Taller & Repuestos", rx: /taller|mec[aá]nic|auto|veh[ií]cul|repuest|concesionar|caucho|llanta|lubric|lavado/i, avgTicket: 145, setupUsd: 750, retainerUsd: 167, botRole: "Cotizador Automotriz IA + Recordatorio Automático de Mantenimiento", heroHeadline: "Diagnóstico certificado y cotización de repuestos/servicio al instante", sampleQ: "Buenas, ¿cuánto sale el mantenimiento general y tienen turno hoy?", sampleA: "¡Hola! 🔧 Sí tenemos bahía disponible hoy. Indícame marca, modelo y año de tu vehículo y en 30 segundos te confirmo precio exacto y hora de recepción." },
+    { key: "fitness", label: "Gimnasio, Fitness & Academia", rx: /gimnasio|fitness|crossfit|pilates|yoga|deport|academia|escuela|colegio|curso|idiom/i, avgTicket: 75, setupUsd: 690, retainerUsd: 167, botRole: "Closer IA de Inscripciones y Clases de Prueba 24/7", heroHeadline: "Activa tu pase de prueba gratuito hoy y transforma tus resultados", sampleQ: "Hola, ¿qué planes mensuales manejan y qué horarios tienen?", sampleA: "¡Hola! 💪 Tenemos horarios desde las 6:00 AM hasta las 9:30 PM y puedes venir mañana mismo a una sesión de prueba sin costo. ¿En qué turno te queda más cómodo entrenar?" }
+];
+
+const DEFAULT_NICHE_PROFILE = {
+    key: "general",
+    label: "Comercio & Servicios Profesionales",
+    avgTicket: 95,
+    setupUsd: 750,
+    retainerUsd: 167,
+    botRole: "Agente Comercial IA 24/7 en WhatsApp + Embudo Web de Alta Conversión",
+    heroHeadline: "Atención inmediata 24/7 y cotización personalizada en menos de 1 minuto",
+    sampleQ: "Hola, quisiera cotizar un servicio y confirmar si atienden hoy.",
+    sampleA: "¡Hola! 👋 Gracias por escribirnos. Estamos activos para ayudarte ahora mismo: indícanos qué solución buscas y te enviamos disponibilidad y presupuesto al instante."
+};
+
+function getNicheEconomicsProfile(categoryStr) {
+    const cat = String(categoryStr || "");
+    for (const p of NICHE_REVENUE_PROFILES) {
+        if (p.rx.test(cat)) return p;
+    }
+    return DEFAULT_NICHE_PROFILE;
+}
+
+function estimateNicheRevenueLeak(lead) {
+    const prof = getNicheEconomicsProfile(`${lead?.category || ""} ${lead?.secondaryCategories || ""}`);
+    const webInfo = classifyWebsiteStatus(lead || {});
+    const reviews = Math.max(0, parseInt(lead?.reviewCount, 10) || 0);
+
+    // Conservative monthly local search / inquiry volume proxy based on reviews & local presence
+    const estimatedMonthlyInquiries = Math.max(18, Math.min(340, Math.round(16 + Math.sqrt(reviews + 4) * 9.5)));
+
+    let leakRate = 0.06;
+    const reasons = [];
+
+    if (webInfo.status === "none") {
+        leakRate += 0.24;
+        reasons.push("fuga de búsquedas en Google sin sitio web propio");
+    } else if (webInfo.status === "social_link") {
+        leakRate += 0.21;
+        reasons.push("uso de Linktree/red social en vez de embudo web de conversión");
+    } else if (webInfo.status === "broken") {
+        leakRate += 0.27;
+        reasons.push("enlace web caído en Google Maps");
+    } else if (webInfo.status === "slow" || webInfo.status === "outdated" || webInfo.status === "insecure") {
+        leakRate += 0.14;
+        reasons.push("fricción móvil y rebote en su web actual");
+    }
+
+    if (!lead?.has_ai_automation) {
+        leakRate += 0.17;
+        reasons.push("42% de consultas fuera de horario sin Agente IA 24/7");
+    }
+    if (lead?.commission_bleed) {
+        leakRate += 0.12;
+        reasons.push(`comisiones cedidas a ${lead.booking_platform || "apps externas"}`);
+    }
+    if (lead?.unclaimed) {
+        leakRate += 0.08;
+        reasons.push("ficha de Google Maps sin reclamar");
+    }
+
+    leakRate = Math.min(0.58, leakRate);
+    // Conservative close rate (22%) applied to leaked inquiries * avgTicket
+    const rawMonthlyUsd = Math.round((estimatedMonthlyInquiries * leakRate * 0.22 * prof.avgTicket) / 50) * 50;
+    const monthlyLeakUsd = Math.max(450, Math.min(18500, rawMonthlyUsd));
+
+    return {
+        monthlyLeakUsd,
+        annualLeakUsd: monthlyLeakUsd * 12,
+        avgTicketUsd: prof.avgTicket,
+        verticalKey: prof.key,
+        verticalLabel: prof.label,
+        botRole: prof.botRole,
+        heroHeadline: prof.heroHeadline,
+        sampleQ: prof.sampleQ,
+        sampleA: prof.sampleA,
+        setupUsd: prof.setupUsd,
+        retainerUsd: prof.retainerUsd,
+        leakSummary: reasons.slice(0, 2).join(" + ") || "optimización de conversión local"
+    };
+}
+
 /**
- * Multi-Signal Commercial Opportunity Scoring Engine v4.0 (0 - 99)
+ * Dual-Engine Commercial Opportunity Scoring v4.5 (Web Score + AI Automation Score + Offer Router)
  */
 function calculateLeadScore(lead) {
-    let score = 45;
+    let webScore = 38;
+    let autoScore = 36;
     const opportunities = [];
 
-    if (!lead.website || lead.website.trim() === "") {
-        score += 26;
+    const webInfo = classifyWebsiteStatus(lead);
+    const reviews = parseInt(lead.reviewCount, 10) || 0;
+    const rating = parseFloat(lead.averageRating) || 0;
+    const tech = (lead.tech_stack || "").toLowerCase();
+
+    // 1. Web Design / Redesign Scoring
+    if (webInfo.status === "none") {
+        webScore += 44;
         opportunities.push("Sin Sitio Web (Venta Directa Web)");
+    } else if (webInfo.status === "social_link") {
+        webScore += 46;
+        autoScore += 14;
+        opportunities.push("Falsa Web: Solo Linktree/RRSS (Cierre Rápido Web)");
+    } else if (webInfo.status === "broken") {
+        webScore += 48;
+        opportunities.push("Web Caída / Hosting Roto (Urgencia Inmediata)");
     } else {
-        score += 4;
-        const tech = (lead.tech_stack || "").toLowerCase();
-        if (tech && !tech.includes("pixel") && !tech.includes("gtm")) {
-            score += 12;
-            opportunities.push("Sin Píxel de Conversión (Oportunidad Ads)");
+        if (webInfo.status === "slow") {
+            webScore += 30;
+            opportunities.push(`Web Móvil Lenta (${lead.pagespeed_mobile}/100 PageSpeed)`);
+        } else if (webInfo.status === "outdated") {
+            webScore += 28;
+            opportunities.push(lead.copyright_year ? `Web Obsoleta (©${lead.copyright_year})` : "Web No Adaptada a Móvil");
         }
-        if (lead.ad_spend_active) {
-            score += 8;
-            opportunities.push("Invierte en Ads Activamente");
+        if (lead.ssl_insecure) {
+            webScore += 16;
+            opportunities.push("Dominio Sin SSL HTTPS");
         }
         if (tech.includes("wix") || tech.includes("squarespace")) {
-            opportunities.push("CMS Limitado (Oportunidad Rediseño)");
+            webScore += 18;
+            opportunities.push("CMS Limitado (Migración a Web Rápida)");
         }
-        if (typeof lead.pagespeed_mobile === "number" && lead.pagespeed_mobile < 55) {
-            score += 12;
-            opportunities.push(`Web Móvil Lenta (${lead.pagespeed_mobile}/100 PageSpeed)`);
+        if (tech && !tech.includes("pixel") && !tech.includes("gtm")) {
+            webScore += 12;
+            autoScore += 10;
+            opportunities.push("Sin Píxel de Conversión (Fuga Retargeting)");
+        }
+        if (lead.has_whatsapp_cta === false && lead._enrichedDone) {
+            webScore += 10;
+            autoScore += 12;
+            opportunities.push("Web sin Botón WhatsApp Directo");
         }
     }
 
-    if (lead.unclaimed) {
-        score += 18;
-        opportunities.push("Ficha Google No Reclamada (SEO Local)");
+    // 2. AI Automation, Chatbot & CRM Scoring
+    const isCommissionApp = Boolean(lead.commission_bleed || (lead.booking_platform && /ubereats|rappi|pedidosya|doctoralia|booksy|fresha|treatwell|opentable|thefork|glovo/i.test(lead.booking_platform)));
+    if (isCommissionApp) {
+        lead.commission_bleed = true;
+        autoScore += 22;
+        webScore += 10;
+        opportunities.push(`Sangría de Comisiones (${lead.booking_platform}) · Canal Propio`);
+    } else if (!lead.booking_platform && reviews >= 25) {
+        autoScore += 14;
+        opportunities.push("Sin Agendamiento / Pedidos 24/7");
+    }
+
+    if (!lead.has_ai_automation) {
+        if (reviews >= 40) {
+            autoScore += 26;
+            opportunities.push("Alto Flujo Manual (Vender Agente IA 24/7)");
+        } else if (reviews >= 12) {
+            autoScore += 16;
+            opportunities.push("Atención Manual sin Bot IA");
+        }
+    }
+
+    if (lead.ad_spend_active) {
+        autoScore += 18;
+        opportunities.push("Invierte en Ads Activamente");
     }
 
     if (lead.review_pain_points) {
-        score += 10;
+        autoScore += 18;
         opportunities.push(`Dolor Clientes: ${lead.review_pain_points}`);
     }
 
+    if (lead.unclaimed) {
+        webScore += 16;
+        autoScore += 8;
+        opportunities.push("Ficha Google No Reclamada (SEO Local)");
+    }
+
     if (lead.dmarc_status === "missing") {
-        score += 6;
+        webScore += 6;
         opportunities.push("Dominio sin Protección DMARC");
     }
 
-    if (lead.phone && String(lead.phone).length > 6) score += 8;
-    if (lead.email && String(lead.email).includes("@")) score += 12;
-    if (lead.decision_maker || lead.legal_name) score += 6;
+    // Contactability multipliers
+    if (lead.phone && String(lead.phone).length > 6) { webScore += 6; autoScore += 10; }
+    if (lead.email && String(lead.email).includes("@")) { webScore += 8; autoScore += 8; }
+    if (lead.decision_maker || lead.legal_name) { webScore += 4; autoScore += 6; }
 
     const hasSocial = Boolean(lead.instagram || lead.facebook || lead.linkedin || lead.tiktok);
-    if (!hasSocial && lead.website) {
-        score += 6;
+    if (!hasSocial && lead.website && !webInfo.needsWeb) {
+        autoScore += 5;
         opportunities.push("Sin Ecosistema RRSS Vinculado");
     }
 
-    const rating = parseFloat(lead.averageRating) || 0;
-    const reviews = parseInt(lead.reviewCount) || 0;
-
     if (rating >= 4.5 && reviews > 0 && reviews < 25) {
-        score += 8;
+        webScore += 7;
         opportunities.push("Excelente Calificación, Pocas Reseñas");
     } else if (rating > 0 && rating < 4.1 && reviews >= 10) {
-        score += 9;
-        opportunities.push("Gestión de Reputación (<4.1★)");
+        autoScore += 12;
+        opportunities.push("Automatizar Reseñas 5★ (<4.1★)");
     } else if (reviews >= 120) {
-        score += 7;
+        autoScore += 10;
         opportunities.push("Negocio Consolidado / Alto Tráfico");
     }
 
-    score = Math.min(99, Math.max(15, score));
+    webScore = Math.min(99, Math.max(15, webScore));
+    autoScore = Math.min(99, Math.max(15, autoScore));
+    const score = Math.max(webScore, autoScore);
+
+    const econ = estimateNicheRevenueLeak(lead);
+
+    let offerType = "web";
+    let recommendedOffer = `Diseño Web Rápida + SEO Local`;
+    let suggestedTicket = `$${econ.setupUsd} USD único`;
+
+    if (webScore >= 74 && autoScore >= 72) {
+        offerType = "combo";
+        recommendedOffer = "Pack Web Conversión + Agente IA 24/7";
+        suggestedTicket = `$${econ.setupUsd + 300} setup + $${econ.retainerUsd}/mes`;
+    } else if (autoScore > webScore) {
+        offerType = "automation";
+        recommendedOffer = "Agente IA WhatsApp 24/7 + CRM";
+        suggestedTicket = `$${Math.round(econ.setupUsd * 0.85)} setup + $${econ.retainerUsd}/mes`;
+    }
 
     let priority = "Media";
     let priorityColor = "#f59e0b";
@@ -142,6 +328,16 @@ function calculateLeadScore(lead) {
 
     return {
         score,
+        webScore,
+        automationScore: autoScore,
+        webStatus: webInfo.status,
+        webStatusLabel: webInfo.label,
+        offerType,
+        recommendedOffer,
+        suggestedTicket,
+        monthlyLeakUsd: econ.monthlyLeakUsd,
+        annualLeakUsd: econ.annualLeakUsd,
+        botRole: econ.botRole,
         priority,
         priorityColor,
         opportunities: Array.from(new Set(opportunities))
@@ -149,48 +345,166 @@ function calculateLeadScore(lead) {
 }
 
 /**
- * Omnichannel Personalized Pitch & Sequence Generator v4.0
- * Channels: whatsapp | followup | email | call
+ * Quadrant Top 3 Competitor Benchmark ("Tú vs. Los Líderes de Tu Zona")
  */
-function generateOutreachPitch(lead, channel = "whatsapp") {
+function computeQuadrantTop3Benchmark(lead, allLeads) {
+    if (!lead || !Array.isArray(allLeads) || allLeads.length === 0) {
+        return { rank: 1, totalPeers: 1, top3: [], gapSummary: "" };
+    }
+    const targetCat = normalizeCategory(lead.category);
+    let peers = targetCat
+        ? allLeads.filter(l => normalizeCategory(l.category) === targetCat)
+        : [];
+    if (peers.length < 3 && targetCat) {
+        const rootWord = targetCat.split(/\s+/)[0];
+        if (rootWord && rootWord.length >= 4) {
+            peers = allLeads.filter(l => normalizeCategory(l.category).includes(rootWord));
+        }
+    }
+    if (peers.length < 2) {
+        peers = allLeads.slice();
+    }
+
+    const authorityScore = (item) => {
+        const r = parseFloat(item.averageRating) || 0;
+        const rev = Math.max(0, parseInt(item.reviewCount, 10) || 0);
+        const wInfo = classifyWebsiteStatus(item);
+        return (r * Math.log10(rev + 10) * 22)
+            + (!wInfo.needsWeb ? 20 : 0)
+            + (item.has_ai_automation ? 14 : 0)
+            + (item.ad_spend_active ? 12 : 0)
+            + (item.booking_platform && !item.commission_bleed ? 8 : 0);
+    };
+
+    const ranked = peers
+        .map(p => ({ item: p, auth: authorityScore(p) }))
+        .sort((a, b) => b.auth - a.auth);
+
+    const idx = ranked.findIndex(x =>
+        (lead.dedupeKey && x.item.dedupeKey === lead.dedupeKey) ||
+        x.item.name === lead.name
+    );
+    const rank = idx >= 0 ? idx + 1 : ranked.length;
+
+    const top3 = ranked
+        .filter(x => x.item.name !== lead.name)
+        .slice(0, 3)
+        .map((x, i) => {
+            const p = x.item;
+            const d = haversineDistance(lead.latitude, lead.longitude, p.latitude, p.longitude);
+            const distStr = d !== null ? (d < 1 ? `${Math.round(d * 1000)}m` : `${d.toFixed(1)}km`) : "tu zona";
+            const wInfo = classifyWebsiteStatus(p);
+            return {
+                pos: i + 1,
+                name: p.name || "Competidor",
+                rating: p.averageRating || "4.5",
+                reviews: parseInt(p.reviewCount, 10) || 0,
+                distStr,
+                hasRealWeb: !wInfo.needsWeb,
+                hasAuto: Boolean(p.has_ai_automation || p.booking_platform),
+                ads: Boolean(p.ad_spend_active)
+            };
+        });
+
+    const leader = top3[0];
+    const gapSummary = leader
+        ? `Puesto #${rank} de ${ranked.length} en su rubro · Líder cercano: ${leader.name} (${leader.rating}★, ${leader.reviews} reseñas a ${leader.distStr})`
+        : `Puesto #${rank} de ${ranked.length} analizados en el cuadrante`;
+
+    return { rank, totalPeers: ranked.length, top3, gapSummary };
+}
+
+/**
+ * 1-Click Competitor Ad Spy URLs (Meta Ad Library + Google Ads Transparency)
+ */
+function getAdSpyLinks(lead) {
+    const cleanName = String(lead?.name || "").trim();
+    const domain = extractDomain(lead?.website || "");
+    const ws = classifyWebsiteStatus(lead || {});
+    let fbQuery = cleanName;
+    if (lead?.facebook) {
+        try {
+            const fbPath = new URL(normalizeUrl(lead.facebook)).pathname.replace(/\//g, "").trim();
+            if (fbPath && fbPath.length > 2 && !/^(profile\.php|pages|people)$/i.test(fbPath)) {
+                fbQuery = fbPath;
+            }
+        } catch (_) {}
+    }
+    const googleTarget = (domain && !ws.needsWeb) ? domain : cleanName;
+    return {
+        metaAdsUrl: `https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country=ALL&q=${encodeURIComponent(fbQuery)}`,
+        googleAdsUrl: `https://adstransparency.google.com/?region=anywhere&q=${encodeURIComponent(googleTarget)}`
+    };
+}
+
+/**
+ * Offer-Aware Omnichannel & Follow-Up Cadence Sequencer (Día 1 · Día 3 · Día 7 · Email · Call)
+ * Channels: whatsapp | followup | closing | email | call
+ */
+function generateOutreachPitch(lead, channel = "whatsapp", benchmark = null) {
     const name = lead.name || "su empresa";
     const execGreeting = lead.decision_maker ? `Hola ${lead.decision_maker.split(":")[1]?.trim() || lead.decision_maker}, saludo al equipo de *${name}*` : `Hola, un gusto saludar al equipo de *${name}*`;
     const category = lead.category || "su sector";
     const city = lead.address ? (lead.address.split(",")[1] || lead.address.split(",")[0]).trim() : "su zona";
-    const rating = lead.averageRating ? `${lead.averageRating}★` : "buena reputación";
-    const peerHook = lead.nearestPeerName && lead.nearestPeerDistanceKm
-        ? ` (especialmente teniendo a *${lead.nearestPeerName}* a solo ${lead.nearestPeerDistanceKm < 1 ? Math.round(lead.nearestPeerDistanceKm * 1000) + "m" : lead.nearestPeerDistanceKm.toFixed(1) + "km"})`
+    const rating = lead.averageRating ? `${lead.averageRating}★` : "excelente reputación";
+    const econ = estimateNicheRevenueLeak(lead);
+    const webInfo = classifyWebsiteStatus(lead);
+    const leakStr = `$${econ.monthlyLeakUsd.toLocaleString("en-US")} USD/mes`;
+
+    const leaderPeer = benchmark?.top3?.[0]?.name || lead.nearestPeerName || "";
+    const leaderDist = benchmark?.top3?.[0]?.distStr || (lead.nearestPeerDistanceKm ? (lead.nearestPeerDistanceKm < 1 ? Math.round(lead.nearestPeerDistanceKm * 1000) + "m" : lead.nearestPeerDistanceKm.toFixed(1) + "km") : "");
+    const peerHook = leaderPeer
+        ? ` frente a competidores como *${leaderPeer}*${leaderDist ? ` (a ${leaderDist})` : ""}`
         : "";
 
     let diagnosticHook = "";
-    if (!lead.website) {
-        diagnosticHook = `noté que aún no cuentan con un sitio web de conversión rápida conectado a Google Maps${peerHook}, dejando escapar clientes que buscan ${category} desde el móvil.`;
-    } else if (lead.unclaimed) {
-        diagnosticHook = `detecté que su ficha de Google Maps aparece con funciones sin reclamar/optimizar${peerHook}, lo que frena su posicionamiento orgánico local.`;
-    } else if (typeof lead.pagespeed_mobile === "number" && lead.pagespeed_mobile < 60) {
-        diagnosticHook = `audité su web móvil y actualmente marca ${lead.pagespeed_mobile}/100 en Google PageSpeed, perdiendo prospectos por tiempo de carga.`;
-    } else if (lead.review_pain_points) {
-        diagnosticHook = `analizando el flujo comercial en ${city}, vimos oportunidades clave para automatizar su atención (${lead.review_pain_points.toLowerCase()}) y multiplicar cierres.`;
-    } else if (!lead.tech_stack || (!lead.tech_stack.toLowerCase().includes("pixel") && !lead.ad_spend_active)) {
-        diagnosticHook = `vi que tienen sitio web y ${rating}, pero no tienen píxeles de retargeting activos para recapturar a quienes visitan su página sin comprar.`;
+    let solutionPromise = "";
+
+    if (lead.offer_type === "automation") {
+        if (lead.commission_bleed && lead.booking_platform) {
+            diagnosticHook = `vimos que tienen gran tracción (${rating}), pero dependen de *${lead.booking_platform}* cediendo margen en comisiones y sin un Agente IA propio en WhatsApp que atienda y agende 24/7 (fuga estimada: *${leakStr}*).`;
+        } else if (lead.review_pain_points) {
+            diagnosticHook = `analizando su flujo en ${city}, detectamos alta demanda pero cuello de botella en atención manual (${lead.review_pain_points.toLowerCase()}), dejando escapar aprox. *${leakStr}* en consultas fuera de horario${peerHook}.`;
+        } else {
+            diagnosticHook = `vi que ya tienen presencia web y ${rating}, pero su captación sigue siendo manual sin un *${econ.botRole}* que responda y cierre citas en menos de 30 segundos las 24 horas (fuga estimada: *${leakStr}*).`;
+        }
+        solutionPromise = `Ya montamos una *demo interactiva en vivo* de cómo respondería el Agente IA entrenado específicamente para *${name}*.`;
+    } else if (lead.offer_type === "combo") {
+        const webGap = webInfo.status === "social_link" ? "usan un enlace genérico de redes/Linktree en vez de web propia" : "aún no cuentan con un ecosistema web rápido";
+        diagnosticHook = `notamos que aunque destacan con ${rating}, ${webGap} ni tienen recepción automatizada 24/7 en WhatsApp, desviando aprox. *${leakStr}* en clientes de alta intención${peerHook}.`;
+        solutionPromise = `Armamos una *vista previa real* de cómo luciría la nueva Web + Recepcionista IA 24/7 de *${name}*.`;
     } else {
-        diagnosticHook = `vi que ya destacan con ${rating}${peerHook} y preparamos un sistema de captación automatizada para dominar las búsquedas de ${category} en ${city}.`;
+        if (webInfo.status === "social_link") {
+            diagnosticHook = `noté que en Google Maps dirigen su tráfico a un enlace de Linktree/red social en lugar de una web propia de conversión rápida${peerHook}, perdiendo posicionamiento local (fuga estimada: *${leakStr}*).`;
+        } else if (webInfo.status === "broken") {
+            diagnosticHook = `detecté urgente que el enlace de su página web en Google Maps está caído/con error ahora mismo${peerHook}, haciendo que los clientes que intentan entrar reboten directo a la competencia.`;
+        } else if (!lead.website) {
+            diagnosticHook = `noté que con ${rating} aún no tienen página web conectada a Google Maps${peerHook}, dejando en la mesa aprox. *${leakStr}* de clientes que buscan ${category} desde el celular.`;
+        } else {
+            diagnosticHook = `audité su página móvil actual y presenta fricción de conversión${typeof lead.pagespeed_mobile === "number" ? ` (${lead.pagespeed_mobile}/100 en Google PageSpeed)` : ""}${peerHook}, frenando cierres por *${leakStr}*.`;
+        }
+        solutionPromise = `Ya diseñamos un *prototipo visual sin costo* de cómo se vería la nueva web rápida de *${name}* conectada a WhatsApp.`;
     }
 
     if (channel === "whatsapp") {
-        return `${execGreeting} 👋\n\nEstuve auditando los negocios líderes de *${category}* en ${city} y destacó su perfil (${rating}).\n\nSin embargo, ${diagnosticHook}\n\nPreparé un breve diagnóstico visual de 2 minutos específico para *${name}*. ¿Me autorizan enviarlo por aquí sin ningún compromiso?`;
+        const auditSuffix = lead.cloud_audit_url ? `\n\n🔗 Diagnóstico + Demo aquí: ${lead.cloud_audit_url}` : "";
+        return `${execGreeting} 👋\n\nEstuve auditando los negocios referentes de *${category}* en ${city} y destacó su perfil (${rating}).\n\nSin embargo, ${diagnosticHook}\n\n${solutionPromise} ¿Me autorizan enviársela por aquí en 1 minuto sin ningún compromiso?${auditSuffix}`;
     }
 
     if (channel === "followup") {
-        return `Hola equipo de *${name}*, ¿cómo están? 👋\n\nLes escribí hace un par de días sobre el diagnóstico digital que armamos para su sede en ${city}${peerHook}.\n\nSolo quería confirmar si prefieren que les comparta el resumen en PDF por esta vía o a ${lead.email || "su correo corporativo"}. ¡Quedo atento!`;
+        return `Hola equipo de *${name}*, ¿cómo va la semana? 👋\n\nLes escribí hace un par de días porque dejamos armada la demostración personalizada de *${lead.recommended_offer || "Web + Automatización IA"}* para su sede en ${city}.\n\nEn negocios de *${category}*, implementar esto suele recuperar entre *${leakStr}* desde el primer mes al atender en segundos incluso de noche y domingos.\n\n¿Les comparto el enlace interactivo por aquí para que lo prueben desde su celular en 60 segundos?`;
+    }
+
+    if (channel === "closing") {
+        return `Hola *${name}* 👋 Te escribo por última vez para no incomodar.\n\nEsta semana estamos activando el sistema exclusivo de captación y *${econ.botRole}* para *un solo negocio de ${category}* en este cuadrante de ${city} (para no generar conflicto de interés con ${leaderPeer || "sus competidores directos"}).\n\nComo ustedes ya tienen ${rating}, los priorizamos primero. Si les interesa ver el prototipo antes de que pasemos al siguiente en la lista, respóndeme *"DEMO"* hoy y se los activo. ¡Éxitos!`;
     }
 
     if (channel === "call") {
-        return `📞 GUIÓN DE LLAMADA FRÍA (30 SEGUNDOS):\n\n"Hola, buenos días. Busco a ${lead.decision_maker || "la persona encargada de crecimiento comercial"} en ${name}.\n\nTe llamo muy breve porque hicimos un estudio geoespacial de ${category} en ${city}; ustedes tienen ${rating}, pero ${diagnosticHook.replace(/\*/g, "")}\n\nNo te llamo para venderte hoy en frío: ya generamos la auditoría con los datos reales de su zona. ¿Te parece bien si la vemos 5 minutos el jueves o te la envío primero a tu WhatsApp?"`;
+        return `📞 GUIÓN DE LLAMADA FRÍA (30 SEGUNDOS · ${(lead.recommended_offer || "WEB + IA").toUpperCase()}):\n\n"Hola, buenos días. Busco a ${lead.decision_maker || "la persona encargada de crecimiento comercial"} en ${name}.\n\nTe llamo muy puntual: hicimos un barrido de ${category} en ${city}; ustedes tienen ${rating}, pero ${diagnosticHook.replace(/\*/g, "")}\n\nNo te llamo para venderte a ciegas: ya montamos un prototipo funcionando con el nombre de ${name}. ¿Te lo paso ahora mismo a este WhatsApp para que lo veas en 1 minuto?"`;
     }
 
     // Cold Email
-    return `Asunto: Diagnóstico de captación local para ${name} en ${city}\n\nHola ${lead.decision_maker || `equipo directivo de ${name}`},\n\nAnalizando los referentes de ${category} en ${city}, su reputación (${rating}) sobresale claramente.\n\nNo obstante, realizando una auditoría técnica sobre su huella digital, ${diagnosticHook.replace(/\*/g, "")}\n\nHemos ayudado a empresas del rubro ${category} a incrementar su flujo de citas y ventas B2B/B2C entre un 28% y 45% en menos de 60 días.\n\n¿Tienen 7 minutos esta semana para mostrarles el informe comparativo de su cuadrante?\n\nSaludos cordiales,\nConsultoría de Inteligencia Comercial`;
+    return `Asunto: Prototipo listo para ${name} (Fuga detectada: ~${leakStr})\n\nHola ${lead.decision_maker || `equipo directivo de ${name}`},\n\nAnalizando el cuadrante comercial de ${category} en ${city}, su reputación (${rating}) destaca claramente${benchmark?.rank ? ` (posición actual #${benchmark.rank} de ${benchmark.totalPeers} en huella digital)` : ""}.\n\nNo obstante, en nuestra auditoría técnica detectamos que ${diagnosticHook.replace(/\*/g, "")}\n\n${solutionPromise.replace(/\*/g, "")}\n\n¿Tienen 7 minutos este jueves para mostrársela en vivo o prefieren que les responda este correo con el enlace de prueba?\n\nSaludos cordiales,\nConsultoría de Crecimiento Web & Automatización IA`;
 }
 
 /**
@@ -200,29 +514,32 @@ function generateOutreachPitch(lead, channel = "whatsapp") {
  */
 async function callGeminiAnalysis(apiKey, lead, customChannel = "whatsapp") {
     const cleanLead = typeof lead === "object" && lead !== null ? lead : { name: String(lead || "Prospecto") };
+    const econ = estimateNicheRevenueLeak(cleanLead);
+    const ws = classifyWebsiteStatus(cleanLead);
 
-    const prompt = `Actúa como el Principal Revenue Strategist de una firma élite en Silicon Valley.
-Analiza este prospecto real extraído con AtlasIQ v4.0 y entrega una estrategia quirúrgica de cierre B2B:
+    const prompt = `Actúa como el Principal Revenue Strategist de una agencia élite de Desarrollo Web y Automatizaciones IA.
+Analiza este prospecto real extraído con AtlasIQ y entrega un plan quirúrgico para cerrarle "${cleanLead.recommended_offer || "Web + Agente IA 24/7"}":
 
 DATOS PROFUNDOS DEL PROSPECTO:
 - Empresa: ${cleanLead.name || "N/A"} ${cleanLead.legal_name ? `(Razón Social: ${cleanLead.legal_name})` : ""}
 - Decisor / Cargo OSINT: ${cleanLead.decision_maker || "No identificado públicamente"}
-- ID Fiscal: ${cleanLead.tax_id || "No indexado"}
-- Rubro: ${cleanLead.category || "Comercial"} ${cleanLead.secondaryCategories ? `(${cleanLead.secondaryCategories})` : ""}
-- Calificación Maps: ${cleanLead.averageRating || "N/A"}★ (${cleanLead.reviewCount || 0} reseñas) | Ficha Reclamada: ${cleanLead.unclaimed ? "NO RECLAMADA (Alerta Crítica)" : "Sí"}
-- Dolor en Reseñas: ${cleanLead.review_pain_points || "Sin quejas críticas detectadas"}
-- Sitio Web: ${cleanLead.website || "SIN SITIO WEB"} ${typeof cleanLead.pagespeed_mobile === "number" ? `| Google PageSpeed Móvil: ${cleanLead.pagespeed_mobile}/100` : ""}
-- Stack & Píxeles: ${cleanLead.tech_stack || "Ninguno"} | Invierte en Ads: ${cleanLead.ad_spend_active ? "SÍ" : "No detectado"}
-- Plataforma Reservas/Delivery: ${cleanLead.booking_platform || "No integrada"}
-- Seguridad Email DNS: Proveedor=${cleanLead.mx_provider || "Sin verificar"} | SPF=${cleanLead.spf_status || "N/A"} | DMARC=${cleanLead.dmarc_status || "N/A"}
-- Competidor Más Cercano: ${cleanLead.nearestPeerName ? `${cleanLead.nearestPeerName} (${cleanLead.nearestPeerDistanceKm ? Math.round(cleanLead.nearestPeerDistanceKm * 1000) + "m" : "cercano"})` : "Zona activa"}
+- Rubro: ${cleanLead.category || "Comercial"} | Ticket Promedio Rubro: ~$${econ.avgTicketUsd} USD
+- Score Venta Web: ${cleanLead.web_score || 70}/99 | Score Automatización IA: ${cleanLead.automation_score || 70}/99
+- Oferta Ganadora Detectada: ${cleanLead.recommended_offer || "Pack Web + IA"} (${cleanLead.suggested_ticket || ""})
+- Fuga Mensual Estimada: ~$${econ.monthlyLeakUsd} USD/mes (${econ.leakSummary})
+- Estado Real del Enlace Web: ${ws.label} (${cleanLead.website || "SIN WEB"}) ${typeof cleanLead.pagespeed_mobile === "number" ? `| PageSpeed Móvil: ${cleanLead.pagespeed_mobile}/100` : ""}
+- Calificación Maps: ${cleanLead.averageRating || "N/A"}★ (${cleanLead.reviewCount || 0} reseñas) | Reclamada: ${cleanLead.unclaimed ? "NO" : "Sí"}
+- Dolor en Reseñas: ${cleanLead.review_pain_points || "Sin quejas críticas"}
+- Stack & Bots actuales: ${cleanLead.tech_stack || "Ninguno"} | Automatización IA activa: ${cleanLead.has_ai_automation ? "Sí (" + cleanLead.automation_stack + ")" : "NO (100% Manual)"}
+- Reservas / Comisiones: ${cleanLead.booking_platform ? `${cleanLead.booking_platform}${cleanLead.commission_bleed ? " (PAGA COMISIÓN EXTERNA)" : ""}` : "Sin agenda online"}
+- Competidor Cercano: ${cleanLead.nearestPeerName ? `${cleanLead.nearestPeerName} (${cleanLead.nearestPeerDistanceKm ? Math.round(cleanLead.nearestPeerDistanceKm * 1000) + "m" : "cercano"})` : "Zona activa"}
 
 RESPONDE EN ESPAÑOL EJECUTIVO, DIRECTO Y ACCIONABLE CON ESTAS 5 SECCIONES:
-1. 🎯 SCORE ESTRATÉGICO & PÉRDIDA ESTIMADA MENSUAL (en USD por sus brechas actuales).
-2. 🔍 TOP 3 VULNERABILIDADES TÉCNICAS / COMERCIALES EXPLOTABLES HOY.
-3. 🎣 ROMPEHIELOS DE 5 SEGUNDOS (imposible de ignorar por el dueño).
-4. 💬 SECUENCIA WHATSAPP DE 2 TOQUES (Toque 1 Apertura + Toque 2 Seguimiento a las 48h).
-5. 📞 GUIÓN DE OBJECIONES Y LLAMADA RÁPIDA (${customChannel.toUpperCase()}).`;
+1. 💰 DIAGNÓSTICO DE FUGA DE DINERO (por qué pierden ~$${econ.monthlyLeakUsd}/mes hoy y qué paquete exacto venderles: Web, Automatización o Combo).
+2. 🤖 ARQUITECTURA DE AUTOMATIZACIÓN + WEB IDEAL PARA ESTE NEGOCIO (flujo exacto WhatsApp/IA/CRM que les ahorrará horas y multiplicará citas).
+3. 🎣 ROMPEHIELOS DE 5 SEGUNDOS POR WHATSAPP (natural, humano, imposible de ignorar).
+4. 💬 CADENCIA DE 3 TOQUES (Día 1 Diagnóstico + Día 3 Demo en Vivo + Día 7 Escasez de Zona).
+5. 🛡️ MANEJO DE LAS 2 OBJECIONES MÁS PROBABLES ("Ya tengo Instagram/conocido" o "Está caro").`;
 
     // 1. Try Cloud Gemini 2.5 Flash if API Key is provided
     if (apiKey && apiKey.trim().length > 10) {
@@ -907,14 +1224,16 @@ async function auditWebsitePageSpeed(websiteUrl) {
 }
 
 /**
- * Publish Interactive Trojan-Horse Audit Landing Page to Cloudflare Worker
+ * Publish Interactive Trojan-Horse Audit + Live Niche Web/Bot Demo to Cloudflare Worker
  */
-async function publishLiveCloudAudit(edgeWorkerUrl, lead, branding = {}) {
+async function publishLiveCloudAudit(edgeWorkerUrl, lead, branding = {}, benchmark = null) {
     if (!edgeWorkerUrl || !edgeWorkerUrl.startsWith("http")) {
         throw new Error("Configura primero la URL de tu Cloudflare Edge Worker en ⚙️ Ajustes.");
     }
+    const econ = estimateNicheRevenueLeak(lead);
+    const ws = classifyWebsiteStatus(lead);
     const slugBase = (lead.name || "empresa").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").substring(0, 32);
-    const slug = `${slugBase}-${Math.floor(1000 + Math.random() * 9000)}`;
+    const slug = lead.cloud_audit_slug || `${slugBase}-${Math.floor(1000 + Math.random() * 9000)}`;
 
     const resp = await fetch(`${edgeWorkerUrl.replace(/\/$/, "")}/api/audit/publish`, {
         method: "POST",
@@ -923,11 +1242,25 @@ async function publishLiveCloudAudit(edgeWorkerUrl, lead, branding = {}) {
             slug,
             leadName: lead.name,
             category: lead.category,
+            rating: lead.averageRating || "4.7",
+            reviewCount: lead.reviewCount || 0,
             score: lead.lead_score || 75,
+            webScore: lead.web_score || 75,
+            automationScore: lead.automation_score || 75,
+            webStatusLabel: ws.label,
+            recommendedOffer: lead.recommended_offer || "Pack Web + Agente IA 24/7",
+            monthlyLeakUsd: econ.monthlyLeakUsd,
+            botRole: econ.botRole,
+            heroHeadline: econ.heroHeadline,
+            sampleQ: econ.sampleQ,
+            sampleA: econ.sampleA,
             website: lead.website || "",
             speedScore: lead.pagespeed_mobile ?? null,
             opportunities: lead.opportunities || "",
             nearestPeer: lead.nearestPeerName ? `${lead.nearestPeerName} (${lead.nearestPeerDistanceKm ? Math.round(lead.nearestPeerDistanceKm * 1000) + "m" : "cercano"})` : "",
+            top3: benchmark?.top3 || [],
+            rank: benchmark?.rank || null,
+            totalPeers: benchmark?.totalPeers || null,
             agencyName: branding.agencyName || "WINDOWSTELECOM",
             agencyWa: branding.agencyWa || "https://wa.me/584127785780"
         })
@@ -941,9 +1274,151 @@ async function publishLiveCloudAudit(edgeWorkerUrl, lead, branding = {}) {
 }
 
 /**
- * Configurable White-Label Executive PDF Audit Generator v4.0 (jsPDF)
+ * Fetch Real-Time Prospect Open & Click Telemetry from Cloudflare Edge Worker
  */
-function generateLeadPdfAudit(lead, branding = {}) {
+async function fetchCloudAuditStats(edgeWorkerUrl, slugOrUrl) {
+    if (!edgeWorkerUrl || !slugOrUrl) return null;
+    let slug = String(slugOrUrl).trim();
+    if (slug.includes("/audit/")) {
+        slug = slug.split("/audit/")[1].split(/[?#]/)[0].trim();
+    }
+    if (!slug) return null;
+    const resp = await fetch(`${edgeWorkerUrl.replace(/\/$/, "")}/api/audit/stats/${encodeURIComponent(slug)}`, {
+        signal: AbortSignal.timeout(6000)
+    });
+    if (!resp.ok) return null;
+    return await resp.json();
+}
+
+/**
+ * Export Standalone 1-File Interactive Client Website + 24/7 AI Bot Demo (.html)
+ * Client opens it on mobile/desktop -> sees their custom brand website + live simulated AI chat!
+ */
+function downloadStandaloneClientDemoHtml(lead, branding = {}) {
+    if (!lead) return;
+    const econ = estimateNicheRevenueLeak(lead);
+    const agencyName = branding.agencyName || "WINDOWSTELECOM";
+    const agencyWa = branding.agencyWa || "https://wa.me/584127785780";
+    const safeName = escapeHtml(lead.name || "Empresa");
+    const safeCat = escapeHtml(lead.category || econ.verticalLabel);
+    const safeAddr = escapeHtml(lead.address || "Atención preferencial en tu ciudad");
+    const safeRating = escapeHtml(lead.averageRating || "4.9");
+    const safePhone = escapeHtml(lead.phone || "WhatsApp Directo 24/7");
+    const ctaText = encodeURIComponent(`Hola ${agencyName}, acabo de probar la Demo Web + Agente IA de ${lead.name || "mi negocio"} y quiero implementarla.`);
+
+    const demoHtml = `<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Demo Interactiva: ${safeName} · Web + Agente IA 24/7</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:#090d16;color:#f8fafc;line-height:1.5}
+.topbar{background:linear-gradient(90deg,#1e3a8a,#0f766e);padding:10px 18px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;font-size:12.5px}
+.topbar b{color:#6ee7b7}
+.topbar a{background:#10b981;color:#052e16;font-weight:800;text-decoration:none;padding:6px 14px;border-radius:99px}
+.hero{max-width:1040px;margin:32px auto;padding:0 20px;display:grid;grid-template-columns:1.15fr 0.85fr;gap:28px;align-items:center}
+@media(max-width:820px){.hero{grid-template-columns:1fr}}
+.pill{display:inline-flex;align-items:center;gap:6px;background:rgba(59,130,246,.16);border:1px solid rgba(59,130,246,.4);color:#93c5fd;padding:5px 12px;border-radius:99px;font-size:12px;font-weight:700}
+h1{font-size:clamp(28px,4vw,44px);line-height:1.12;margin:14px 0;font-weight:900}
+.sub{color:#94a3b8;font-size:16px;margin-bottom:22px}
+.cta-row{display:flex;gap:12px;flex-wrap:wrap}
+.btn-p{background:linear-gradient(135deg,#2563eb,#06b6d4);color:#fff;border:none;padding:13px 22px;border-radius:12px;font-weight:800;font-size:14px;cursor:pointer;text-decoration:none}
+.btn-s{background:#111827;color:#e2e8f0;border:1px solid #334155;padding:13px 18px;border-radius:12px;font-weight:700;font-size:14px}
+.trust{margin-top:22px;display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.tcard{background:#111827;border:1px solid #1e293b;border-radius:12px;padding:12px}
+.tcard strong{display:block;font-size:18px;color:#38bdf8}
+.tcard span{font-size:11.5px;color:#94a3b8}
+.botbox{background:#0f172a;border:1.5px solid #22c55e;border-radius:18px;overflow:hidden;box-shadow:0 20px 50px rgba(16,185,129,.18)}
+.bothead{background:linear-gradient(135deg,#065f46,#047857);padding:14px 16px;display:flex;justify-content:space-between;align-items:center}
+.botmsgs{padding:16px;height:310px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;background:#0b1120}
+.msg{max-width:86%;padding:10px 13px;border-radius:12px;font-size:13px}
+.msg.u{align-self:flex-end;background:#1d4ed8;color:#fff;border-bottom-right-radius:3px}
+.msg.b{align-self:flex-start;background:#1e293b;color:#f1f5f9;border:1px solid #334155;border-bottom-left-radius:3px}
+.chips{padding:10px 14px;background:#0f172a;border-top:1px solid #1e293b;display:flex;gap:6px;flex-wrap:wrap}
+.chip{background:#172554;color:#93c5fd;border:1px solid #1d4ed8;padding:6px 10px;border-radius:99px;font-size:11.5px;font-weight:700;cursor:pointer}
+.chip:hover{background:#2563eb;color:#fff}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div>🚀 Prototipo Exclusivo preparado por <b>${escapeHtml(agencyName)}</b> · Recuperación estimada: <b>~$${econ.monthlyLeakUsd.toLocaleString("en-US")} USD/mes</b></div>
+  <a href="${escapeHtml(agencyWa)}?text=${ctaText}" target="_blank">Activar en mi negocio ➔</a>
+</div>
+<section class="hero">
+  <div>
+    <span class="pill">★ ${safeRating} en Google · ${safeCat}</span>
+    <h1>${safeName}: ${escapeHtml(econ.heroHeadline)}</h1>
+    <p class="sub">📍 ${safeAddr} · ${safePhone}. Sistema web ultra-rápido (&lt;1.2s) integrado con ${escapeHtml(econ.botRole)}.</p>
+    <div class="cta-row">
+      <a class="btn-p" href="#bot" data-q="Quiero agendar ahora mismo">⚡ Probar Agendamiento IA</a>
+      <span class="btn-s">🛡️ Atención Automática 24/7</span>
+    </div>
+    <div class="trust">
+      <div class="tcard"><strong>&lt; 15 seg</strong><span>Tiempo respuesta IA</span></div>
+      <div class="tcard"><strong>24/7/365</strong><span>Noches y domingos</span></div>
+      <div class="tcard"><strong>0% Comisión</strong><span>100% canal propio</span></div>
+    </div>
+  </div>
+  <div class="botbox" id="bot">
+    <div class="bothead">
+      <div><strong style="font-size:14px">🤖 Asistente IA · ${safeName}</strong><div style="font-size:11px;color:#a7f3d0">● En línea 24/7 en WhatsApp y Web</div></div>
+      <span style="font-size:11px;background:rgba(0,0,0,.25);padding:3px 8px;border-radius:99px">DEMO VIVO</span>
+    </div>
+    <div class="botmsgs" id="chat">
+      <div class="msg u">${escapeHtml(econ.sampleQ)}</div>
+      <div class="msg b">${escapeHtml(econ.sampleA)}</div>
+    </div>
+    <div class="chips">
+      <button type="button" class="chip" data-q="📅 Quiero reservar turno mañana">📅 Reservar turno</button>
+      <button type="button" class="chip" data-q="💰 ¿Cuáles son sus precios y promos?">💰 Consultar precios</button>
+      <button type="button" class="chip" data-q="📍 ¿Dónde están ubicados y horarios?">📍 Ubicación</button>
+    </div>
+  </div>
+</section>
+<script>
+const replies = {
+  "📅 Quiero reservar turno mañana": "¡Perfecto! ✅ Ya bloqueé prioridad para ti mañana. Solo confírmame tu nombre completo y si prefieres en la mañana (10:00 AM) o tarde (4:00 PM) para enviarte el recordatorio automático a tu WhatsApp.",
+  "💰 ¿Cuáles son sus precios y promos?": "¡Con gusto! 📋 Manejamos opciones adaptadas a lo que necesitas y beneficio exclusivo por reserva directa web sin intermediarios. ¿Deseas que te envíe el catálogo PDF interactivo ahora mismo?",
+  "📍 ¿Dónde están ubicados y horarios?": "📍 Nos encontramos en ${safeAddr}. Aunque nuestro local cierre en la noche, yo estoy activo 24/7 aquí para dejarte agendado en 30 segundos.",
+  "Quiero agendar ahora mismo": "¡Excelente elección! 🚀 Dime qué día te queda mejor y te confirmo disponibilidad en tiempo real."
+};
+function sendQuick(q){
+  const c=document.getElementById('chat');
+  const u=document.createElement('div');u.className='msg u';u.textContent=q;c.appendChild(u);
+  setTimeout(()=>{
+    const b=document.createElement('div');b.className='msg b';
+    b.textContent=replies[q]||"¡Recibido! Un especialista ya tiene tu ficha pre-calificada en nuestro CRM.";
+    c.appendChild(b);c.scrollTop=c.scrollHeight;
+  },350);
+  c.scrollTop=c.scrollHeight;
+}
+document.addEventListener("click", (e) => {
+  const trg = e.target.closest("[data-q]");
+  if (!trg) return;
+  e.preventDefault();
+  sendQuick(trg.getAttribute("data-q"));
+});
+<\/script>
+</body>
+</html>`;
+
+    const blob = new Blob([demoHtml], { type: "text/html;charset=utf-8" });
+    const link = document.createElement("a");
+    const fileSlug = String(lead.name || "Cliente").replace(/[^a-zA-Z0-9_\u00C0-\u017F]/g, "_").substring(0, 32);
+    link.href = URL.createObjectURL(blob);
+    link.setAttribute("download", `Demo_Web_IA_${fileSlug}.html`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    playAudioNotification("success");
+}
+
+/**
+ * Configurable White-Label Executive PDF Audit Generator v4.5 (Dual Score + USD Leak + Top 3 Benchmark)
+ */
+function generateLeadPdfAudit(lead, branding = {}, allLeadsRef = []) {
     if (!lead) return;
     const jspdfModule = (typeof window !== "undefined" && window.jspdf) ? window.jspdf : (typeof jspdf !== "undefined" ? jspdf : null);
     if (!jspdfModule || !jspdfModule.jsPDF) {
@@ -954,6 +1429,9 @@ function generateLeadPdfAudit(lead, branding = {}) {
     const agencyName = branding.agencyName || "WINDOWSTELECOM";
     const consultantName = branding.consultantName || "Joseph Castillo – CEO & Principal Strategist";
     const agencyWeb = branding.agencyWeb || "windowstelecom.com";
+    const econ = estimateNicheRevenueLeak(lead);
+    const ws = classifyWebsiteStatus(lead);
+    const bench = computeQuadrantTop3Benchmark(lead, allLeadsRef);
 
     const doc = new jspdfModule.jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
     const pageWidth = 210;
@@ -963,164 +1441,169 @@ function generateLeadPdfAudit(lead, branding = {}) {
 
     // 1. Header Banner
     doc.setFillColor(11, 15, 25);
-    doc.rect(0, 0, pageWidth, 40, "F");
+    doc.rect(0, 0, pageWidth, 38, "F");
     doc.setFillColor(37, 99, 235);
-    doc.rect(0, 40, pageWidth, 2.5, "F");
+    doc.rect(0, 38, pageWidth, 2.5, "F");
 
     doc.setTextColor(255, 255, 255);
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(14);
-    doc.text(`${agencyName}  |  AtlasIQ Deep Intelligence v4.0`, margin, 16);
+    doc.setFontSize(13.5);
+    doc.text(`${agencyName}  |  Diagnóstico de Conversión Web & Automatización IA`, margin, 15);
 
     doc.setFont("helvetica", "normal");
-    doc.setFontSize(9);
+    doc.setFontSize(8.8);
     doc.setTextColor(148, 163, 184);
-    doc.text("AUDITORÍA EJECUTIVA DE HUELLA DIGITAL, VELOCIDAD WEB & PRESIÓN GEOESPACIAL", margin, 23);
+    doc.text("AUDITORÍA DE FUGA DE INGRESOS, HUELLA WEB, RECEPCIÓN IA 24/7 Y RANKING DE CUADRANTE", margin, 22);
 
     const todayStr = new Date().toLocaleDateString("es-ES", { year: "numeric", month: "long", day: "numeric" });
-    doc.text(`Fecha: ${todayStr}  |  Ref: ATQ4-${Math.floor(100000 + Math.random() * 900000)}`, margin, 30);
+    doc.text(`Fecha: ${todayStr}  |  Oferta Recomendada: ${lead.recommended_offer || "Web + Agente IA 24/7"}`, margin, 29);
 
     // 2. Business Title & OSINT
-    let y = 51;
+    let y = 49;
     doc.setFont("helvetica", "bold");
     doc.setFontSize(15);
     doc.setTextColor(15, 23, 42);
     doc.text(String(lead.name || "Empresa Auditada").substring(0, 62), margin, y);
 
-    y += 6;
+    y += 5.5;
     doc.setFont("helvetica", "normal");
-    doc.setFontSize(9.5);
+    doc.setFontSize(9);
     doc.setTextColor(100, 116, 139);
     const osintLine = [
         `Rubro: ${lead.category || "Comercial"}`,
-        lead.legal_name ? `Entidad: ${lead.legal_name}` : "",
-        lead.tax_id ? `ID Fiscal: ${lead.tax_id}` : ""
+        `Posición Cuadrante: #${bench.rank} de ${bench.totalPeers}`,
+        lead.legal_name ? `Entidad: ${lead.legal_name}` : ""
     ].filter(Boolean).join("  •  ");
-    doc.text(osintLine.substring(0, 95), margin, y);
+    doc.text(osintLine.substring(0, 98), margin, y);
 
-    // 3. Score Card
-    y += 8;
+    // 3. Dual Score + Revenue Leak Card
+    y += 7;
     doc.setFillColor(248, 250, 252);
     doc.setDrawColor(226, 232, 240);
-    doc.roundedRect(margin, y, contentWidth, 31, 3, 3, "FD");
+    doc.roundedRect(margin, y, contentWidth, 32, 3, 3, "FD");
 
-    const score = parseInt(lead.lead_score) || 65;
-    const scoreColor = score >= 75 ? [16, 185, 129] : (score >= 50 ? [245, 158, 11] : [239, 68, 68]);
+    const wScore = parseInt(lead.web_score, 10) || 70;
+    const aScore = parseInt(lead.automation_score, 10) || 70;
 
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(10.5);
+    doc.setFontSize(9.5);
     doc.setTextColor(15, 23, 42);
-    doc.text("Índice de Oportunidad y Potencial de Captación (Score v4.0):", margin + 6, y + 9);
+    doc.text(`Score Oportunidad Web: ${wScore}/99`, margin + 5, y + 9);
+    doc.text(`Score Automatización IA: ${aScore}/99`, margin + 65, y + 9);
 
-    doc.setFontSize(17);
-    doc.setTextColor(scoreColor[0], scoreColor[1], scoreColor[2]);
-    doc.text(`${score} / 100`, margin + 6, y + 19);
+    doc.setTextColor(220, 38, 38);
+    doc.text(`Fuga Estimada: ~$${econ.monthlyLeakUsd.toLocaleString("en-US")} USD/mes`, margin + 124, y + 9);
 
     doc.setFont("helvetica", "normal");
-    doc.setFontSize(8.5);
+    doc.setFontSize(8.3);
     doc.setTextColor(71, 85, 105);
-    doc.text(String(lead.opportunities || "Oportunidad de expansión multicanal").substring(0, 82), margin + 38, y + 18);
-
-    doc.setFillColor(226, 232, 240);
-    doc.roundedRect(margin + 6, y + 24, contentWidth - 12, 3, 1.5, 1.5, "F");
-    doc.setFillColor(scoreColor[0], scoreColor[1], scoreColor[2]);
-    doc.roundedRect(margin + 6, y + 24, (contentWidth - 12) * (score / 100), 3, 1.5, 1.5, "F");
+    doc.text(`Causa principal: ${econ.leakSummary}`.substring(0, 96), margin + 5, y + 17);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(37, 99, 235);
+    doc.text(`Solución llave en mano: ${econ.botRole}`.substring(0, 96), margin + 5, y + 24.5);
 
     // 4. Deep Technical Matrix
     y += 40;
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(11.5);
+    doc.setFontSize(11);
     doc.setTextColor(15, 23, 42);
-    doc.text("1. Auditoría Profunda de Activos Digitales y Ciberseguridad", margin, y);
+    doc.text("1. Radiografía Técnica de Captación Web y Automatización Comercial", margin, y);
 
-    y += 5;
-    const speedTxt = typeof lead.pagespeed_mobile === "number" ? ` (PageSpeed Móvil: ${lead.pagespeed_mobile}/100, LCP: ${lead.pagespeed_lcp || "N/A"})` : "";
-    const dmarcTxt = lead.dmarc_status === "present" ? "SPF+DMARC Protegido" : (lead.dmarc_status === "missing" ? "Sin DMARC (Riesgo Spoofing)" : "DoH");
+    y += 4.5;
+    const speedTxt = typeof lead.pagespeed_mobile === "number" ? ` (PageSpeed: ${lead.pagespeed_mobile}/100)` : "";
+    const dmarcTxt = lead.dmarc_status === "present" ? "SPF+DMARC OK" : (lead.dmarc_status === "missing" ? "Sin DMARC" : "DoH");
 
     const checks = [
-        { label: "Presencia Web & Velocidad:", val: lead.website ? `${extractDomain(lead.website)}${speedTxt}` : "CRÍTICO: Sin sitio web activo (fuga directa de clientes)", ok: !!lead.website && (lead.pagespeed_mobile === null || lead.pagespeed_mobile >= 55) },
-        { label: "Propiedad Google Maps:", val: lead.unclaimed ? "ALERTA: Perfil sin reclamar oficialmente en Google Business" : `Verificado · ${lead.averageRating || "N/A"}★ (${lead.reviewCount || 0} reseñas)`, ok: !lead.unclaimed },
-        { label: "Email & Seguridad DNS:", val: lead.email ? `${lead.email} (${lead.mx_provider || "MX"} · ${dmarcTxt})` : "Sin buzón corporativo público detectado", ok: !!lead.email && lead.dmarc_status !== "missing" },
-        { label: "Stack & Píxeles Ads:", val: lead.tech_stack || "Sin analítica ni píxeles de retargeting detectados", ok: !!lead.tech_stack && lead.ad_spend_active },
-        { label: "Reservas / E-Commerce:", val: lead.booking_platform ? `Integrado con ${lead.booking_platform}` : "Sin motor automatizado de citas/pedidos detectado", ok: !!lead.booking_platform },
-        { label: "Decisor / Contacto:", val: `${lead.decision_maker || "Gerencia"}  •  Tel: ${lead.phone || "No listado"}`, ok: !!lead.phone }
+        { label: "Estado Real Web:", val: `${ws.label.replace(/[^\w\sáéíóúÁÉÍÓÚñÑ()/.-]/g, "").trim()}${lead.website ? " · " + extractDomain(lead.website) : ""}${speedTxt}`, ok: !ws.needsWeb },
+        { label: "Recepción & Bots IA:", val: lead.has_ai_automation ? `Automatizado (${lead.automation_stack || "CRM Activo"})` : "CRÍTICO: Atención 100% manual (pierde el 42% de leads fuera de horario)", ok: Boolean(lead.has_ai_automation) },
+        { label: "Agenda / Comisiones:", val: lead.booking_platform ? `${lead.booking_platform}${lead.commission_bleed ? " (ALERTA: Cede 18%-28% de comisión a terceros)" : " (Canal directo)"}` : "Sin motor propio de citas o pedidos online 24/7", ok: Boolean(lead.booking_platform && !lead.commission_bleed) },
+        { label: "Ficha Google Maps:", val: lead.unclaimed ? "ALERTA: Ficha sin reclamar oficialmente en Google Business" : `Verificada · ${lead.averageRating || "N/A"}★ (${lead.reviewCount || 0} reseñas)`, ok: !lead.unclaimed },
+        { label: "Píxeles & Tráfico Pago:", val: lead.tech_stack || "Sin píxeles de retargeting Meta/Google detectados", ok: Boolean(lead.ad_spend_active) },
+        { label: "Correo & DNS:", val: lead.email ? `${lead.email} (${lead.mx_provider || "MX"} · ${dmarcTxt})` : "Sin buzón corporativo público indexado", ok: Boolean(lead.email && lead.dmarc_status !== "missing") }
     ];
 
     checks.forEach((item) => {
         doc.setFillColor(item.ok ? 240 : 254, item.ok ? 253 : 242, item.ok ? 244 : 242);
-        doc.roundedRect(margin, y, contentWidth, 8.5, 1.5, 1.5, "F");
+        doc.roundedRect(margin, y, contentWidth, 8.2, 1.5, 1.5, "F");
         doc.setFont("helvetica", "bold");
-        doc.setFontSize(8.5);
+        doc.setFontSize(8.3);
         doc.setTextColor(15, 23, 42);
-        doc.text(item.label, margin + 3.5, y + 5.7);
+        doc.text(item.label, margin + 3.5, y + 5.5);
         doc.setFont("helvetica", "normal");
-        doc.setFontSize(8.2);
+        doc.setFontSize(8);
         doc.setTextColor(item.ok ? 21 : 185, item.ok ? 128 : 28, item.ok ? 61 : 28);
-        doc.text(String(item.val).substring(0, 72), margin + 56, y + 5.7);
-        y += 10;
+        doc.text(String(item.val).substring(0, 76), margin + 46, y + 5.5);
+        y += 9.5;
     });
 
-    // 5. Competitive Pressure
-    y += 4;
+    // 5. Top 3 Local Quadrant Benchmark
+    y += 3;
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(11.5);
+    doc.setFontSize(11);
     doc.setTextColor(15, 23, 42);
-    doc.text("2. Inteligencia Geoespacial y Competencia Cercana", margin, y);
+    doc.text("2. Comparativa Directa: Usted vs. Top Competidores de su Cuadrante", margin, y);
 
-    y += 5;
+    y += 4.5;
     doc.setFillColor(248, 250, 252);
-    doc.roundedRect(margin, y, contentWidth, 21, 2, 2, "F");
+    doc.roundedRect(margin, y, contentWidth, 25, 2, 2, "F");
     doc.setFont("helvetica", "normal");
-    doc.setFontSize(8.8);
+    doc.setFontSize(8.3);
     doc.setTextColor(51, 65, 85);
-    const pDist = lead.nearestPeerDistanceKm
-        ? (lead.nearestPeerDistanceKm < 1 ? `${Math.round(lead.nearestPeerDistanceKm * 1000)} m` : `${lead.nearestPeerDistanceKm.toFixed(1)} km`)
-        : null;
-    doc.text(pDist ? `Competidor directo más cercano detectado a ${pDist}: ${lead.nearestPeerName || "Mismo rubro"}.` : "Cuadrante comercial con competencia local activa en Google Maps.", margin + 4, y + 7);
-    doc.text("Los comercios con web rápida (<2.5s), SEO Local optimizado y respuesta automática por WhatsApp", margin + 4, y + 13);
-    doc.text("absorben hasta el 72% de los clics de alta intención en su radio inmediato.", margin + 4, y + 18);
+
+    if (bench.top3.length > 0) {
+        bench.top3.forEach((c, idx) => {
+            const tags = [
+                c.hasRealWeb ? "Web Propia" : "Sin Web",
+                c.hasAuto ? "Agenda/Bot" : "Manual",
+                c.ads ? "Paga Ads" : "Orgánico"
+            ].join(" · ");
+            doc.text(`#${idx + 1} ${c.name.substring(0, 34)} (${c.distStr}) — ${c.rating}★ (${c.reviews} res.)  [${tags}]`, margin + 4, y + 6.5 + idx * 6);
+        });
+    } else {
+        doc.text("Cuadrante comercial activo con oportunidad inmediata de dominar el Top 3 de Google Maps.", margin + 4, y + 12);
+    }
 
     // 6. Action Plan
-    y += 28;
+    y += 31;
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(11.5);
+    doc.setFontSize(11);
     doc.setTextColor(15, 23, 42);
-    doc.text("3. Hoja de Ruta Recomendada (Implementación en 30 Días)", margin, y);
+    doc.text("3. Plan de Implementación Llave en Mano (14 a 21 Días)", margin, y);
 
-    y += 5;
+    y += 4.5;
     const steps = [
-        "Optimización de Ficha Google Business Profile + Automatización de Reseñas 5★.",
-        "Arquitectura Web Móvil Ultra-Rápida (>90 PageSpeed) con Embudo a WhatsApp CRM.",
-        "Instalación de Meta Pixel, Google Ads Tag y Campañas Hiperlocales de Retargeting.",
-        "Blindaje de Dominio Corporativo (MX, SPF, DMARC) y Agendamiento Online 24/7."
+        "Despliegue de Web Móvil Ultra-Rápida (>92 PageSpeed) con SEO Local para Google Maps.",
+        `Activación de ${econ.botRole} conectado a WhatsApp.`,
+        "Sistema automático de captura de leads, recordatorios de citas y solicitud de reseñas 5★.",
+        "Instalación de Meta Pixel + Google Tag para recapturar el 100% de las visitas interesadas."
     ];
     steps.forEach((st, i) => {
         doc.setFillColor(238, 242, 255);
-        doc.circle(margin + 3.5, y + 3.5, 2.8, "F");
+        doc.circle(margin + 3.5, y + 3.2, 2.6, "F");
         doc.setFont("helvetica", "bold");
-        doc.setFontSize(8);
+        doc.setFontSize(7.8);
         doc.setTextColor(37, 99, 235);
-        doc.text(String(i + 1), margin + 2.6, y + 5.2);
+        doc.text(String(i + 1), margin + 2.6, y + 4.9);
         doc.setFont("helvetica", "normal");
-        doc.setFontSize(8.8);
+        doc.setFontSize(8.4);
         doc.setTextColor(30, 41, 59);
-        doc.text(st, margin + 10, y + 5.2);
-        y += 8.2;
+        doc.text(st.substring(0, 95), margin + 9.5, y + 4.9);
+        y += 7.6;
     });
 
     // Footer
     doc.setDrawColor(203, 213, 225);
-    doc.line(margin, pageHeight - 20, pageWidth - margin, pageHeight - 20);
+    doc.line(margin, pageHeight - 19, pageWidth - margin, pageHeight - 19);
     doc.setFont("helvetica", "bold");
     doc.setFontSize(8.5);
     doc.setTextColor(15, 23, 42);
-    doc.text(`${consultantName}  |  ${agencyName}`, margin, pageHeight - 13.5);
+    doc.text(`${consultantName}  |  ${agencyName}`, margin, pageHeight - 13);
     doc.setFont("helvetica", "normal");
     doc.setFontSize(7.5);
     doc.setTextColor(148, 163, 184);
-    doc.text(`Generado con AtlasIQ Enterprise v4.0  •  ${agencyWeb}  •  Auditoría Confidencial`, margin, pageHeight - 8.5);
+    doc.text(`Generado con AtlasIQ Enterprise  •  ${agencyWeb}  •  Diagnóstico Comercial Confidencial`, margin, pageHeight - 8);
 
-    const safeName = String(lead.name || "Empresa").replace(/[^a-zA-Z0-9_\u00C0-\u017F]/g, "_").substring(0, 35);
-    doc.save(`${safeName}_Auditoria_${agencyName.replace(/\s+/g, "_")}.pdf`);
+    const safeFileName = String(lead.name || "Empresa").replace(/[^a-zA-Z0-9_\u00C0-\u017F]/g, "_").substring(0, 35);
+    doc.save(`${safeFileName}_Auditoria_${agencyName.replace(/\s+/g, "_")}.pdf`);
     playAudioNotification("success");
 }
